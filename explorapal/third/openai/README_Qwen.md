@@ -101,6 +101,30 @@ curl -X POST "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
 | 视频演示 | wan2.2-i2v-flash | 速度快，控制准 | 科学实验演示 |
 | 推理学习 | qvq-max | 视觉推理强 | 问题解决，科学思维 |
 
+## 阿里云语音服务集成
+
+### 语音转文字 (ASR)
+- **服务**: 阿里云智能语音服务
+- **API**: Real-time Speech Recognition / One-sentence Recognition
+- **支持语言**: 中文、英文等多语言
+- **特点**: 实时识别、高准确率、噪音过滤
+
+### 文字转语音 (TTS)
+- **服务**: 阿里云语音合成
+- **API**: Text-to-Speech Synthesis
+- **音色选择**: 多种音色可选，包括儿童友好音色
+- **格式支持**: MP3, WAV, PCM等
+
+### 配置方式
+```yaml
+# 语音服务配置
+SpeechService:
+  AppKey: "your-app-key"
+  AccessKeyId: "your-access-key-id"
+  AccessKeySecret: "your-access-key-secret"
+  Region: "cn-shanghai"  # 服务地域
+```
+
 ## 注意事项
 
 ### 1. API调用限制
