@@ -128,6 +128,22 @@ goctl rpc protoc ai-dialogue.proto --go_out=. --go-grpc_out=. --zrpc_out=.
 ```
 
 #### 2. 启动RPC服务
+
+**⚠️ 如果遇到端口占用错误，请先处理：**
+
+```bash
+# 方法1：使用工具脚本终止占用端口的进程
+chmod +x tools/kill_port.sh
+./tools/kill_port.sh 8081  # 项目管理RPC服务端口
+./tools/kill_port.sh 8082  # AI对话RPC服务端口
+./tools/kill_port.sh 9999  # API服务端口
+
+# 方法2：手动查找并终止进程
+lsof -ti :8082 | xargs kill -9  # macOS
+# 或
+sudo netstat -tlnp | grep :8082  # Linux，然后kill对应PID
+```
+
 ```bash
 # 启动项目管理RPC服务
 cd explorapal/app/project-management/rpc
@@ -145,9 +161,19 @@ go run api.go
 ```
 
 #### 4. 从项目根目录启动（推荐）
+
+**启动前检查端口占用：**
 ```bash
 cd explorapal
+chmod +x tools/kill_port.sh
 
+# 检查并清理端口占用（如果需要）
+./tools/kill_port.sh 8081  # 项目管理RPC服务
+./tools/kill_port.sh 8082  # AI对话RPC服务
+./tools/kill_port.sh 9999  # API服务
+```
+
+```bash
 # 启动项目管理RPC服务
 go run app/project-management/rpc/projectmanagementservice.go
 
@@ -157,6 +183,16 @@ go run app/ai-dialogue/rpc/aidialogueservice.go
 # 启动API服务
 go run app/api/api.go
 ```
+
+**默认端口配置：**
+- 项目管理RPC服务: `8081`
+- AI对话RPC服务: `8082`
+- API服务: `9999`
+
+如需修改端口，请编辑对应的配置文件：
+- `app/project-management/rpc/etc/project-management.yaml`
+- `app/ai-dialogue/rpc/etc/ai-dialogue.yaml`
+- `app/api/etc/api.yaml`
 
 ### 数据库初始化
 ```bash
@@ -178,6 +214,62 @@ mysql -hlocalhost -P3306 -uroot -p<your-db-password> explorapal < database/migra
 # 检查数据库连接和表结构
 go run tools/checkdb/main.go
 ```
+
+## 故障排除
+
+### 端口占用错误
+
+**错误信息：**
+```
+listen tcp 0.0.0.0:8082: bind: address already in use
+```
+
+**解决方案：**
+
+1. **使用工具脚本（推荐）**
+```bash
+cd explorapal
+chmod +x tools/kill_port.sh
+./tools/kill_port.sh 8082  # 替换为实际占用的端口号
+```
+
+2. **手动查找并终止进程（macOS）**
+```bash
+# 查找占用端口的进程
+lsof -i :8082
+
+# 终止进程（替换PID为实际进程ID）
+kill -9 <PID>
+
+# 或一行命令
+lsof -ti :8082 | xargs kill -9
+```
+
+3. **手动查找并终止进程（Linux）**
+```bash
+# 查找占用端口的进程
+sudo netstat -tlnp | grep :8082
+# 或
+sudo ss -tlnp | grep :8082
+
+# 终止进程（替换PID为实际进程ID）
+sudo kill -9 <PID>
+```
+
+4. **修改配置文件使用其他端口**
+如果无法终止占用端口的进程，可以修改配置文件使用其他端口：
+- 编辑 `app/ai-dialogue/rpc/etc/ai-dialogue.yaml`，修改 `ListenOn: 0.0.0.0:8082` 为其他端口（如 `8083`）
+- 编辑 `app/project-management/rpc/etc/project-management.yaml`，修改 `ListenOn: 0.0.0.0:8081` 为其他端口（如 `8084`）
+- 编辑 `app/api/etc/api.yaml`，修改 `Port: 9999` 为其他端口（如 `9998`）
+
+## 故障排除
+
+遇到问题？请查看 [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) 获取详细的故障排除指南。
+
+常见问题：
+- **端口占用错误**：使用 `tools/kill_port.sh` 脚本终止占用端口的进程
+- **Protobuf代码未生成**：运行 `app/ai-dialogue/rpc/generate_proto.sh`
+- **数据库连接失败**：检查MySQL服务是否运行，确认配置文件中的密码正确
 
 ## 开发计划
 
