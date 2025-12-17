@@ -7,7 +7,7 @@ import (
 	"explorapal/app/ai-dialogue/rpc/internal/config"
 	"explorapal/app/ai-dialogue/rpc/internal/server"
 	"explorapal/app/ai-dialogue/rpc/internal/svc"
-	"explorapal/app/ai-dialogue/rpc/aidialogue"
+	"explorapal/app/ai-dialogue/rpc/aidialogue" // 需要先运行 generate_proto.sh 生成protobuf代码
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"

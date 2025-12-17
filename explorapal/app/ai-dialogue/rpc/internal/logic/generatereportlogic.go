@@ -44,4 +44,3 @@ func (l *GenerateReportLogic) GenerateReport(in *aidialogue.GenerateReportReq) (
 		NextSteps:  result.NextSteps,
 	}, nil
 }
-}

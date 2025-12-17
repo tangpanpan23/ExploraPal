@@ -41,6 +41,6 @@ func (l *PolishNoteLogic) PolishNote(in *aidialogue.PolishNoteReq) (*aidialogue.
 		Summary:       result.Summary,
 		KeyPoints:     result.KeyPoints,
 		FormattedText: result.FormattedText,
-		Suggestions:   result.Suggestions,
+		Suggestions:   []string{}, // TODO: 从result中提取建议
 	}, nil
 }
