@@ -1,0 +1,137 @@
+syntax = "proto3";
+
+package projectmanagement;
+option go_package = "./projectmanagement";
+
+message CreateProjectReq {
+  int64 user_id = 1;
+  string title = 2;
+  string description = 3;
+  string category = 4;
+  repeated string tags = 5;
+}
+
+message CreateProjectResp {
+  int32 status = 1;
+  string msg = 2;
+  int64 project_id = 3;
+  string project_code = 4;
+}
+
+message GetProjectListReq {
+  int64 user_id = 1;
+  string category = 2;
+  string status = 3;
+  int64 page_size = 4;
+  int64 page = 5;
+}
+
+message GetProjectListResp {
+  int32 status = 1;
+  string msg = 2;
+  repeated ProjectInfo list = 3;
+  int64 total = 4;
+  int64 page_size = 5;
+  int64 page = 6;
+}
+
+message ProjectInfo {
+  int64 project_id = 1;
+  string project_code = 2;
+  string title = 3;
+  string description = 4;
+  string category = 5;
+  string status = 6;
+  int32 progress = 7;
+  string create_time = 8;
+  string update_time = 9;
+  string last_activity = 10;
+  repeated string tags = 11;
+}
+
+message GetProjectDetailReq {
+  int64 project_id = 1;
+  int64 user_id = 2;
+}
+
+message GetProjectDetailResp {
+  int32 status = 1;
+  string msg = 2;
+  ProjectDetail project = 3;
+  repeated ProjectActivity activities = 4;
+  repeated ProjectAchievement achievements = 5;
+}
+
+message ProjectDetail {
+  int64 project_id = 1;
+  string project_code = 2;
+  string title = 3;
+  string description = 4;
+  string category = 5;
+  string status = 6;
+  int32 progress = 7;
+  string create_time = 8;
+  string update_time = 9;
+  string last_activity = 10;
+  repeated string tags = 11;
+  repeated ObservationInfo observations = 12;
+  repeated QuestionInfo questions = 13;
+  repeated ExpressionInfo expressions = 14;
+}
+
+message ObservationInfo {
+  int64 observation_id = 1;
+  string image_url = 2;
+  string recognition = 3;
+  string create_time = 4;
+}
+
+message QuestionInfo {
+  int64 question_id = 1;
+  string question = 2;
+  string answer = 3;
+  string user_response = 4;
+  string create_time = 5;
+}
+
+message ExpressionInfo {
+  int64 expression_id = 1;
+  string content = 2;
+  string type = 3;
+  string polished_note = 4;
+  string create_time = 5;
+}
+
+message ProjectActivity {
+  int64 activity_id = 1;
+  string type = 2;
+  string description = 3;
+  string create_time = 4;
+}
+
+message ProjectAchievement {
+  int64 achievement_id = 1;
+  string type = 2;
+  string title = 3;
+  string content = 4;
+  string url = 5;
+  string create_time = 6;
+}
+
+message UpdateProjectStatusReq {
+  int64 project_id = 1;
+  int64 user_id = 2;
+  string status = 3;
+}
+
+message UpdateProjectStatusResp {
+  int32 status = 1;
+  string msg = 2;
+}
+
+service ProjectManagementService {
+  rpc CreateProject(CreateProjectReq) returns (CreateProjectResp);
+  rpc GetProjectList(GetProjectListReq) returns (GetProjectListResp);
+  rpc GetProjectDetail(GetProjectDetailReq) returns (GetProjectDetailResp);
+  rpc UpdateProjectStatus(UpdateProjectStatusReq) returns (UpdateProjectStatusResp);
+}

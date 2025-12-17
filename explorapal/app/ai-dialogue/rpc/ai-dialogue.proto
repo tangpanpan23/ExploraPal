@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package aidialogue;
+option go_package = "./aidialogue";
+
+message AnalyzeImageReq {
+  string image_url = 1;
+  string prompt = 2;
+  string category = 3;
+}
+
+message AnalyzeImageResp {
+  int32 status = 1;
+  string msg = 2;
+  string object_name = 3;
+  string category = 4;
+  float confidence = 5;
+  string description = 6;
+  repeated string key_features = 7;
+  string scientific_name = 8;
+}
+
+message GenerateQuestionsReq {
+  string context_info = 1;
+  string category = 2;
+  int64 user_age = 3;
+}
+
+message GenerateQuestionsResp {
+  int32 status = 1;
+  string msg = 2;
+  repeated Question questions = 3;
+}
+
+message Question {
+  string content = 1;
+  string type = 2;
+  string difficulty = 3;
+  string purpose = 4;
+}
+
+message PolishNoteReq {
+  string raw_content = 1;
+  string context_info = 2;
+  string category = 3;
+  int64 user_age = 4;
+}
+
+message PolishNoteResp {
+  int32 status = 1;
+  string msg = 2;
+  string title = 3;
+  string summary = 4;
+  repeated string key_points = 5;
+  string formatted_text = 6;
+  repeated string suggestions = 7;
+}
+
+message GenerateReportReq {
+  string project_data = 1;
+  string category = 2;
+}
+
+message GenerateReportResp {
+  int32 status = 1;
+  string msg = 2;
+  string title = 3;
+  string content = 4;
+  string abstract = 5;
+  string conclusion = 6;
+  repeated string next_steps = 7;
+}
+
+service AIDialogueService {
+  rpc AnalyzeImage(AnalyzeImageReq) returns (AnalyzeImageResp);
+  rpc GenerateQuestions(GenerateQuestionsReq) returns (GenerateQuestionsResp);
+  rpc PolishNote(PolishNoteReq) returns (PolishNoteResp);
+  rpc GenerateReport(GenerateReportReq) returns (GenerateReportResp);
+}

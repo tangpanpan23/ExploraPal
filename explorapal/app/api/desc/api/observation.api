@@ -1,0 +1,67 @@
+type (
+	UploadObservationImageReq {
+		ProjectId int64  `json:"project_id" desc:"项目ID"`
+		UserId    int64  `json:"user_id" desc:"用户ID"`
+		ImageData string `json:"image_data" desc:"base64编码的图片数据"`
+		ImageName string `json:"image_name" desc:"图片名称"`
+		ImageType string `json:"image_type" desc:"图片类型：jpeg,png,jpg"`
+	}
+
+	UploadObservationImageResp {
+		ObservationId int64  `json:"observation_id" desc:"观察记录ID"`
+		ImageUrl      string `json:"image_url" desc:"图片访问URL"`
+		Status        string `json:"status" desc:"上传状态"`
+	}
+
+	RecognizeImageReq {
+		ObservationId int64 `json:"observation_id" desc:"观察记录ID"`
+		ProjectId     int64 `json:"project_id" desc:"项目ID"`
+		UserId        int64 `json:"user_id" desc:"用户ID"`
+	}
+
+	RecognizeImageResp {
+		ObservationId    int64             `json:"observation_id" desc:"观察记录ID"`
+		Recognition      RecognitionResult `json:"recognition" desc:"识别结果"`
+		Suggestions      []string          `json:"suggestions" desc:"AI建议的观察要点"`
+		NextActions      []string          `json:"next_actions" desc:"建议的下一步行动"`
+		InterestingFacts []string          `json:"interesting_facts" desc:"有趣的事实"`
+	}
+
+	RecognitionResult {
+		ObjectName     string            `json:"object_name" desc:"识别对象名称"`
+		Category       string            `json:"category" desc:"类别"`
+		Confidence     float64           `json:"confidence" desc:"置信度"`
+		Description    string            `json:"description" desc:"描述"`
+		KeyFeatures    []string          `json:"key_features" desc:"关键特征"`
+		ScientificName string            `json:"scientific_name,optional" desc:"学名"`
+		ARInfo         ARInformation     `json:"ar_info,optional" desc:"AR增强信息"`
+		RelatedImages  []RelatedImage    `json:"related_images,optional" desc:"相关图片"`
+	}
+
+	ARInformation {
+		Hotspots []ARHotspot `json:"hotspots" desc:"AR热点"`
+		Labels   []ARLabel   `json:"labels" desc:"AR标签"`
+	}
+
+	ARHotspot {
+		X         float64 `json:"x" desc:"X坐标(0-1)"`
+		Y         float64 `json:"y" desc:"Y坐标(0-1)"`
+		Title     string  `json:"title" desc:"热点标题"`
+		Content   string  `json:"content" desc:"热点内容"`
+		Type      string  `json:"type" desc:"热点类型：feature,fact,question"`
+	}
+
+	ARLabel {
+		X         float64 `json:"x" desc:"X坐标(0-1)"`
+		Y         float64 `json:"y" desc:"Y坐标(0-1)"`
+		Text      string  `json:"text" desc:"标签文本"`
+		Color     string  `json:"color" desc:"标签颜色"`
+	}
+
+	RelatedImage {
+		Url         string  `json:"url" desc:"图片URL"`
+		Title       string  `json:"title" desc:"图片标题"`
+		Description string  `json:"description" desc:"图片描述"`
+		Credit      string  `json:"credit" desc:"图片来源"`
+	}
+)

@@ -1,0 +1,37 @@
+Name: api
+Host: 0.0.0.0
+Port: 8888
+Mode: dev
+
+# JWT配置
+JwtAuth:
+  AccessSecret: your-secret-key
+  AccessExpire: 86400
+
+# 数据库配置
+DBConfig:
+  DataSource: root:password@tcp(localhost:3306)/explorapal?charset=utf8mb4&parseTime=true&loc=Local
+
+# 缓存配置
+Cache:
+  - Host: localhost:6379
+    Type: node
+
+# OpenAI配置
+OpenAI:
+  APIKey: your-openai-api-key
+  BaseURL: ""
+  Timeout: 30
+  MaxTokens: 2000
+  Temperature: 0.7
+
+# CORS配置
+CORS:
+  AllowOrigins: ["*"]
+  AllowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+  AllowHeaders: ["*"]
+  AllowCredentials: true
+
+# 日志配置
+Log:
+  Level: info

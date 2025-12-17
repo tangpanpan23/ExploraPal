@@ -1,0 +1,60 @@
+type (
+	SpeechToTextReq {
+		ProjectId int64  `json:"project_id" desc:"项目ID"`
+		UserId    int64  `json:"user_id" desc:"用户ID"`
+		AudioData string `json:"audio_data" desc:"base64编码的音频数据"`
+		AudioFormat string `json:"audio_format" desc:"音频格式：wav,mp3,m4a"`
+		Language   string `json:"language,optional,default=zh-CN" desc:"语言代码"`
+	}
+
+	SpeechToTextResp {
+		Text           string  `json:"text" desc:"转换后的文字"`
+		Confidence     float64 `json:"confidence" desc:"识别置信度"`
+		Duration       float64 `json:"duration" desc:"音频时长(秒)"`
+		Language       string  `json:"language" desc:"检测到的语言"`
+		ExpressionId   int64   `json:"expression_id" desc:"表达记录ID"`
+	}
+
+	PolishNoteReq {
+		ProjectId    int64  `json:"project_id" desc:"项目ID"`
+		UserId       int64  `json:"user_id" desc:"用户ID"`
+		QuestionId   int64  `json:"question_id" desc:"相关问题ID"`
+		RawContent   string `json:"raw_content" desc:"原始内容"`
+		ContentType  string `json:"content_type" desc:"内容类型：speech,text"`
+		ContextInfo  ContextInfo `json:"context_info,optional" desc:"上下文信息"`
+	}
+
+	ContextInfo {
+		ObservationResults string `json:"observation_results,optional" desc:"观察结果"`
+		PreviousAnswers    string `json:"previous_answers,optional" desc:"之前回答"`
+		ProjectCategory    string `json:"project_category" desc:"项目类别"`
+		UserAge            int32  `json:"user_age,optional" desc:"用户年龄"`
+	}
+
+	PolishNoteResp {
+		OriginalContent string       `json:"original_content" desc:"原始内容"`
+		PolishedNote    PolishedNote `json:"polished_note" desc:"润色后的笔记"`
+		ExpressionId    int64        `json:"expression_id" desc:"表达记录ID"`
+		Suggestions     []string     `json:"suggestions" desc:"改进建议"`
+		KeyLearnings    []string     `json:"key_learnings" desc:"关键学习点"`
+	}
+
+	PolishedNote {
+		Title       string     `json:"title" desc:"笔记标题"`
+		Summary     string     `json:"summary" desc:"内容总结"`
+		KeyPoints   []string   `json:"key_points" desc:"关键要点"`
+		ScientificConcepts []string `json:"scientific_concepts" desc:"科学概念"`
+		Questions   []string   `json:"questions" desc:"引发的疑问"`
+		Connections []string   `json:"connections" desc:"关联知识"`
+		VisualElements []VisualElement `json:"visual_elements" desc:"视觉元素"`
+		FormattedText string   `json:"formatted_text" desc:"格式化文本"`
+	}
+
+	VisualElement {
+		Type        string `json:"type" desc:"元素类型：diagram,illustration,chart,mindmap"`
+		Title       string `json:"title" desc:"元素标题"`
+		Description string `json:"description" desc:"元素描述"`
+		Data        string `json:"data" desc:"元素数据(JSON格式)"`
+		Position    string `json:"position" desc:"位置建议"`
+	}
+)

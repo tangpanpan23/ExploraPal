@@ -1,0 +1,119 @@
+syntax = "v1"
+
+info (
+	title:   "explorapal"
+	desc:    "AI learning companion for children"
+	author:  "explorapal"
+	email:   "contact@explorapal.com"
+	version: "v1"
+)
+
+// 导入业务模块API定义
+import "api/project.api"
+import "api/observation.api"
+import "api/questioning.api"
+import "api/expression.api"
+import "api/achievement.api"
+
+// ===================================> 项目管理 <====================================
+@server (
+	group:      project
+	prefix:     api/project
+	middleware: JwtAuthMiddleware
+)
+service api {
+	@doc "创建探索项目"
+	@handler createProject
+	post /create (CreateProjectReq) returns (CreateProjectResp)
+
+	@doc "获取项目列表"
+	@handler getProjectList
+	post /list (GetProjectListReq) returns (GetProjectListResp)
+
+	@doc "获取项目详情"
+	@handler getProjectDetail
+	post /detail (GetProjectDetailReq) returns (GetProjectDetailResp)
+
+	@doc "更新项目状态"
+	@handler updateProjectStatus
+	post /status/update (UpdateProjectStatusReq) returns (CommonStatusResp)
+}
+
+// ===================================> 观察阶段 <====================================
+@server (
+	group:      observation
+	prefix:     api/observation
+	middleware: JwtAuthMiddleware
+)
+service api {
+	@doc "上传观察图片"
+	@handler uploadObservationImage
+	post /image/upload (UploadObservationImageReq) returns (UploadObservationImageResp)
+
+	@doc "识别图片内容"
+	@handler recognizeImage
+	post /image/recognize (RecognizeImageReq) returns (RecognizeImageResp)
+}
+
+// ===================================> 提问引导 <====================================
+@server (
+	group:      questioning
+	prefix:     api/questioning
+	middleware: JwtAuthMiddleware
+)
+service api {
+	@doc "生成引导问题"
+	@handler generateQuestions
+	post /questions/generate (GenerateQuestionsReq) returns (GenerateQuestionsResp)
+
+	@doc "选择问题并获取AI回答"
+	@handler selectQuestion
+	post /question/select (SelectQuestionReq) returns (SelectQuestionResp)
+}
+
+// ===================================> 表达阶段 <====================================
+@server (
+	group:      expression
+	prefix:     api/expression
+	middleware: JwtAuthMiddleware
+)
+service api {
+	@doc "语音转文字"
+	@handler speechToText
+	post /speech/text (SpeechToTextReq) returns (SpeechToTextResp)
+
+	@doc "AI润色生成笔记"
+	@handler polishNote
+	post /note/polish (PolishNoteReq) returns (PolishNoteResp)
+}
+
+// ===================================> 成果生成 <====================================
+@server (
+	group:      achievement
+	prefix:     api/achievement
+	middleware: JwtAuthMiddleware
+)
+service api {
+	@doc "生成研究简报"
+	@handler generateReport
+	post /report/generate (GenerateReportReq) returns (GenerateReportResp)
+
+	@doc "生成纪录片脚本"
+	@handler generateDocumentary
+	post /documentary/generate (GenerateDocumentaryReq) returns (GenerateDocumentaryResp)
+
+	@doc "生成学术海报"
+	@handler generatePoster
+	post /poster/generate (GeneratePosterReq) returns (GeneratePosterResp)
+}
+
+// ===================================> 公共接口 <====================================
+@server (
+	group:  common
+	prefix: api/common
+)
+service api {
+	@doc "健康检查"
+	@handler ping
+	get /ping
+}

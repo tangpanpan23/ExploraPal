@@ -1,0 +1,54 @@
+type (
+	GenerateQuestionsReq {
+		ProjectId     int64 `json:"project_id" desc:"项目ID"`
+		UserId        int64 `json:"user_id" desc:"用户ID"`
+		ObservationId int64 `json:"observation_id" desc:"观察记录ID"`
+	}
+
+	GenerateQuestionsResp {
+		Questions []Question `json:"questions" desc:"生成的引导问题"`
+	}
+
+	Question {
+		QuestionId   int64  `json:"question_id" desc:"问题ID"`
+		Content      string `json:"content" desc:"问题内容"`
+		Type         string `json:"type" desc:"问题类型：observation,reasoning,experiment,comparison"`
+		Difficulty   string `json:"difficulty" desc:"难度级别：basic,intermediate,advanced"`
+		Purpose      string `json:"purpose" desc:"问题目的"`
+		Hints        []string `json:"hints,optional" desc:"提示"`
+		ExpectedThinking string `json:"expected_thinking,optional" desc:"期望的思考方向"`
+	}
+
+	SelectQuestionReq {
+		ProjectId   int64  `json:"project_id" desc:"项目ID"`
+		UserId      int64  `json:"user_id" desc:"用户ID"`
+		QuestionId  int64  `json:"question_id" desc:"选择的问题ID"`
+	}
+
+	SelectQuestionResp {
+		QuestionId     int64             `json:"question_id" desc:"问题ID"`
+		Question       string            `json:"question" desc:"问题内容"`
+		AIResponse     AIResponse        `json:"ai_response" desc:"AI回答"`
+		FollowUpQuestions []string       `json:"follow_up_questions" desc:"后续问题建议"`
+		ThinkingPrompts   []string       `json:"thinking_prompts" desc:"思考提示"`
+		Activities         []Activity     `json:"activities" desc:"建议活动"`
+	}
+
+	AIResponse {
+		Answer       string   `json:"answer" desc:"AI回答"`
+		KeyPoints    []string `json:"key_points" desc:"关键要点"`
+		Examples     []string `json:"examples" desc:"举例说明"`
+		Analogies    []string `json:"analogies" desc:"类比"`
+		VisualAids   []string `json:"visual_aids" desc:"视觉辅助建议"`
+	}
+
+	Activity {
+		Type        string   `json:"type" desc:"活动类型：experiment,drawing,comparison,roleplay"`
+		Title       string   `json:"title" desc:"活动标题"`
+		Description string   `json:"description" desc:"活动描述"`
+		Materials   []string `json:"materials" desc:"所需材料"`
+		Steps       []string `json:"steps" desc:"步骤说明"`
+		Duration    int32    `json:"duration" desc:"预计时长(分钟)"`
+		Difficulty  string   `json:"difficulty" desc:"难度"`
+	}
+)

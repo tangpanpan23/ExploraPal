@@ -1,0 +1,16 @@
+Name: project-management.rpc
+ListenOn: 0.0.0.0:8081
+Mode: dev
+
+# 数据库配置
+DBConfig:
+  DataSource: root:password@tcp(localhost:3306)/explorapal?charset=utf8mb4&parseTime=true&loc=Local
+
+# 缓存配置
+Cache:
+  - Host: localhost:6379
+    Type: node
+
+# 日志配置
+Log:
+  Level: info
