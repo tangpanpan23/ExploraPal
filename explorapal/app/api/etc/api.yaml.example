@@ -1,0 +1,38 @@
+Name: api
+Host: 0.0.0.0
+Port: 8888
+Mode: dev
+
+# JWT配置
+JwtAuth:
+  AccessSecret: your-jwt-secret-key-here
+  AccessExpire: 86400
+
+# 数据库配置
+DBConfig:
+  DataSource: root:your-db-password@tcp(localhost:3306)/explorapal?charset=utf8mb4&parseTime=true&loc=Local
+
+# 缓存配置
+Cache:
+  - Host: localhost:6379
+    Type: node
+
+# 内部AI服务配置 (TAL MLOps平台)
+AIService:
+  TAL_MLOPS_APP_ID: your-tal-mlops-app-id-here
+  TAL_MLOPS_APP_KEY: your-tal-mlops-app-key-here
+  BaseURL: "http://ai-service.tal.com/openai-compatible/v1"
+  Timeout: 30
+  MaxTokens: 2000
+  Temperature: 0.7
+
+# CORS配置
+CORS:
+  AllowOrigins: ["*"]
+  AllowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+  AllowHeaders: ["*"]
+  AllowCredentials: true
+
+# 日志配置
+Log:
+  Level: info

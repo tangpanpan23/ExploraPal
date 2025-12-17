@@ -1,0 +1,61 @@
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go coverage files
+*.cover
+*.coverprofile
+
+# Go modules
+go.sum
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Configuration files with sensitive data
+explorapal/app/api/etc/api.yaml
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+tmp/
+temp/
+
+# Build directories
+dist/
+build/
+
+# Node modules (if any)
+node_modules/
+
+# Coverage reports
+coverage.txt
+coverage.html
+
+# Binary files
+bin/
+*.bin
