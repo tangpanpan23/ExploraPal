@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-var configFile = flag.String("f", "etc/projectmanagement.yaml", "the config file")
+var configFile = flag.String("f", "etc/project-management.yaml", "the config file")
 
 func main() {
 	flag.Parse()
@@ -34,6 +34,6 @@ func main() {
 	})
 	defer s.Stop()
 
-	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)
+	fmt.Printf("🚀 Starting project management rpc server at %s...\n", c.ListenOn)
 	s.Start()
 }

@@ -115,15 +115,47 @@ explorapal/
 3. 确认账户权限，支持调用qwen3-vl-plus、qwen-flash、qwen3-max、qwen3-omni-flash等模型
 
 ### 启动服务
+
+#### 1. 生成Protobuf代码（首次运行需要）
 ```bash
-# 启动项目管理服务
+cd explorapal
+
+# 生成AI对话服务的protobuf代码
+cd app/ai-dialogue/rpc
+protoc --go_out=. --go-grpc_out=. ai-dialogue.proto
+# 或者使用goctl
+goctl rpc protoc ai-dialogue.proto --go_out=. --go-grpc_out=. --zrpc_out=.
+```
+
+#### 2. 启动RPC服务
+```bash
+# 启动项目管理RPC服务
+cd explorapal/app/project-management/rpc
+go run projectmanagementservice.go
+
+# 启动AI对话RPC服务（需要先生成protobuf代码）
+cd explorapal/app/ai-dialogue/rpc
+go run aidialogueservice.go
+```
+
+#### 3. 启动API服务
+```bash
+cd explorapal/app/api
+go run api.go
+```
+
+#### 4. 从项目根目录启动（推荐）
+```bash
+cd explorapal
+
+# 启动项目管理RPC服务
 go run app/project-management/rpc/projectmanagementservice.go
+
+# 启动AI对话RPC服务
+go run app/ai-dialogue/rpc/aidialogueservice.go
 
 # 启动API服务
 go run app/api/api.go
-
-# 启动其他RPC服务
-go run app/ai-dialogue/rpc/aidialogueservice.go
 ```
 
 ### 数据库初始化
