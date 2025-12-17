@@ -17,10 +17,10 @@ Cache:
   - Host: localhost:6379
     Type: node
 
-# OpenAI配置
-OpenAI:
-  APIKey: your-openai-api-key
-  BaseURL: ""
+# 阿里云DashScope配置
+DashScope:
+  APIKey: your-dashscope-api-key
+  BaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1"
   Timeout: 30
   MaxTokens: 2000
   Temperature: 0.7

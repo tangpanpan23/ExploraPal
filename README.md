@@ -95,14 +95,13 @@ explorapal/
 
 ## AI能力集成
 
-### OpenAI集成
-- **GPT-4 Vision**: 图像识别和分析
-- **GPT-4**: 问题生成、笔记润色、报告撰写
-- **DALL-E**: 生成视觉辅助内容
-
-### Claude集成
-- **Claude-3**: 复杂推理和知识梳理
-- **儿童友好表达**: 优化AI回答的儿童适应性
+### 阿里云Qwen集成
+- **qwen3-vl-plus** (256K): 视觉理解，支持思考模式，图像分析最优
+- **qwen-flash** (1048.576K): 思考+非思考模式融合，问题生成和笔记润色
+- **qwen3-max** (256K): 智能体编程优化，复杂推理和报告生成
+- **wanx2.1-t2i-turbo** (1K): 快速高质量图像生成
+- **wan2.2-i2v-flash**: 极致速度视频生成
+- **qvq-max**: 强大的视觉推理能力
 
 ### 语音处理
 - **Azure Speech Services**: 语音转文字
@@ -114,7 +113,13 @@ explorapal/
 - Go 1.22+
 - MySQL 8.0+
 - Redis 6.0+
-- OpenAI API Key
+- 阿里云DashScope API Key
+
+### 阿里云DashScope配置
+1. 在阿里云控制台开通DashScope服务
+2. 获取API Key
+3. 确保账户余额充足
+4. 默认支持所有推荐模型，无需额外部署
 
 ### 启动服务
 ```bash

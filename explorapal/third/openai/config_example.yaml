@@ -1,0 +1,21 @@
+# 阿里云DashScope配置示例
+DashScope:
+  # 从阿里云DashScope控制台获取的API密钥
+  APIKey: "your-dashscope-api-key-here"
+
+  # DashScope API端点
+  BaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+
+  # 请求配置
+  Timeout: 30      # 超时时间(秒)
+  MaxTokens: 2000  # 最大token数
+  Temperature: 0.7 # 温度参数(0.0-1.0)
+
+# 模型映射配置（推荐的Qwen模型）
+Models:
+  ImageAnalysis: "qwen3-vl-plus"          # 图像分析 (视觉理解，支持思考模式)
+  TextGeneration: "qwen-flash"            # 文本生成 (思考+非思考模式融合)
+  AdvancedReasoning: "qwen3-max"          # 复杂推理 (智能体优化)
+  ImageGeneration: "wanx2.1-t2i-turbo"   # 图像生成 (快速高质量)
+  VideoGeneration: "wan2.2-i2v-flash"    # 视频生成 (极致速度)
+  MultimodalReasoning: "qvq-max"         # 多模态推理 (视觉推理强)

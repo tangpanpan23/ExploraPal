@@ -7,27 +7,59 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
-// Client OpenAI客户端
+// Client 阿里云Qwen客户端 (兼容OpenAI接口)
 type Client struct {
 	client *openai.Client
 	config *Config
 }
 
-// Config 配置
+// Config 阿里云Qwen配置
 type Config struct {
-	APIKey     string  `json:"apiKey"`
-	BaseURL    string  `json:"baseURL,omitempty"`
-	Timeout    int     `json:"timeout,omitempty"`    // 超时时间(秒)
-	MaxTokens  int     `json:"maxTokens,omitempty"`  // 最大token数
+	APIKey      string  `json:"apiKey"`                // DashScope API密钥
+	BaseURL     string  `json:"baseURL,omitempty"`     // DashScope端点
+	ResourceName string `json:"resourceName,omitempty"` // 资源名称（可选）
+	DeploymentName string `json:"deploymentName,omitempty"` // 部署名称（可选）
+	Timeout     int     `json:"timeout,omitempty"`     // 超时时间(秒)
+	MaxTokens   int     `json:"maxTokens,omitempty"`   // 最大token数
 	Temperature float32 `json:"temperature,omitempty"` // 温度参数
 }
 
-// NewClient 创建OpenAI客户端
+// 阿里云Qwen模型映射 (推荐替换Azure AI)
+const (
+	// 图像分析 - 使用多模态视觉理解模型
+	ModelImageAnalysis = "qwen3-vl-plus" // 视觉理解，支持思考模式，替代gpt-5-chat
+
+	// 问题生成和笔记润色 - 使用快速Flash模型
+	ModelTextGeneration = "qwen-flash" // 思考+非思考模式融合，替代gpt-5-mini
+
+	// 复杂推理和报告生成 - 使用Max模型
+	ModelAdvancedReasoning = "qwen3-max" // 智能体编程和工具调用优化，替代gpt-5.2
+
+	// 图像生成 - 使用万相图像生成模型
+	ModelImageGeneration = "wanx2.1-t2i-turbo" // 快速图像生成，替代GPT-image-1
+
+	// 视频生成 - 使用万相视频模型
+	ModelVideoGeneration = "wan2.2-i2v-flash" // 极致速度视频生成
+
+	// 多模态推理 - 使用QVQ模型
+	ModelMultimodalReasoning = "qvq-max" // 视觉推理能力强
+
+	// 备用模型
+	ModelImageAnalysisBackup = "qwen3-vl-235b-a22b-instruct" // 备用的视觉模型
+	ModelTextGenerationBackup = "qwen-turbo" // 备用的快速模型
+	ModelAdvancedReasoningBackup = "qwen-max" // 备用的推理模型
+)
+
+// NewClient 创建阿里云Qwen客户端
 func NewClient(config *Config) *Client {
 	clientConfig := openai.DefaultConfig(config.APIKey)
 	if config.BaseURL != "" {
 		clientConfig.BaseURL = config.BaseURL
 	}
+
+	// 阿里云DashScope兼容配置
+	// Qwen模型通过DashScope API提供，与OpenAI兼容
+	clientConfig.APIType = openai.APITypeOpenAI // DashScope兼容OpenAI格式
 
 	return &Client{
 		client: openai.NewClientWithConfig(clientConfig),
@@ -35,10 +67,68 @@ func NewClient(config *Config) *Client {
 	}
 }
 
+// GetAvailableModels 获取可用的模型列表
+func (c *Client) GetAvailableModels() []string {
+	return []string{
+		"qwen3-vl-plus",         // 图像分析主模型
+		"qwen-flash",            // 文本生成主模型
+		"qwen3-max",             // 复杂推理主模型
+		"wanx2.1-t2i-turbo",     // 图像生成主模型
+		"wan2.2-i2v-flash",      // 视频生成主模型
+		"qvq-max",               // 多模态推理主模型
+		"qwen3-vl-235b-a22b-instruct", // 图像分析备用模型
+		"qwen-turbo",            // 文本生成备用模型
+		"qwen-max",              // 复杂推理备用模型
+	}
+}
+
+// ValidateModel 检查模型是否可用
+func (c *Client) ValidateModel(model string) bool {
+	availableModels := c.GetAvailableModels()
+	for _, availableModel := range availableModels {
+		if availableModel == model {
+			return true
+		}
+	}
+	return false
+}
+
+// GetModelForTask 根据任务类型推荐模型
+func GetModelForTask(task string) string {
+	switch task {
+	case "image_analysis":
+		return ModelImageAnalysis         // qwen3-vl-plus - 视觉理解
+	case "text_generation":
+		return ModelTextGeneration       // qwen-flash - 快速文本生成
+	case "advanced_reasoning":
+		return ModelAdvancedReasoning    // qwen3-max - 复杂推理
+	case "image_generation":
+		return ModelImageGeneration      // wanx2.1-t2i-turbo - 图像生成
+	case "video_generation":
+		return ModelVideoGeneration      // wan2.2-i2v-flash - 视频生成
+	case "multimodal_reasoning":
+		return ModelMultimodalReasoning  // qvq-max - 多模态推理
+	default:
+		return ModelTextGeneration // 默认使用通用模型
+	}
+}
+
+// GetModelCapabilities 获取模型能力说明
+func GetModelCapabilities() map[string]string {
+	return map[string]string{
+		"qwen3-vl-plus": "视觉理解，支持思考模式，图像分析最优，支持超长视频理解",
+		"qwen-flash": "思考+非思考模式融合，复杂推理优秀，指令遵循强",
+		"qwen3-max": "智能体编程优化，工具调用增强，领域SOTA水平",
+		"wanx2.1-t2i-turbo": "快速高质量图像生成，支持中英文输入",
+		"wan2.2-i2v-flash": "极致速度视频生成，指令理解准确",
+		"qvq-max": "强大视觉推理能力，支持流式输出思考过程",
+	}
+}
+
 // AnalyzeImage 分析图片
 func (c *Client) AnalyzeImage(ctx context.Context, imageURL, prompt string) (*ImageAnalysisResult, error) {
 	req := openai.ChatCompletionRequest{
-		Model: openai.GPT4VisionPreview,
+		Model: ModelImageAnalysis,
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role: openai.ChatMessageRoleUser,
@@ -62,11 +152,11 @@ func (c *Client) AnalyzeImage(ctx context.Context, imageURL, prompt string) (*Im
 
 	resp, err := c.client.CreateChatCompletion(ctx, req)
 	if err != nil {
-		return nil, fmt.Errorf("OpenAI API调用失败: %w", err)
+		return nil, fmt.Errorf("Qwen API调用失败: %w", err)
 	}
 
 	if len(resp.Choices) == 0 {
-		return nil, fmt.Errorf("OpenAI API返回结果为空")
+		return nil, fmt.Errorf("Qwen API返回结果为空")
 	}
 
 	result := &ImageAnalysisResult{
@@ -79,6 +169,7 @@ func (c *Client) AnalyzeImage(ctx context.Context, imageURL, prompt string) (*Im
 
 // GenerateQuestions 生成引导问题
 func (c *Client) GenerateQuestions(ctx context.Context, contextInfo string, category string) ([]Question, error) {
+
 	prompt := fmt.Sprintf(`基于以下信息为孩子生成3个引导性的探索问题：
 
 上下文信息：%s
@@ -89,6 +180,7 @@ func (c *Client) GenerateQuestions(ctx context.Context, contextInfo string, cate
 2. 问题要激发好奇心和思考
 3. 问题难度要循序渐进（从简单到深入）
 4. 每个问题都要有明确的类型标注
+5. 确保所有内容适合儿童教育场景，避免任何不适宜内容
 
 请以JSON格式返回，包含以下字段：
 - content: 问题内容
@@ -97,7 +189,7 @@ func (c *Client) GenerateQuestions(ctx context.Context, contextInfo string, cate
 - purpose: 问题目的说明`, contextInfo, category)
 
 	req := openai.ChatCompletionRequest{
-		Model: openai.GPT3Dot5Turbo,
+		Model: ModelTextGeneration,
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role: openai.ChatMessageRoleUser,
@@ -113,6 +205,10 @@ func (c *Client) GenerateQuestions(ctx context.Context, contextInfo string, cate
 		return nil, fmt.Errorf("生成问题失败: %w", err)
 	}
 
+	if len(resp.Choices) == 0 {
+		return nil, fmt.Errorf("Qwen API返回结果为空")
+	}
+
 	// 这里需要解析JSON响应并转换为Question结构体
 	// 为了简化，先返回空结果
 	return []Question{}, nil
@@ -120,6 +216,7 @@ func (c *Client) GenerateQuestions(ctx context.Context, contextInfo string, cate
 
 // PolishNote AI润色笔记
 func (c *Client) PolishNote(ctx context.Context, rawContent, contextInfo string) (*PolishedNote, error) {
+
 	prompt := fmt.Sprintf(`请帮孩子润色他的探索笔记，让它更清晰、有逻辑性。
 
 原始内容：%s
@@ -131,6 +228,7 @@ func (c *Client) PolishNote(ctx context.Context, rawContent, contextInfo string)
 2. 让表达更清晰准确
 3. 添加适当的科学概念解释
 4. 指出可能的疑问和下一步探索方向
+5. 确保所有内容适合儿童教育场景，避免任何不适宜内容
 
 请以JSON格式返回包含以下字段的结果：
 - title: 笔记标题
@@ -142,7 +240,7 @@ func (c *Client) PolishNote(ctx context.Context, rawContent, contextInfo string)
 - formatted_text: 格式化的文本内容`, rawContent, contextInfo)
 
 	req := openai.ChatCompletionRequest{
-		Model: openai.GPT3Dot5Turbo,
+		Model: ModelTextGeneration,
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role: openai.ChatMessageRoleUser,
@@ -158,6 +256,10 @@ func (c *Client) PolishNote(ctx context.Context, rawContent, contextInfo string)
 		return nil, fmt.Errorf("润色笔记失败: %w", err)
 	}
 
+	if len(resp.Choices) == 0 {
+		return nil, fmt.Errorf("Qwen API返回结果为空")
+	}
+
 	// 这里需要解析JSON响应并转换为PolishedNote结构体
 	// 为了简化，先返回基本结果
 	result := &PolishedNote{
@@ -169,6 +271,7 @@ func (c *Client) PolishNote(ctx context.Context, rawContent, contextInfo string)
 
 // GenerateReport 生成研究报告
 func (c *Client) GenerateReport(ctx context.Context, projectData string) (*ResearchReport, error) {
+
 	prompt := fmt.Sprintf(`基于孩子的研究数据生成一份研究报告：
 
 项目数据：%s
@@ -185,10 +288,15 @@ func (c *Client) GenerateReport(ctx context.Context, projectData string) (*Resea
 9. 孩子独特见解
 10. 下一步探索建议
 
+重要要求：
+- 确保所有内容适合儿童教育场景
+- 避免任何不适宜的敏感内容
+- 保持积极正面的教育导向
+
 请以JSON格式返回报告内容。`, projectData)
 
 	req := openai.ChatCompletionRequest{
-		Model: openai.GPT4,
+		Model: ModelAdvancedReasoning,
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role: openai.ChatMessageRoleUser,
@@ -202,6 +310,10 @@ func (c *Client) GenerateReport(ctx context.Context, projectData string) (*Resea
 	resp, err := c.client.CreateChatCompletion(ctx, req)
 	if err != nil {
 		return nil, fmt.Errorf("生成报告失败: %w", err)
+	}
+
+	if len(resp.Choices) == 0 {
+		return nil, fmt.Errorf("Qwen API返回结果为空")
 	}
 
 	// 这里需要解析JSON响应并转换为ResearchReport结构体
@@ -268,3 +380,4 @@ type Reference struct {
 	URL     string `json:"url,omitempty"`
 	Credit  string `json:"credit"`
 }
+
