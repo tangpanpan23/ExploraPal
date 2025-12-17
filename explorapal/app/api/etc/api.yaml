@@ -10,7 +10,7 @@ JwtAuth:
 
 # 数据库配置
 DBConfig:
-  DataSource: root:tangpanpan314@tcp(localhost:3306)/explorapal?charset=utf8mb4&parseTime=true&loc=Local
+  DataSource: root:<your-db-password>@tcp(localhost:3306)/explorapal?charset=utf8mb4&parseTime=true&loc=Local
 
 # 缓存配置
 Cache:
