@@ -128,8 +128,23 @@ go run app/ai-dialogue/rpc/aidialogueservice.go
 
 ### 数据库初始化
 ```bash
-# 执行数据库迁移
-go run database/migrations/
+# 方法1：使用Go脚本执行迁移（推荐）
+go run migrate.go
+
+# 方法2：使用Shell脚本执行迁移
+chmod +x migrate.sh
+./migrate.sh
+
+# 方法3：直接使用MySQL命令执行迁移
+mysql -hlocalhost -P3306 -uroot -ptangpanpan314 explorapal < database/migrations/20241217000001_create_explorapal_tables.up.sql
+```
+
+数据库配置位于 `app/api/etc/api.yaml` 中的 `DBConfig.DataSource` 字段。
+
+### 数据库连接验证
+```bash
+# 检查数据库连接和表结构
+go run check_db.go
 ```
 
 ## 开发计划

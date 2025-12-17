@@ -2,6 +2,8 @@ package logic
 
 import (
 	"context"
+	"database/sql"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -10,7 +12,6 @@ import (
 	"explorapal/app/project-management/rpc/projectmanagement"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"github.com/zeromicro/go-zero/core/stores/sqlx"
 )
 
 type CreateProjectLogic struct {
@@ -34,19 +35,24 @@ func (l *CreateProjectLogic) CreateProject(in *projectmanagement.CreateProjectRe
 
 	// 创建项目记录
 	project := &hps.Projects{
-		ProjectID:   projectID,
+		ProjectId:   projectID,
 		ProjectCode: projectCode,
-		UserID:      in.UserId,
+		UserId:      in.UserId,
 		Title:       in.Title,
-		Description: in.Description,
 		Category:    in.Category,
 		Status:      "active",
 		Progress:    0,
 	}
 
+	// 设置描述
+	if in.Description != "" {
+		project.Description = sql.NullString{String: in.Description, Valid: true}
+	}
+
 	// 设置标签
 	if len(in.Tags) > 0 {
-		project.SetTags(in.Tags)
+		tagsJSON, _ := json.Marshal(in.Tags)
+		project.Tags = sql.NullString{String: string(tagsJSON), Valid: true}
 	}
 
 	// 插入数据库
@@ -61,9 +67,9 @@ func (l *CreateProjectLogic) CreateProject(in *projectmanagement.CreateProjectRe
 
 	// 记录活动
 	activity := &hps.ProjectActivities{
-		ActivityID:  time.Now().UnixNano(),
-		ProjectID:   projectID,
-		UserID:      in.UserId,
+		ActivityId:  time.Now().UnixNano(),
+		ProjectId:   projectID,
+		UserId:      in.UserId,
 		Type:        "create_project",
 		Description: fmt.Sprintf("创建了项目：%s", in.Title),
 	}

@@ -25,7 +25,7 @@ func NewUpdateProjectStatusLogic(ctx context.Context, svcCtx *svc.ServiceContext
 
 func (l *UpdateProjectStatusLogic) UpdateProjectStatus(in *projectmanagement.UpdateProjectStatusReq) (*projectmanagement.UpdateProjectStatusResp, error) {
 	// 获取现有项目
-	project, err := l.svcCtx.ProjectModel.FindOne(l.ctx, in.ProjectId)
+	project, err := l.svcCtx.ProjectModel.FindOneByProjectId(l.ctx, in.ProjectId)
 	if err != nil {
 		l.Logger.Errorf("获取项目失败: %v", err)
 		return &projectmanagement.UpdateProjectStatusResp{

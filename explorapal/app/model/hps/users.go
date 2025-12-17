@@ -1,9 +1,9 @@
 package hps
 
 import (
-	"explorapal/app/model"
+	"time"
 
-	"gorm.io/gorm"
+	"explorapal/app/model"
 )
 
 // User 用户表
@@ -25,12 +25,4 @@ type User struct {
 // TableName 设置表名
 func (User) TableName() string {
 	return "users"
-}
-
-// BeforeCreate 创建前的钩子
-func (u *User) BeforeCreate(tx *gorm.DB) error {
-	if u.Status == "" {
-		u.Status = "active"
-	}
-	return nil
 }

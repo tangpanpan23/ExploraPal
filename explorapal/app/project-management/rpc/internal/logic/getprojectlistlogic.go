@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 
 	"explorapal/app/project-management/rpc/internal/svc"
 	"explorapal/app/project-management/rpc/projectmanagement"
@@ -41,20 +42,30 @@ func (l *GetProjectListLogic) GetProjectList(in *projectmanagement.GetProjectLis
 
 		// 转换数据结构
 		for _, p := range projectList {
-			tags, _ := p.GetTags()
-			projectInfo := &projectmanagement.ProjectInfo{
-				ProjectId:     p.ProjectID,
-				ProjectCode:   p.ProjectCode,
-				Title:         p.Title,
-				Description:   p.Description,
-				Category:      p.Category,
-				Status:        p.Status,
-				Progress:      p.Progress,
-				CreateTime:    p.CreateTime.Format("2006-01-02 15:04:05"),
-				UpdateTime:    p.UpdateTime.Format("2006-01-02 15:04:05"),
-				LastActivity:  p.LastActivityAt.Time.Format("2006-01-02 15:04:05"),
-				Tags:          tags,
+			var tags []string
+			if p.Tags.Valid {
+				_ = json.Unmarshal([]byte(p.Tags.String), &tags)
 			}
+
+			projectInfo := &projectmanagement.ProjectInfo{
+				ProjectId:   p.ProjectId,
+				ProjectCode: p.ProjectCode,
+				Title:       p.Title,
+				Category:    p.Category,
+				Status:      p.Status,
+				Progress:    int32(p.Progress),
+				CreateTime:  p.CreateTime.Format("2006-01-02 15:04:05"),
+				UpdateTime:  p.UpdateTime.Format("2006-01-02 15:04:05"),
+				Tags:        tags,
+			}
+
+			if p.Description.Valid {
+				projectInfo.Description = p.Description.String
+			}
+			if p.LastActivityAt.Valid {
+				projectInfo.LastActivity = p.LastActivityAt.Time.Format("2006-01-02 15:04:05")
+			}
+
 			projects = append(projects, projectInfo)
 		}
 
@@ -73,20 +84,30 @@ func (l *GetProjectListLogic) GetProjectList(in *projectmanagement.GetProjectLis
 
 		// 转换数据结构
 		for _, p := range projectList {
-			tags, _ := p.GetTags()
-			projectInfo := &projectmanagement.ProjectInfo{
-				ProjectId:     p.ProjectID,
-				ProjectCode:   p.ProjectCode,
-				Title:         p.Title,
-				Description:   p.Description,
-				Category:      p.Category,
-				Status:        p.Status,
-				Progress:      p.Progress,
-				CreateTime:    p.CreateTime.Format("2006-01-02 15:04:05"),
-				UpdateTime:    p.UpdateTime.Format("2006-01-02 15:04:05"),
-				LastActivity:  p.LastActivityAt.Time.Format("2006-01-02 15:04:05"),
-				Tags:          tags,
+			var tags []string
+			if p.Tags.Valid {
+				_ = json.Unmarshal([]byte(p.Tags.String), &tags)
 			}
+
+			projectInfo := &projectmanagement.ProjectInfo{
+				ProjectId:   p.ProjectId,
+				ProjectCode: p.ProjectCode,
+				Title:       p.Title,
+				Category:    p.Category,
+				Status:      p.Status,
+				Progress:    int32(p.Progress),
+				CreateTime:  p.CreateTime.Format("2006-01-02 15:04:05"),
+				UpdateTime:  p.UpdateTime.Format("2006-01-02 15:04:05"),
+				Tags:        tags,
+			}
+
+			if p.Description.Valid {
+				projectInfo.Description = p.Description.String
+			}
+			if p.LastActivityAt.Valid {
+				projectInfo.LastActivity = p.LastActivityAt.Time.Format("2006-01-02 15:04:05")
+			}
+
 			projects = append(projects, projectInfo)
 		}
 

@@ -3,8 +3,6 @@ package hps
 import (
 	"encoding/json"
 	"explorapal/app/model"
-
-	"gorm.io/gorm"
 )
 
 // Achievement 成果记录表

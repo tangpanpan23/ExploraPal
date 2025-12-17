@@ -3,6 +3,7 @@ package openai
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/sashabaranov/go-openai"
 )
@@ -15,11 +16,11 @@ type Client struct {
 
 // Config 内部AI服务配置
 type Config struct {
-	TAL_MLOPS_APP_ID  string  `json:"talMLOpsAppId"`  // TAL MLOps应用ID
-	TAL_MLOPS_APP_KEY string  `json:"talMLOpsAppKey"` // TAL MLOps应用密钥
-	BaseURL           string  `json:"baseURL,omitempty"` // 内部AI服务端点，默认: http://ai-service.tal.com/openai-compatible/v1
-	Timeout           int     `json:"timeout,omitempty"`   // 超时时间(秒)
-	MaxTokens         int     `json:"maxTokens,omitempty"` // 最大token数
+	TAL_MLOPS_APP_ID  string  `json:"talMLOpsAppId"`         // TAL MLOps应用ID
+	TAL_MLOPS_APP_KEY string  `json:"talMLOpsAppKey"`        // TAL MLOps应用密钥
+	BaseURL           string  `json:"baseURL,omitempty"`     // 内部AI服务端点，默认: http://ai-service.tal.com/openai-compatible/v1
+	Timeout           int     `json:"timeout,omitempty"`     // 超时时间(秒)
+	MaxTokens         int     `json:"maxTokens,omitempty"`   // 最大token数
 	Temperature       float32 `json:"temperature,omitempty"` // 温度参数
 }
 
@@ -38,29 +39,33 @@ const (
 	ModelVoiceInteraction = "qwen3-omni-flash" // 多模态语音处理
 
 	// 备用模型
-	ModelImageAnalysisBackup = "qwen3-vl-235b-a22b-instruct" // 备用的视觉模型
-	ModelTextGenerationBackup = "qwen-turbo" // 备用的快速模型
-	ModelAdvancedReasoningBackup = "qwen-max" // 备用的推理模型
-	ModelVoiceInteractionBackup = "qwen3-omni-flash" // 语音交互备用模型
+	ModelImageAnalysisBackup     = "qwen3-vl-235b-a22b-instruct" // 备用的视觉模型
+	ModelTextGenerationBackup    = "qwen-turbo"                  // 备用的快速模型
+	ModelAdvancedReasoningBackup = "qwen-max"                    // 备用的推理模型
+	ModelVoiceInteractionBackup  = "qwen3-omni-flash"            // 语音交互备用模型
 )
 
 // NewClient 创建内部AI服务客户端
 func NewClient(config *Config) *Client {
-	clientConfig := openai.DefaultConfig("")
+	// 构建认证token
+	token := fmt.Sprintf("%s:%s", config.TAL_MLOPS_APP_ID, config.TAL_MLOPS_APP_KEY)
 
 	// 设置内部AI服务端点
-	if config.BaseURL != "" {
-		clientConfig.BaseURL = config.BaseURL
-	} else {
-		clientConfig.BaseURL = "http://ai-service.tal.com/openai-compatible/v1"
+	baseURL := config.BaseURL
+	if baseURL == "" {
+		baseURL = "http://ai-service.tal.com/openai-compatible/v1"
 	}
 
-	// 设置认证信息 (Bearer token格式)
-	token := fmt.Sprintf("%s:%s", config.TAL_MLOPS_APP_ID, config.TAL_MLOPS_APP_KEY)
-	clientConfig.APIKey = "Bearer " + token
-
-	// 设置API类型为OpenAI兼容
+	// 创建客户端配置
+	clientConfig := openai.DefaultConfig(token)
+	clientConfig.BaseURL = baseURL
 	clientConfig.APIType = openai.APITypeOpenAI
+
+	// 设置自定义HTTP headers用于认证
+	clientConfig.HTTPClient.Transport = &customTransport{
+		base:  clientConfig.HTTPClient.Transport,
+		token: fmt.Sprintf("Bearer %s", token),
+	}
 
 	return &Client{
 		client: openai.NewClientWithConfig(clientConfig),
@@ -68,16 +73,30 @@ func NewClient(config *Config) *Client {
 	}
 }
 
+// customTransport 自定义传输层，添加Authorization header
+type customTransport struct {
+	base  http.RoundTripper
+	token string
+}
+
+func (t *customTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	req.Header.Set("Authorization", t.token)
+	if t.base == nil {
+		return http.DefaultTransport.RoundTrip(req)
+	}
+	return t.base.RoundTrip(req)
+}
+
 // GetAvailableModels 获取可用的模型列表
 func (c *Client) GetAvailableModels() []string {
 	return []string{
-		"qwen3-vl-plus",         // 图像分析主模型
-		"qwen-flash",            // 文本生成主模型
-		"qwen3-max",             // 复杂推理主模型
-		"qwen3-omni-flash",      // 语音交互主模型
+		"qwen3-vl-plus",               // 图像分析主模型
+		"qwen-flash",                  // 文本生成主模型
+		"qwen3-max",                   // 复杂推理主模型
+		"qwen3-omni-flash",            // 语音交互主模型
 		"qwen3-vl-235b-a22b-instruct", // 图像分析备用模型
-		"qwen-turbo",            // 文本生成备用模型
-		"qwen-max",              // 复杂推理备用模型
+		"qwen-turbo",                  // 文本生成备用模型
+		"qwen-max",                    // 复杂推理备用模型
 	}
 }
 
@@ -96,13 +115,13 @@ func (c *Client) ValidateModel(model string) bool {
 func GetModelForTask(task string) string {
 	switch task {
 	case "image_analysis":
-		return ModelImageAnalysis         // qwen3-vl-plus - 视觉理解
+		return ModelImageAnalysis // qwen3-vl-plus - 视觉理解
 	case "text_generation":
-		return ModelTextGeneration       // qwen-flash - 快速文本生成
+		return ModelTextGeneration // qwen-flash - 快速文本生成
 	case "advanced_reasoning":
-		return ModelAdvancedReasoning    // qwen3-max - 复杂推理
+		return ModelAdvancedReasoning // qwen3-max - 复杂推理
 	case "voice_interaction":
-		return ModelVoiceInteraction     // qwen3-omni-flash - 语音交互
+		return ModelVoiceInteraction // qwen3-omni-flash - 语音交互
 	default:
 		return ModelTextGeneration // 默认使用通用模型
 	}
@@ -111,35 +130,29 @@ func GetModelForTask(task string) string {
 // GetModelCapabilities 获取模型能力说明
 func GetModelCapabilities() map[string]string {
 	return map[string]string{
-		"qwen3-vl-plus": "视觉理解，支持思考模式，图像分析最优，支持超长视频理解",
-		"qwen-flash": "思考+非思考模式融合，复杂推理优秀，指令遵循强",
-		"qwen3-max": "智能体编程优化，工具调用增强，领域SOTA水平",
+		"qwen3-vl-plus":    "视觉理解，支持思考模式，图像分析最优，支持超长视频理解",
+		"qwen-flash":       "思考+非思考模式融合，复杂推理优秀，指令遵循强",
+		"qwen3-max":        "智能体编程优化，工具调用增强，领域SOTA水平",
 		"qwen3-omni-flash": "多模态实时交互，支持文本、图像、音频、视频，119种语言文本交互，20种语言语音交互",
 	}
 }
 
 // AnalyzeImage 分析图片
 func (c *Client) AnalyzeImage(ctx context.Context, imageURL, prompt string) (*ImageAnalysisResult, error) {
+	// 构建包含图片URL的prompt
+	// 注意：如果内部AI服务支持多模态，可能需要使用不同的API格式
+	// 这里先使用文本格式，将图片URL包含在prompt中
+	fullPrompt := fmt.Sprintf("%s\n\n图片URL: %s", prompt, imageURL)
+
 	req := openai.ChatCompletionRequest{
 		Model: ModelImageAnalysis,
 		Messages: []openai.ChatCompletionMessage{
 			{
-				Role: openai.ChatMessageRoleUser,
-				Content: []openai.ChatMessagePart{
-					{
-						Type: openai.ChatMessagePartTypeText,
-						Text: prompt,
-					},
-					{
-						Type: openai.ChatMessagePartTypeImageURL,
-						ImageURL: &openai.ChatMessageImageURL{
-							URL: imageURL,
-						},
-					},
-				},
+				Role:    openai.ChatMessageRoleUser,
+				Content: fullPrompt,
 			},
 		},
-		MaxTokens: c.config.MaxTokens,
+		MaxTokens:   c.config.MaxTokens,
 		Temperature: c.config.Temperature,
 	}
 
@@ -185,11 +198,11 @@ func (c *Client) GenerateQuestions(ctx context.Context, contextInfo string, cate
 		Model: ModelTextGeneration,
 		Messages: []openai.ChatCompletionMessage{
 			{
-				Role: openai.ChatMessageRoleUser,
+				Role:    openai.ChatMessageRoleUser,
 				Content: prompt,
 			},
 		},
-		MaxTokens: c.config.MaxTokens,
+		MaxTokens:   c.config.MaxTokens,
 		Temperature: c.config.Temperature,
 	}
 
@@ -236,11 +249,11 @@ func (c *Client) PolishNote(ctx context.Context, rawContent, contextInfo string)
 		Model: ModelTextGeneration,
 		Messages: []openai.ChatCompletionMessage{
 			{
-				Role: openai.ChatMessageRoleUser,
+				Role:    openai.ChatMessageRoleUser,
 				Content: prompt,
 			},
 		},
-		MaxTokens: c.config.MaxTokens,
+		MaxTokens:   c.config.MaxTokens,
 		Temperature: c.config.Temperature,
 	}
 
@@ -292,11 +305,11 @@ func (c *Client) GenerateReport(ctx context.Context, projectData string) (*Resea
 		Model: ModelAdvancedReasoning,
 		Messages: []openai.ChatCompletionMessage{
 			{
-				Role: openai.ChatMessageRoleUser,
+				Role:    openai.ChatMessageRoleUser,
 				Content: prompt,
 			},
 		},
-		MaxTokens: c.config.MaxTokens,
+		MaxTokens:   c.config.MaxTokens,
 		Temperature: c.config.Temperature,
 	}
 
@@ -337,40 +350,39 @@ type Question struct {
 }
 
 type PolishedNote struct {
-	Title             string   `json:"title"`
-	Summary           string   `json:"summary"`
-	KeyPoints         []string `json:"key_points"`
+	Title              string   `json:"title"`
+	Summary            string   `json:"summary"`
+	KeyPoints          []string `json:"key_points"`
 	ScientificConcepts []string `json:"scientific_concepts"`
-	Questions         []string `json:"questions"`
-	Connections       []string `json:"connections"`
-	FormattedText     string   `json:"formatted_text"`
+	Questions          []string `json:"questions"`
+	Connections        []string `json:"connections"`
+	FormattedText      string   `json:"formatted_text"`
 }
 
 type ResearchReport struct {
-	Title         string     `json:"title"`
-	Abstract      string     `json:"abstract"`
-	Introduction  string     `json:"introduction"`
-	Methodology   string     `json:"methodology"`
-	Findings      []Finding  `json:"findings"`
-	Discussion    string     `json:"discussion"`
-	Conclusion    string     `json:"conclusion"`
+	Title         string      `json:"title"`
+	Abstract      string      `json:"abstract"`
+	Introduction  string      `json:"introduction"`
+	Methodology   string      `json:"methodology"`
+	Findings      []Finding   `json:"findings"`
+	Discussion    string      `json:"discussion"`
+	Conclusion    string      `json:"conclusion"`
 	References    []Reference `json:"references"`
-	ChildInsights string     `json:"child_insights"`
-	NextSteps     []string   `json:"next_steps"`
-	Content       string     `json:"content"` // 简化字段，用于存储完整内容
+	ChildInsights string      `json:"child_insights"`
+	NextSteps     []string    `json:"next_steps"`
+	Content       string      `json:"content"` // 简化字段，用于存储完整内容
 }
 
 type Finding struct {
-	Title       string   `json:"title"`
-	Description string   `json:"description"`
-	Evidence    []string `json:"evidence"`
-	Significance string  `json:"significance"`
+	Title        string   `json:"title"`
+	Description  string   `json:"description"`
+	Evidence     []string `json:"evidence"`
+	Significance string   `json:"significance"`
 }
 
 type Reference struct {
-	Title   string `json:"title"`
-	Type    string `json:"type"`
-	URL     string `json:"url,omitempty"`
-	Credit  string `json:"credit"`
+	Title  string `json:"title"`
+	Type   string `json:"type"`
+	URL    string `json:"url,omitempty"`
+	Credit string `json:"credit"`
 }
-

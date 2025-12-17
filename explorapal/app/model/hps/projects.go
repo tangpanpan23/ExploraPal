@@ -2,9 +2,9 @@ package hps
 
 import (
 	"encoding/json"
-	"explorapal/app/model"
+	"time"
 
-	"gorm.io/gorm"
+	"explorapal/app/model"
 )
 
 // Project 探索项目表
@@ -45,16 +45,5 @@ func (p *Project) SetTags(tags []string) error {
 		return err
 	}
 	p.Tags = string(data)
-	return nil
-}
-
-// BeforeCreate 创建前的钩子
-func (p *Project) BeforeCreate(tx *gorm.DB) error {
-	if p.Status == "" {
-		p.Status = "active"
-	}
-	if p.Progress == 0 {
-		p.Progress = 0
-	}
 	return nil
 }
