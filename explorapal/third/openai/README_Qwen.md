@@ -33,30 +33,16 @@
   - 适配复杂的智能体需求
 - **适用场景**: 研究报告生成、深度学习分析、项目总结
 
-### 4. 图像生成 (ModelImageGeneration)
-- **模型**: `wanx2.1-t2i-turbo`
-- **分辨率**: 1K
+### 4. 多模态语音交互 (ModelVoiceInteraction)
+- **模型**: `qwen3-omni-flash`
+- **上下文长度**: 48K
 - **优势**:
-  - 生成速度快
-  - 图像细节丰富
-  - 支持通用生成场景
-- **适用场景**: 学习辅助插图、视觉化概念解释
-
-### 5. 视频生成 (ModelVideoGeneration)
-- **模型**: `wan2.2-i2v-flash`
-- **优势**:
-  - 极致生成速度
-  - 指令理解与运镜控制准确
-  - 画面元素保持一致
-- **适用场景**: 教育视频、动画演示
-
-### 6. 多模态推理 (ModelMultimodalReasoning)
-- **模型**: `qvq-max`
-- **优势**:
-  - 强大的视觉推理能力
-  - 支持流式输出思考过程
-  - 视觉理解与推理并重
-- **适用场景**: 复杂视觉问题解决、科学实验分析
+  - 基于Thinker-Talker混合专家架构
+  - 支持文本、图像、音频、视频的高效理解与语音生成
+  - 119种语言文本交互，20种语言语音交互
+  - 生成类人语音，实现跨语言精准沟通
+  - 强大指令跟随与系统提示定制功能
+- **适用场景**: 语音转文字、文字转语音、多模态对话、语音助手
 
 ## 配置步骤
 
@@ -97,33 +83,22 @@ curl -X POST "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
 | 图像分析 | qwen3-vl-plus | 超长视频理解，空间感知强 | 观察学习，AR增强 |
 | 问题生成 | qwen-flash | 思考模式灵活，推理优秀 | 个性化引导问题 |
 | 内容创作 | qwen3-max | 工具调用强，结构化输出 | 研究报告，学习总结 |
-| 视觉辅助 | wanx2.1-t2i-turbo | 快速高质量生成 | 概念插图，思维导图 |
-| 视频演示 | wan2.2-i2v-flash | 速度快，控制准 | 科学实验演示 |
-| 推理学习 | qvq-max | 视觉推理强 | 问题解决，科学思维 |
+| 语音交互 | qwen3-omni-flash | 多模态语音处理 | 语音转文字，文字转语音 |
 
 ## 阿里云语音服务集成
 
+语音功能现在由 **qwen3-omni-flash** 多模态大模型提供，支持：
+
 ### 语音转文字 (ASR)
-- **服务**: 阿里云智能语音服务
-- **API**: Real-time Speech Recognition / One-sentence Recognition
-- **支持语言**: 中文、英文等多语言
-- **特点**: 实时识别、高准确率、噪音过滤
+- **支持**: 119种语言文本交互
+- **特点**: 实时语音识别、多语言支持、高准确率
 
 ### 文字转语音 (TTS)
-- **服务**: 阿里云语音合成
-- **API**: Text-to-Speech Synthesis
-- **音色选择**: 多种音色可选，包括儿童友好音色
-- **格式支持**: MP3, WAV, PCM等
+- **支持**: 20种语言语音交互
+- **特点**: 生成类人语音、跨语言精准沟通、多种音色可选
 
 ### 配置方式
-```yaml
-# 语音服务配置
-SpeechService:
-  AppKey: "your-app-key"
-  AccessKeyId: "your-access-key-id"
-  AccessKeySecret: "your-access-key-secret"
-  Region: "cn-shanghai"  # 服务地域
-```
+语音功能通过DashScope API统一配置，无需额外配置。
 
 ## 注意事项
 

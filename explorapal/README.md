@@ -36,7 +36,7 @@
 - **框架**: Go + go-zero 微服务框架
 - **数据库**: MySQL
 - **缓存**: Redis
-- **AI服务**: OpenAI GPT-4 Vision, Claude
+- **AI服务**: 阿里云Qwen系列大模型 (qwen3-vl-plus, qwen-flash, qwen3-max)
 - **架构**: API服务 + RPC服务 微服务架构
 
 ### 项目结构
@@ -53,9 +53,8 @@ explorapal/
 ├── database/migrations/        # 数据库迁移
 ├── pkg/                        # 通用包
 ├── third/                      # 第三方服务集成
-│   ├── openai/                 # OpenAI客户端
-│   ├── claude/                 # Claude客户端
-│   └── azure-speech/           # 语音服务
+│   ├── openai/                 # 阿里云Qwen客户端
+│   └── azure-speech/           # 阿里云语音服务（兼容）
 └── storage/                    # 文件存储
 ```
 
@@ -99,13 +98,8 @@ explorapal/
 - **qwen3-vl-plus** (256K): 视觉理解，支持思考模式，图像分析最优
 - **qwen-flash** (1048.576K): 思考+非思考模式融合，问题生成和笔记润色
 - **qwen3-max** (256K): 智能体编程优化，复杂推理和报告生成
-- **wanx2.1-t2i-turbo** (1K): 快速高质量图像生成
-- **wan2.2-i2v-flash**: 极致速度视频生成
-- **qvq-max**: 强大的视觉推理能力
+- **qwen3-omni-flash** (48K): 多模态大模型，支持语音转文字和文字转语音
 
-### 语音处理
-- **阿里云智能语音服务 (ASR)**: 实时语音转文字，支持多语言、中文准确率高
-- **阿里云语音合成 (TTS)**: 文字转语音，支持多种音色和儿童友好声音
 
 ## 部署和运行
 
@@ -119,13 +113,7 @@ explorapal/
 1. 在阿里云控制台开通DashScope服务
 2. 获取API Key
 3. 确保账户余额充足
-4. 默认支持所有推荐模型，无需额外部署
-
-### 阿里云语音服务配置
-1. 开通阿里云智能语音服务
-2. 获取AccessKey ID和AccessKey Secret
-3. 创建语音应用，获取AppKey
-4. 选择合适的服务地域
+4. 默认支持所有推荐模型，包括语音功能的qwen3-omni-flash，无需额外部署
 
 ### 启动服务
 ```bash

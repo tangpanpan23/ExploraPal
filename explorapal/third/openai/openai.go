@@ -35,19 +35,14 @@ const (
 	// 复杂推理和报告生成 - 使用Max模型
 	ModelAdvancedReasoning = "qwen3-max" // 智能体编程和工具调用优化，替代gpt-5.2
 
-	// 图像生成 - 使用万相图像生成模型
-	ModelImageGeneration = "wanx2.1-t2i-turbo" // 快速图像生成，替代GPT-image-1
-
-	// 视频生成 - 使用万相视频模型
-	ModelVideoGeneration = "wan2.2-i2v-flash" // 极致速度视频生成
-
-	// 多模态推理 - 使用QVQ模型
-	ModelMultimodalReasoning = "qvq-max" // 视觉推理能力强
+	// 语音交互 - 使用Omni多模态模型
+	ModelVoiceInteraction = "qwen3-omni-flash" // 多模态语音处理
 
 	// 备用模型
 	ModelImageAnalysisBackup = "qwen3-vl-235b-a22b-instruct" // 备用的视觉模型
 	ModelTextGenerationBackup = "qwen-turbo" // 备用的快速模型
 	ModelAdvancedReasoningBackup = "qwen-max" // 备用的推理模型
+	ModelVoiceInteractionBackup = "qwen3-omni-flash" // 语音交互备用模型
 )
 
 // NewClient 创建阿里云Qwen客户端
@@ -73,9 +68,7 @@ func (c *Client) GetAvailableModels() []string {
 		"qwen3-vl-plus",         // 图像分析主模型
 		"qwen-flash",            // 文本生成主模型
 		"qwen3-max",             // 复杂推理主模型
-		"wanx2.1-t2i-turbo",     // 图像生成主模型
-		"wan2.2-i2v-flash",      // 视频生成主模型
-		"qvq-max",               // 多模态推理主模型
+		"qwen3-omni-flash",      // 语音交互主模型
 		"qwen3-vl-235b-a22b-instruct", // 图像分析备用模型
 		"qwen-turbo",            // 文本生成备用模型
 		"qwen-max",              // 复杂推理备用模型
@@ -102,12 +95,8 @@ func GetModelForTask(task string) string {
 		return ModelTextGeneration       // qwen-flash - 快速文本生成
 	case "advanced_reasoning":
 		return ModelAdvancedReasoning    // qwen3-max - 复杂推理
-	case "image_generation":
-		return ModelImageGeneration      // wanx2.1-t2i-turbo - 图像生成
-	case "video_generation":
-		return ModelVideoGeneration      // wan2.2-i2v-flash - 视频生成
-	case "multimodal_reasoning":
-		return ModelMultimodalReasoning  // qvq-max - 多模态推理
+	case "voice_interaction":
+		return ModelVoiceInteraction     // qwen3-omni-flash - 语音交互
 	default:
 		return ModelTextGeneration // 默认使用通用模型
 	}
@@ -119,9 +108,7 @@ func GetModelCapabilities() map[string]string {
 		"qwen3-vl-plus": "视觉理解，支持思考模式，图像分析最优，支持超长视频理解",
 		"qwen-flash": "思考+非思考模式融合，复杂推理优秀，指令遵循强",
 		"qwen3-max": "智能体编程优化，工具调用增强，领域SOTA水平",
-		"wanx2.1-t2i-turbo": "快速高质量图像生成，支持中英文输入",
-		"wan2.2-i2v-flash": "极致速度视频生成，指令理解准确",
-		"qvq-max": "强大视觉推理能力，支持流式输出思考过程",
+		"qwen3-omni-flash": "多模态实时交互，支持文本、图像、音频、视频，119种语言文本交互，20种语言语音交互",
 	}
 }
 
