@@ -4,12 +4,12 @@
 echo "🚀 开始执行数据库迁移..."
 
 # 从api.yaml配置文件读取数据库连接信息
-# DBConfig.DataSource: root:tangpanpan314@tcp(localhost:3306)/explorapal?charset=utf8mb4&parseTime=true&loc=Local
+# DBConfig.DataSource: root:<your-db-password>@tcp(localhost:3306)/explorapal?charset=utf8mb4&parseTime=true&loc=Local
 
 DB_HOST="localhost"
 DB_PORT="3306"
 DB_USER="root"
-DB_PASS="tangpanpan314"
+DB_PASS="<your-db-password>"  # 请替换为实际数据库密码
 DB_NAME="explorapal"
 
 # 迁移文件路径

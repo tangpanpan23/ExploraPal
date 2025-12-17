@@ -136,7 +136,7 @@ chmod +x migrate.sh
 ./migrate.sh
 
 # 方法3：直接使用MySQL命令执行迁移
-mysql -hlocalhost -P3306 -uroot -ptangpanpan314 explorapal < database/migrations/20241217000001_create_explorapal_tables.up.sql
+mysql -hlocalhost -P3306 -uroot -p<your-db-password> explorapal < database/migrations/20241217000001_create_explorapal_tables.up.sql
 ```
 
 数据库配置位于 `app/api/etc/api.yaml` 中的 `DBConfig.DataSource` 字段。
@@ -144,7 +144,7 @@ mysql -hlocalhost -P3306 -uroot -ptangpanpan314 explorapal < database/migrations
 ### 数据库连接验证
 ```bash
 # 检查数据库连接和表结构
-go run check_db.go
+go run tools/checkdb/main.go
 ```
 
 ## 开发计划
