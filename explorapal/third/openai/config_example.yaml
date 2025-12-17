@@ -1,21 +1,22 @@
-# 阿里云DashScope配置示例
-DashScope:
-  # 从阿里云DashScope控制台获取的API密钥
-  APIKey: "your-dashscope-api-key-here"
+# 内部AI服务配置示例 (通过TAL MLOps平台)
+AIService:
+  # TAL MLOps应用ID (从配置文件获取的唯一标识)
+  TAL_MLOPS_APP_ID: "your-tal-mlops-app-id"
 
-  # DashScope API端点
-  BaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  # TAL MLOps应用密钥 (从配置文件获取的唯一标识)
+  TAL_MLOPS_APP_KEY: "your-tal-mlops-app-key"
+
+  # 内部AI服务端点 (默认值，通常不需要修改)
+  BaseURL: "http://ai-service.tal.com/openai-compatible/v1"
 
   # 请求配置
   Timeout: 30      # 超时时间(秒)
   MaxTokens: 2000  # 最大token数
   Temperature: 0.7 # 温度参数(0.0-1.0)
 
-# 模型映射配置（推荐的Qwen模型）
+# 模型映射配置（内部AI服务支持的Qwen模型）
 Models:
-  ImageAnalysis: "qwen3-vl-plus"          # 图像分析 (视觉理解，支持思考模式)
-  TextGeneration: "qwen-flash"            # 文本生成 (思考+非思考模式融合)
-  AdvancedReasoning: "qwen3-max"          # 复杂推理 (智能体优化)
-  ImageGeneration: "wanx2.1-t2i-turbo"   # 图像生成 (快速高质量)
-  VideoGeneration: "wan2.2-i2v-flash"    # 视频生成 (极致速度)
-  MultimodalReasoning: "qvq-max"         # 多模态推理 (视觉推理强)
+  ImageAnalysis: "qwen3-vl-plus"     # 图像分析 (视觉理解，支持思考模式)
+  TextGeneration: "qwen-flash"       # 文本生成 (思考+非思考模式融合)
+  AdvancedReasoning: "qwen3-max"     # 复杂推理 (智能体优化)
+  VoiceInteraction: "qwen3-omni-flash" # 语音交互 (多模态语音处理)

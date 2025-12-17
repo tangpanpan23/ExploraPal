@@ -1,8 +1,35 @@
-# 阿里云Qwen AI模型集成指南
+# 内部AI服务集成指南 (基于阿里云Qwen)
 
 ## 概述
 
-本项目已集成阿里云的Qwen系列AI模型，完全替代了原有的Azure AI/OpenAI模型。Qwen系列模型在中文理解、多模态处理和推理能力方面具有显著优势。
+本项目通过TAL MLOps平台调用内部AI服务，使用阿里云Qwen系列大模型，完全替代了原有的Azure AI/OpenAI模型。内部服务提供统一的OpenAI兼容API接口，简化了集成复杂度。
+
+## 调用方式
+
+### API调用格式
+```bash
+curl --location 'http://ai-service.tal.com/openai-compatible/v1/chat/completions' \
+--header "Authorization: Bearer ${TAL_MLOPS_APP_ID}:${TAL_MLOPS_APP_KEY}" \
+--header 'Content-Type: application/json' \
+--data '{
+    "model": "qwen-flash",
+    "messages": [
+        {
+            "role": "system",
+            "content": "You are a helpful assistant."
+        },
+        {
+            "role": "user",
+            "content": "你是谁？"
+        }
+    ]
+}'
+```
+
+### 配置参数
+- `TAL_MLOPS_APP_ID`: TAL MLOps应用ID (配置文件中的唯一标识)
+- `TAL_MLOPS_APP_KEY`: TAL MLOps应用密钥 (配置文件中的唯一标识)
+- `BaseURL`: 内部AI服务端点 (默认: http://ai-service.tal.com/openai-compatible/v1)
 
 ## 推荐模型配置
 
@@ -85,9 +112,9 @@ curl -X POST "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
 | 内容创作 | qwen3-max | 工具调用强，结构化输出 | 研究报告，学习总结 |
 | 语音交互 | qwen3-omni-flash | 多模态语音处理 | 语音转文字，文字转语音 |
 
-## 阿里云语音服务集成
+## 语音功能集成
 
-语音功能现在由 **qwen3-omni-flash** 多模态大模型提供，支持：
+语音功能通过 **qwen3-omni-flash** 多模态大模型提供，同样通过内部AI服务调用：
 
 ### 语音转文字 (ASR)
 - **支持**: 119种语言文本交互
@@ -97,8 +124,56 @@ curl -X POST "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
 - **支持**: 20种语言语音交互
 - **特点**: 生成类人语音、跨语言精准沟通、多种音色可选
 
-### 配置方式
-语音功能通过DashScope API统一配置，无需额外配置。
+### 调用方式
+语音功能使用相同的API端点和认证方式，通过指定model为"qwen3-omni-flash"即可使用语音功能。
+
+## 使用示例
+
+### Go代码调用示例
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "explorapal/third/openai"
+)
+
+func main() {
+    // 初始化客户端
+    config := &openai.Config{
+        TAL_MLOPS_APP_ID:  "your-app-id",
+        TAL_MLOPS_APP_KEY: "your-app-key",
+        BaseURL:           "http://ai-service.tal.com/openai-compatible/v1",
+    }
+
+    client := openai.NewClient(config)
+
+    // 调用文本生成功能
+    messages := []openai.ChatCompletionMessage{
+        {
+            Role:    openai.ChatMessageRoleSystem,
+            Content: "你是一个儿童教育助手",
+        },
+        {
+            Role:    openai.ChatMessageRoleUser,
+            Content: "帮我生成一个关于恐龙的简单问题",
+        },
+    }
+
+    resp, err := client.CreateChatCompletion(context.Background(), openai.ChatCompletionRequest{
+        Model:    openai.ModelTextGeneration,
+        Messages: messages,
+    })
+
+    if err != nil {
+        fmt.Printf("调用失败: %v\n", err)
+        return
+    }
+
+    fmt.Printf("AI回复: %s\n", resp.Choices[0].Message.Content)
+}
+```
 
 ## 注意事项
 
@@ -120,12 +195,13 @@ curl -X POST "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
 ## 故障排除
 
 ### 常见问题
-1. **API密钥错误**: 检查API Key是否正确配置
-2. **余额不足**: 前往阿里云控制台充值
-3. **模型不可用**: 确认模型名称是否正确
-4. **超时错误**: 适当调整timeout参数
+1. **认证失败**: 检查TAL_MLOPS_APP_ID和TAL_MLOPS_APP_KEY是否正确配置
+2. **网络连接**: 确认内部AI服务 (ai-service.tal.com) 网络可达
+3. **权限不足**: 联系TAL MLOps管理员确认账户权限
+4. **模型不可用**: 确认模型名称是否正确，当前支持的模型包括qwen3-vl-plus、qwen-flash、qwen3-max、qwen3-omni-flash
+5. **超时错误**: 适当调整timeout参数，或检查内部服务负载情况
 
 ### 获取帮助
-- [DashScope文档](https://help.aliyun.com/zh/dashscope/)
-- [Qwen模型介绍](https://qwen.aliyun.com/)
-- [阿里云工单](https://workorder.aliyun.com/)
+- 联系TAL MLOps平台管理员
+- 查看内部AI服务文档
+- 提交工单到TAL技术支持

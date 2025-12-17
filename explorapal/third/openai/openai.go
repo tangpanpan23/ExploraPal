@@ -7,33 +7,32 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
-// Client 阿里云Qwen客户端 (兼容OpenAI接口)
+// Client 内部AI服务客户端 (兼容OpenAI接口)
 type Client struct {
 	client *openai.Client
 	config *Config
 }
 
-// Config 阿里云Qwen配置
+// Config 内部AI服务配置
 type Config struct {
-	APIKey      string  `json:"apiKey"`                // DashScope API密钥
-	BaseURL     string  `json:"baseURL,omitempty"`     // DashScope端点
-	ResourceName string `json:"resourceName,omitempty"` // 资源名称（可选）
-	DeploymentName string `json:"deploymentName,omitempty"` // 部署名称（可选）
-	Timeout     int     `json:"timeout,omitempty"`     // 超时时间(秒)
-	MaxTokens   int     `json:"maxTokens,omitempty"`   // 最大token数
-	Temperature float32 `json:"temperature,omitempty"` // 温度参数
+	TAL_MLOPS_APP_ID  string  `json:"talMLOpsAppId"`  // TAL MLOps应用ID
+	TAL_MLOPS_APP_KEY string  `json:"talMLOpsAppKey"` // TAL MLOps应用密钥
+	BaseURL           string  `json:"baseURL,omitempty"` // 内部AI服务端点，默认: http://ai-service.tal.com/openai-compatible/v1
+	Timeout           int     `json:"timeout,omitempty"`   // 超时时间(秒)
+	MaxTokens         int     `json:"maxTokens,omitempty"` // 最大token数
+	Temperature       float32 `json:"temperature,omitempty"` // 温度参数
 }
 
-// 阿里云Qwen模型映射 (推荐替换Azure AI)
+// 内部AI服务模型映射 (通过TAL MLOps平台)
 const (
 	// 图像分析 - 使用多模态视觉理解模型
-	ModelImageAnalysis = "qwen3-vl-plus" // 视觉理解，支持思考模式，替代gpt-5-chat
+	ModelImageAnalysis = "qwen3-vl-plus" // 视觉理解，支持思考模式
 
 	// 问题生成和笔记润色 - 使用快速Flash模型
-	ModelTextGeneration = "qwen-flash" // 思考+非思考模式融合，替代gpt-5-mini
+	ModelTextGeneration = "qwen-flash" // 思考+非思考模式融合
 
 	// 复杂推理和报告生成 - 使用Max模型
-	ModelAdvancedReasoning = "qwen3-max" // 智能体编程和工具调用优化，替代gpt-5.2
+	ModelAdvancedReasoning = "qwen3-max" // 智能体编程和工具调用优化
 
 	// 语音交互 - 使用Omni多模态模型
 	ModelVoiceInteraction = "qwen3-omni-flash" // 多模态语音处理
@@ -45,16 +44,23 @@ const (
 	ModelVoiceInteractionBackup = "qwen3-omni-flash" // 语音交互备用模型
 )
 
-// NewClient 创建阿里云Qwen客户端
+// NewClient 创建内部AI服务客户端
 func NewClient(config *Config) *Client {
-	clientConfig := openai.DefaultConfig(config.APIKey)
+	clientConfig := openai.DefaultConfig("")
+
+	// 设置内部AI服务端点
 	if config.BaseURL != "" {
 		clientConfig.BaseURL = config.BaseURL
+	} else {
+		clientConfig.BaseURL = "http://ai-service.tal.com/openai-compatible/v1"
 	}
 
-	// 阿里云DashScope兼容配置
-	// Qwen模型通过DashScope API提供，与OpenAI兼容
-	clientConfig.APIType = openai.APITypeOpenAI // DashScope兼容OpenAI格式
+	// 设置认证信息 (Bearer token格式)
+	token := fmt.Sprintf("%s:%s", config.TAL_MLOPS_APP_ID, config.TAL_MLOPS_APP_KEY)
+	clientConfig.APIKey = "Bearer " + token
+
+	// 设置API类型为OpenAI兼容
+	clientConfig.APIType = openai.APITypeOpenAI
 
 	return &Client{
 		client: openai.NewClientWithConfig(clientConfig),

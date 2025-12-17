@@ -109,11 +109,10 @@ explorapal/
 - Redis 6.0+
 - 阿里云DashScope API Key
 
-### 阿里云DashScope配置
-1. 在阿里云控制台开通DashScope服务
-2. 获取API Key
-3. 确保账户余额充足
-4. 默认支持所有推荐模型，包括语音功能的qwen3-omni-flash，无需额外部署
+### 内部AI服务配置 (TAL MLOps平台)
+1. 获取TAL MLOps应用ID和应用密钥
+2. 确保内部AI服务网络可达 (http://ai-service.tal.com)
+3. 确认账户权限，支持调用qwen3-vl-plus、qwen-flash、qwen3-max、qwen3-omni-flash等模型
 
 ### 启动服务
 ```bash
