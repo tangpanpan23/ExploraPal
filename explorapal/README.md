@@ -123,6 +123,7 @@ explorapal/
 2. 确保内部AI服务网络可达 (http://ai-service.tal.com)
 3. 确认账户权限，支持调用qwen3-vl-plus、qwen-flash、qwen3-max、qwen3-omni-flash等模型
 4. 注意：所有服务超时时间设置为60秒（包括HTTP请求、RPC调用、AI服务），确保网络连接稳定
+5. 慢调用阈值：AI对话服务设置为5秒，项目管理服务设置为2秒，避免正常业务调用被误报为慢调用
 
 ### 启动服务
 

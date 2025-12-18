@@ -2,7 +2,7 @@ Name: api
 Host: 0.0.0.0
 Port: 9003
 Mode: dev
-Timeout: 60000  # 60秒超时
+Timeout: 75000  # 75秒超时
 
 # JWT配置
 JwtAuth:

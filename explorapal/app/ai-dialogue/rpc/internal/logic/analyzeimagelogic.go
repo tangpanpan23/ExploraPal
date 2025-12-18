@@ -48,12 +48,12 @@ func (l *AnalyzeImageLogic) AnalyzeImage(in *aidialogue.AnalyzeImageReq) (*aidia
 	return &aidialogue.AnalyzeImageResp{
 		Status:        200,
 		Msg:           "图片分析成功",
-		ObjectName:    result.ObjectName,
-		Category:      result.Category,
+		ObjectName:    sanitizeUTF8(result.ObjectName),
+		Category:      sanitizeUTF8(result.Category),
 		Confidence:    float32(result.Confidence),
-		Description:   result.Description,
-		KeyFeatures:   result.KeyFeatures,
-		ScientificName: result.ScientificName,
+		Description:   sanitizeUTF8(result.Description),
+		KeyFeatures:   sanitizeUTF8Slice(result.KeyFeatures),
+		ScientificName: sanitizeUTF8(result.ScientificName),
 	}, nil
 }
 
@@ -86,12 +86,12 @@ func (l *AnalyzeImageLogic) getDefaultImageAnalysisResult(imageURL, prompt strin
 	return &aidialogue.AnalyzeImageResp{
 		Status:        200,
 		Msg:           "图片分析成功（使用模拟响应）",
-		ObjectName:    objectName,
-		Category:      category,
+		ObjectName:    sanitizeUTF8(objectName),
+		Category:      sanitizeUTF8(category),
 		Confidence:    0.85,
-		Description:   description,
-		KeyFeatures:   []string{"特征分析", "形态识别", "内容描述"},
-		ScientificName: scientificName,
+		Description:   sanitizeUTF8(description),
+		KeyFeatures:   sanitizeUTF8Slice([]string{"特征分析", "形态识别", "内容描述"}),
+		ScientificName: sanitizeUTF8(scientificName),
 	}
 }
 
@@ -104,3 +104,4 @@ func containsKeyword(text string, keywords ...string) bool {
 	}
 	return false
 }
+

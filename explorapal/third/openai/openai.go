@@ -67,7 +67,7 @@ func NewClient(config *Config) *Client {
 	if config.Timeout > 0 {
 		clientConfig.HTTPClient.Timeout = time.Duration(config.Timeout) * time.Second
 	} else {
-		clientConfig.HTTPClient.Timeout = 60 * time.Second // 默认60秒超时
+		clientConfig.HTTPClient.Timeout = 70 * time.Second // 默认70秒超时
 	}
 
 	// 设置自定义HTTP headers用于认证

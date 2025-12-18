@@ -8,6 +8,9 @@ import (
 type Config struct {
 	zrpc.RpcServerConf
 
+	// 统计配置 - 慢调用阈值
+	StatConf zrpc.StatConf
+
 	// 数据库配置
 	DBConfig struct {
 		DataSource string

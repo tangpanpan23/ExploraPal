@@ -35,11 +35,11 @@ func (l *GenerateReportLogic) GenerateReport(in *aidialogue.GenerateReportReq) (
 	return &aidialogue.GenerateReportResp{
 		Status:     200,
 		Msg:        "生成报告成功",
-		Title:      result.Title,
-		Content:    result.Content,
-		Abstract:   result.Abstract,
-		Conclusion: result.Conclusion,
-		NextSteps:  result.NextSteps,
+		Title:      sanitizeUTF8(result.Title),
+		Content:    sanitizeUTF8(result.Content),
+		Abstract:   sanitizeUTF8(result.Abstract),
+		Conclusion: sanitizeUTF8(result.Conclusion),
+		NextSteps:  sanitizeUTF8Slice(result.NextSteps),
 	}, nil
 }
 
@@ -72,10 +72,11 @@ func (l *GenerateReportLogic) getDefaultReportResponse(projectData, category str
 	return &aidialogue.GenerateReportResp{
 		Status:     200,
 		Msg:        "生成报告成功（使用模拟响应）",
-		Title:      title,
-		Content:    content,
-		Abstract:   abstract,
-		Conclusion: conclusion,
-		NextSteps:  nextSteps,
+		Title:      sanitizeUTF8(title),
+		Content:    sanitizeUTF8(content),
+		Abstract:   sanitizeUTF8(abstract),
+		Conclusion: sanitizeUTF8(conclusion),
+		NextSteps:  sanitizeUTF8Slice(nextSteps),
 	}
 }
+

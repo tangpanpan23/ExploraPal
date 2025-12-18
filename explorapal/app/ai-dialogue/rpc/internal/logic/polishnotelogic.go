@@ -35,10 +35,10 @@ func (l *PolishNoteLogic) PolishNote(in *aidialogue.PolishNoteReq) (*aidialogue.
 	return &aidialogue.PolishNoteResp{
 		Status:        200,
 		Msg:           "笔记润色成功",
-		Title:         result.Title,
-		Summary:       result.Summary,
-		KeyPoints:     result.KeyPoints,
-		FormattedText: result.FormattedText,
+		Title:         sanitizeUTF8(result.Title),
+		Summary:       sanitizeUTF8(result.Summary),
+		KeyPoints:     sanitizeUTF8Slice(result.KeyPoints),
+		FormattedText: sanitizeUTF8(result.FormattedText),
 		Suggestions:   []string{}, // TODO: 从result中提取建议
 	}, nil
 }
@@ -48,10 +48,11 @@ func (l *PolishNoteLogic) getDefaultPolishedNoteResponse(rawContent, contextInfo
 	return &aidialogue.PolishNoteResp{
 		Status:        200,
 		Msg:           "笔记润色成功（使用模拟响应）",
-		Title:         "探索笔记",
-		Summary:       "这是孩子记录的探索笔记，由于AI服务暂时不可用，显示原始内容。",
-		KeyPoints:     []string{"记录观察", "表达想法", "提出问题"},
-		FormattedText: rawContent, // 保持原始内容
-		Suggestions:   []string{"可以添加更多观察细节", "可以画一幅相关的图画", "可以想一想为什么会这样"},
+		Title:         sanitizeUTF8("探索笔记"),
+		Summary:       sanitizeUTF8("这是孩子记录的探索笔记，由于AI服务暂时不可用，显示原始内容。"),
+		KeyPoints:     sanitizeUTF8Slice([]string{"记录观察", "表达想法", "提出问题"}),
+		FormattedText: sanitizeUTF8(rawContent), // 保持原始内容
+		Suggestions:   sanitizeUTF8Slice([]string{"可以添加更多观察细节", "可以画一幅相关的图画", "可以想一想为什么会这样"}),
 	}
 }
+

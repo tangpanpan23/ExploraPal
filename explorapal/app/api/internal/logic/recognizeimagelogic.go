@@ -29,7 +29,7 @@ func (l *RecognizeImageLogic) RecognizeImage(req *types.RecognizeImageReq) (resp
 	// 调用AI对话RPC服务进行图像分析
 	client, err := zrpc.NewClient(zrpc.RpcClientConf{
 		Endpoints: []string{"127.0.0.1:9002"}, // AI对话RPC服务地址
-		Timeout:   60000,                      // 60秒超时，与AI服务超时保持一致
+		Timeout:   75000,                      // 75秒超时，与AI分析超时保持一致
 	})
 	if err != nil {
 		l.Logger.Errorf("创建AI RPC客户端失败: %v", err)

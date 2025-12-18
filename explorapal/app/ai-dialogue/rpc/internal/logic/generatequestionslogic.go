@@ -35,10 +35,10 @@ func (l *GenerateQuestionsLogic) GenerateQuestions(in *aidialogue.GenerateQuesti
 	var questionList []*aidialogue.Question
 	for _, q := range questions {
 		questionList = append(questionList, &aidialogue.Question{
-			Content:    q.Content,
-			Type:       q.Type,
-			Difficulty: q.Difficulty,
-			Purpose:    q.Purpose,
+			Content:    sanitizeUTF8(q.Content),
+			Type:       sanitizeUTF8(q.Type),
+			Difficulty: sanitizeUTF8(q.Difficulty),
+			Purpose:    sanitizeUTF8(q.Purpose),
 		})
 	}
 
@@ -104,3 +104,4 @@ func (l *GenerateQuestionsLogic) getDefaultQuestionsResponse(category string) *a
 		Questions: questions,
 	}
 }
+

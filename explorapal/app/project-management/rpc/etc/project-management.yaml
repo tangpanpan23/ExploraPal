@@ -1,6 +1,12 @@
 Name: project-management.rpc
 ListenOn: 0.0.0.0:9001
 Mode: dev
+Timeout: 30000  # 30秒，RPC服务器整体超时时间
+
+# 中间件配置
+Middlewares:
+  StatConf:
+    SlowThreshold: "5s"  # 项目管理调用相对较快，设置为5秒
 
 # 数据库配置
 DBConfig:
@@ -10,6 +16,7 @@ DBConfig:
 Cache:
   - Host: localhost:6379
     Type: node
+    Pass: "helloworld"  # 演示环境，不使用Redis密码
 
 # 日志配置
 Log:

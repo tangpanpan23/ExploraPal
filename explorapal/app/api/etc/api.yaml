@@ -2,7 +2,7 @@ Name: api
 Host: 0.0.0.0
 Port: 9003
 Mode: dev
-Timeout: 60000  # 60秒超时，与RPC调用超时保持一致
+Timeout: 75000  # 75秒超时，与AI分析超时保持一致
 
 # JWT配置
 JwtAuth:
@@ -17,6 +17,7 @@ DBConfig:
 Cache:
   - Host: 127.0.0.1:6379
     Type: node
+    Pass: "helloworld"  # 演示环境，不使用Redis密码
 
 # 内部AI服务配置 (TAL MLOps平台)
 # 注意：在开发环境中，如果AI服务不可用，将自动使用模拟响应
