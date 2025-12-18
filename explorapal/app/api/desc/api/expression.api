@@ -57,4 +57,20 @@ type (
 		Data        string `json:"data" desc:"元素数据(JSON格式)"`
 		Position    string `json:"position" desc:"位置建议"`
 	}
+
+	TextToSpeechReq {
+		ProjectId int64   `json:"project_id" desc:"项目ID"`
+		UserId    int64   `json:"user_id" desc:"用户ID"`
+		Text      string  `json:"text" desc:"要转换的文字"`
+		Voice     string  `json:"voice,optional,default=female" desc:"语音类型：female,male"`
+		Language  string  `json:"language,optional,default=zh-CN" desc:"语言代码"`
+		Speed     float64 `json:"speed,optional,default=1.0" desc:"语速，1.0为正常语速"`
+	}
+
+	TextToSpeechResp {
+		AudioData   string `json:"audio_data" desc:"base64编码的音频数据"`
+		Format      string `json:"format" desc:"音频格式：wav,mp3"`
+		Duration    float64 `json:"duration" desc:"音频时长(秒)"`
+		ExpressionId int64  `json:"expression_id" desc:"表达记录ID"`
+	}
 )

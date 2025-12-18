@@ -1,0 +1,45 @@
+// 语音处理API
+@server(
+    group: audio
+)
+
+service Audio {
+    // 语音转文字
+    @handler SpeechToText
+    post /api/audio/speech-to-text (SpeechToTextReq) returns (SpeechToTextResp)
+
+    // 文字转语音
+    @handler TextToSpeech
+    post /api/audio/text-to-speech (TextToSpeechReq) returns (TextToSpeechResp)
+}
+
+// 语音转文字请求
+type SpeechToTextReq {
+    AudioData []byte `json:"audio_data"` // 音频数据（base64编码）
+    Format    string `json:"format"`    // 音频格式，如 "wav", "mp3"
+    Language  string `json:"language"`  // 语言代码，如 "zh-CN", "en-US"
+}
+
+// 语音转文字响应
+type SpeechToTextResp {
+    Status     int32   `json:"status"`
+    Msg        string  `json:"msg"`
+    Text       string  `json:"text"`
+    Confidence float64 `json:"confidence"`
+}
+
+// 文字转语音请求
+type TextToSpeechReq {
+    Text     string  `json:"text"`     // 要转换的文字
+    Voice    string  `json:"voice"`    // 语音类型，如 "female", "male"
+    Language string  `json:"language"` // 语言代码，如 "zh-CN", "en-US"
+    Speed    float64 `json:"speed"`    // 语速，1.0为正常语速
+}
+
+// 文字转语音响应
+type TextToSpeechResp {
+    Status    int32  `json:"status"`
+    Msg       string `json:"msg"`
+    AudioData []byte `json:"audio_data"` // 音频数据（base64编码）
+    Format    string `json:"format"`     // 音频格式，如 "wav", "mp3"
+}

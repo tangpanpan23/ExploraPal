@@ -25,6 +25,8 @@
 # 启动所有服务（建议按顺序启动）
 go run app/project-management/rpc/projectmanagementservice.go    # 9001
 go run app/ai-dialogue/rpc/aidialogueservice.go                 # 9002
+go run app/audio-processing/rpc/main.go                         # 9004
+go run app/video-processing/rpc/main.go                         # 9005
 go run app/api/api.go                                           # 9003
 ```
 
@@ -235,8 +237,13 @@ curl -X POST "http://localhost:9003/api/project/status/update" \
 ### 表达阶段
 - `POST /api/expression/note/polish` - AI润色笔记
 
+### 语音处理
+- `POST /api/audio/text-to-speech` - 文字转语音
+
 ### 成果生成
 - `POST /api/achievement/report/generate` - 生成研究报告
+- `POST /api/achievement/video/analyze` - 视频内容分析
+- `POST /api/achievement/video/generate` - AI视频生成
 
 ### 公共接口
 - `GET /api/common/ping` - 健康检查
@@ -244,16 +251,22 @@ curl -X POST "http://localhost:9003/api/project/status/update" \
 ## 服务架构
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   API Service   │    │ Project Mgmt    │    │  AI Dialogue    │
-│   (Port 9003)   │◄──►│   RPC Service   │    │  RPC Service    │
-│                 │    │   (Port 9001)   │    │   (Port 9002)   │
-│ - RESTful API   │    │                 │    │                 │
-│ - 路由转发      │    │ - 项目CRUD      │    │ - AI 图像分析  │
-│ - 请求验证      │    │ - 数据存储      │    │ - 问题生成     │
-└─────────────────┘    └─────────────────┘    │ - 笔记润色     │
-                                              │ - 报告生成     │
-                                              └─────────────────┘
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   API Service   │    │ Project Mgmt    │    │  AI Dialogue    │    │ Audio Process   │
+│   (Port 9003)   │◄──►│   RPC Service   │    │  RPC Service    │    │  RPC Service    │
+│                 │    │   (Port 9001)   │    │   (Port 9002)   │    │   (Port 9004)   │
+│ - RESTful API   │    │                 │    │                 │    │                 │
+│ - 路由转发      │    │ - 项目CRUD      │    │ - AI 图像分析  │    │ - 语音转文字   │
+│ - 请求验证      │    │ - 数据存储      │    │ - 问题生成     │    │ - 文字转语音   │
+└─────────────────┘    └─────────────────┘    │ - 笔记润色     │    └─────────────────┘
+                                              │ - 报告生成     │    ┌─────────────────┐
+                                              └─────────────────┘    │ Video Process   │
+                                                                     │  RPC Service    │
+                                                                     │   (Port 9005)   │
+                                                                     │                 │
+                                                                     │ - 视频分析      │
+                                                                     │ - 视频生成      │
+                                                                     └─────────────────┘
 ```
 
 ## 技术栈
@@ -261,7 +274,7 @@ curl -X POST "http://localhost:9003/api/project/status/update" \
 - **框架**: Go-Zero
 - **数据库**: MySQL
 - **缓存**: Redis
-- **AI服务**: 阿里云 Qwen (qwen3-vl-plus, qwen-flash, qwen3-max)
+- **AI服务**: 阿里云 Qwen (qwen3-vl-plus, qwen-flash, qwen3-max, qwen3-omni-flash, qwen-vl-plus)
 - **通信**: gRPC (内部) + RESTful API (外部)
 
 ## AI服务降级机制
@@ -298,13 +311,23 @@ curl -X POST "http://localhost:9003/api/observation/image/recognize" \
 
 这样确保在任何环境下都能进行完整的MVP演示！
 
+## 已实现功能扩展
+
+### 语音处理功能 ✅
+- **语音转文字**: 支持音频文件转文字，支持多种格式
+- **文字转语音**: 支持文字转语音播报，支持多种语音和语速
+
+### 多媒体支持功能 ✅
+- **视频分析**: 深度分析视频内容，提取场景、物体、情感、文字、音频等多维度信息
+- **视频生成**: 基于脚本自动生成AI视频，支持教育、故事、动画等多种风格
+
 ## 下一步扩展
 
-1. **语音处理**: 集成语音转文字和文字转语音
-2. **多媒体支持**: 支持视频分析和生成
-3. **个性化学习**: 根据孩子年龄和兴趣推荐内容
-4. **社交功能**: 孩子间分享探索成果
-5. **家长监控**: 为家长提供学习进度和建议
+1. **个性化学习**: 根据孩子年龄和兴趣推荐内容
+2. **社交功能**: 孩子间分享探索成果
+3. **家长监控**: 为家长提供学习进度和建议
+4. **实时协作**: 支持多人同时探索同一个主题
+5. **离线模式**: 支持网络不稳定环境下的学习
 
 ---
 

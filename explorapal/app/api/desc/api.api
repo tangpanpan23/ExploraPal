@@ -78,13 +78,13 @@ service api {
 	middleware: JwtAuthMiddleware
 )
 service api {
-	@doc "语音转文字"
-	@handler speechToText
-	post /speech/text (SpeechToTextReq) returns (SpeechToTextResp)
-
 	@doc "AI润色生成笔记"
 	@handler polishNote
 	post /note/polish (PolishNoteReq) returns (PolishNoteResp)
+
+	@doc "语音转文字"
+	@handler speechToText
+	post /speech/text (SpeechToTextReq) returns (SpeechToTextResp)
 }
 
 // ===================================> 成果生成 <====================================
@@ -105,6 +105,26 @@ service api {
 	@doc "生成学术海报"
 	@handler generatePoster
 	post /poster/generate (GeneratePosterReq) returns (GeneratePosterResp)
+
+	@doc "分析视频内容"
+	@handler analyzeVideo
+	post /video/analyze (AnalyzeVideoReq) returns (AnalyzeVideoResp)
+
+	@doc "生成AI视频"
+	@handler generateVideo
+	post /video/generate (GenerateVideoReq) returns (GenerateVideoResp)
+}
+
+// ===================================> 语音处理 <====================================
+@server (
+	group:      audio
+	prefix:     api/audio
+	middleware: JwtAuthMiddleware
+)
+service api {
+	@doc "文字转语音"
+	@handler textToSpeech
+	post /text-to-speech (TextToSpeechReq) returns (TextToSpeechResp)
 }
 
 // ===================================> 公共接口 <====================================
@@ -117,3 +137,4 @@ service api {
 	@handler ping
 	get /ping
 }
+

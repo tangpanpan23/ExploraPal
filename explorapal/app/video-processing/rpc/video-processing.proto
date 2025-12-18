@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+package videoprocessing;
+option go_package = "explorapal/app/video-processing/rpc";
+
+// 视频分析请求
+message AnalyzeVideoReq {
+  bytes video_data = 1;      // 视频数据
+  string format = 2;         // 视频格式，如 "mp4", "avi", "mov"
+  string analysis_type = 3;  // 分析类型: "content", "scene", "object", "emotion"
+  double duration = 4;       // 分析时长(秒)，0表示分析整个视频
+}
+
+// 视频分析响应
+message AnalyzeVideoResp {
+  int32 status = 1;
+  string msg = 2;
+  VideoAnalysisResult result = 3;
+}
+
+// 视频分析结果
+message VideoAnalysisResult {
+  repeated SceneAnalysis scenes = 1;        // 场景分析结果
+  repeated ObjectDetection objects = 2;     // 物体检测结果
+  repeated EmotionAnalysis emotions = 3;    // 情感分析结果
+  repeated TextRecognition texts = 4;       // 文字识别结果
+  repeated AudioAnalysis audio = 5;         // 音频分析结果
+  VideoSummary summary = 6;                 // 视频总结
+}
+
+// 场景分析
+message SceneAnalysis {
+  double timestamp = 1;      // 时间戳(秒)
+  string scene_type = 2;     // 场景类型: "indoor", "outdoor", "nature", etc.
+  double confidence = 3;     // 置信度
+  string description = 4;    // 场景描述
+}
+
+// 物体检测
+message ObjectDetection {
+  double timestamp = 1;      // 时间戳(秒)
+  string object_name = 2;    // 物体名称
+  double confidence = 3;     // 置信度
+  BoundingBox bbox = 4;      // 边界框
+}
+
+// 边界框
+message BoundingBox {
+  double x = 1;      // 左上角x坐标
+  double y = 2;      // 左上角y坐标
+  double width = 3;  // 宽度
+  double height = 4; // 高度
+}
+
+// 情感分析
+message EmotionAnalysis {
+  double timestamp = 1;      // 时间戳(秒)
+  string emotion = 2;        // 情感类型: "happy", "sad", "angry", etc.
+  double confidence = 3;     // 置信度
+  string description = 4;    // 情感描述
+}
+
+// 文字识别
+message TextRecognition {
+  double timestamp = 1;      // 时间戳(秒)
+  string text = 2;           // 识别出的文字
+  string language = 3;       // 语言
+  double confidence = 4;     // 置信度
+  BoundingBox bbox = 5;      // 文字位置
+}
+
+// 音频分析
+message AudioAnalysis {
+  double timestamp = 1;      // 时间戳(秒)
+  string transcription = 2;  // 语音转文字
+  string language = 3;       // 语言
+  double confidence = 4;     // 置信度
+}
+
+// 视频总结
+message VideoSummary {
+  string title = 1;          // 视频标题
+  string description = 2;    // 视频描述
+  repeated string keywords = 3;    // 关键词
+  string category = 4;       // 视频类别
+  double duration = 5;       // 视频总时长
+}
+
+// 视频生成请求
+message GenerateVideoReq {
+  string script = 1;         // 视频脚本
+  string style = 2;          // 风格: "educational", "story", "animation"
+  double duration = 3;       // 期望时长(秒)
+  repeated string scenes = 4;     // 场景描述
+  string voice = 5;          // 语音类型
+  string language = 6;       // 语言
+}
+
+// 视频生成响应
+message GenerateVideoResp {
+  int32 status = 1;
+  string msg = 2;
+  bytes video_data = 3;      // 生成的视频数据
+  string format = 4;         // 视频格式
+  double duration = 5;       // 实际时长
+  VideoMetadata metadata = 6; // 视频元数据
+}
+
+// 视频元数据
+message VideoMetadata {
+  string title = 1;          // 视频标题
+  string description = 2;    // 视频描述
+  repeated string scenes = 3;     // 生成的场景列表
+  string audio_language = 4; // 音频语言
+  string resolution = 5;     // 分辨率，如 "1920x1080"
+}
+
+// 视频处理服务
+service VideoProcessingService {
+  // 视频分析
+  rpc AnalyzeVideo(AnalyzeVideoReq) returns (AnalyzeVideoResp);
+  // 视频生成
+  rpc GenerateVideo(GenerateVideoReq) returns (GenerateVideoResp);
+}

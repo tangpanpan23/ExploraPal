@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package audioprocessing;
+option go_package = "explorapal/app/audio-processing/rpc";
+
+// 语音转文字请求
+message SpeechToTextReq {
+  bytes audio_data = 1;  // 音频数据
+  string format = 2;     // 音频格式，如 "wav", "mp3", "ogg"
+  string language = 3;   // 语言代码，如 "zh-CN", "en-US"
+}
+
+// 语音转文字响应
+message SpeechToTextResp {
+  int32 status = 1;
+  string msg = 2;
+  string text = 3;      // 识别出的文字
+  double confidence = 4; // 识别置信度
+}
+
+// 文字转语音请求
+message TextToSpeechReq {
+  string text = 1;      // 要转换的文字
+  string voice = 2;     // 语音类型，如 "female", "male"
+  string language = 3;  // 语言代码，如 "zh-CN", "en-US"
+  double speed = 4;     // 语速，1.0为正常语速
+}
+
+// 文字转语音响应
+message TextToSpeechResp {
+  int32 status = 1;
+  string msg = 2;
+  bytes audio_data = 3;  // 生成的音频数据
+  string format = 4;     // 音频格式，如 "wav", "mp3"
+}
+
+// 语音处理服务
+service AudioProcessingService {
+  // 语音转文字
+  rpc SpeechToText(SpeechToTextReq) returns (SpeechToTextResp);
+  // 文字转语音
+  rpc TextToSpeech(TextToSpeechReq) returns (TextToSpeechResp);
+}

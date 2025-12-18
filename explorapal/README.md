@@ -45,8 +45,9 @@ explorapal/
 ├── app/
 │   ├── api/                    # REST API服务
 │   ├── project-management/rpc/ # 项目管理RPC服务
-│   ├── image-recognition/rpc/  # 图像识别RPC服务
+│   ├── image-recognition/rpc/  # 图像识别RPC服务（预留）
 │   ├── audio-processing/rpc/   # 语音处理RPC服务
+│   ├── video-processing/rpc/   # 视频处理RPC服务
 │   └── ai-dialogue/rpc/        # AI对话RPC服务
 ├── common/                     # 通用工具
 ├── constant/                   # 常量定义
@@ -87,24 +88,34 @@ explorapal/
 - `POST /api/expression/speech/text` - 语音转文字
 - `POST /api/expression/note/polish` - AI润色笔记
 
+### 语音处理
+- `POST /api/audio/text-to-speech` - 文字转语音
+
 ### 成果生成
 - `POST /api/achievement/report/generate` - 生成研究报告
 - `POST /api/achievement/documentary/generate` - 生成纪录片
 - `POST /api/achievement/poster/generate` - 生成学术海报
+- `POST /api/achievement/video/analyze` - 视频内容分析
+- `POST /api/achievement/video/generate` - AI视频生成
 
 ## AI能力集成
 
 ### 阿里云Qwen集成
-- **qwen3-vl-plus** (256K): 视觉理解，支持思考模式，图像分析最优
+- **qwen3-vl-plus** (256K): 视觉理解，支持思考模式，图像和视频分析最优
 - **qwen-flash** (1048.576K): 思考+非思考模式融合，问题生成和笔记润色
 - **qwen3-max** (256K): 智能体编程优化，复杂推理和报告生成
-- **qwen3-omni-flash** (48K): 多模态大模型，支持语音转文字和文字转语音
+- **qwen3-omni-flash** (48K): 多模态大模型，支持语音转文字、文字转语音和音频分析
+- **qwen-vl-plus** (系列): 视频理解和生成，支持多媒体内容创作
 
 ### 开发环境降级机制
 当AI服务不可用时，系统会自动降级到模拟响应模式：
 - ✅ 图像分析：返回合理的默认分析结果
+- ✅ 视频分析：提供多维度分析结果（场景、物体、情感、文字、音频）
 - ✅ 问题生成：提供预设的教育性问题
 - ✅ 笔记润色：保持原始内容并添加基本结构
+- ✅ 语音转文字：返回模拟识别结果
+- ✅ 文字转语音：返回模拟音频数据
+- ✅ 视频生成：生成模板化视频内容
 - ✅ 报告生成：生成模板化的研究报告
 
 这样确保即使在没有外部AI服务的情况下，MVP演示功能也能正常运行。
@@ -185,6 +196,14 @@ go run projectmanagementservice.go
 # 启动AI对话RPC服务（需要先生成protobuf代码）
 cd explorapal/app/ai-dialogue/rpc
 go run aidialogueservice.go
+
+# 启动语音处理RPC服务（需要先生成protobuf代码）
+cd explorapal/app/audio-processing/rpc
+go run main.go
+
+# 启动视频处理RPC服务（需要先生成protobuf代码）
+cd explorapal/app/video-processing/rpc
+go run main.go
 ```
 
 #### 3. 启动API服务
@@ -207,6 +226,8 @@ chmod +x tools/check_ports.sh
 ./tools/kill_port.sh 9001  # 项目管理RPC服务
 ./tools/kill_port.sh 9002  # AI对话RPC服务
 ./tools/kill_port.sh 9003  # API服务
+./tools/kill_port.sh 9004  # 语音处理RPC服务
+./tools/kill_port.sh 9005  # 视频处理RPC服务
 ```
 
 ```bash
@@ -215,6 +236,12 @@ go run app/project-management/rpc/projectmanagementservice.go
 
 # 启动AI对话RPC服务
 go run app/ai-dialogue/rpc/aidialogueservice.go
+
+# 启动语音处理RPC服务
+go run app/audio-processing/rpc/main.go
+
+# 启动视频处理RPC服务
+go run app/video-processing/rpc/main.go
 
 # 启动API服务
 go run app/api/api.go

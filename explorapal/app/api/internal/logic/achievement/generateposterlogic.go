@@ -1,0 +1,31 @@
+package achievement
+
+import (
+	"context"
+
+	"explorapal/app/api/internal/svc"
+	"explorapal/app/api/internal/types"
+
+	"github.com/zeromicro/go-zero/core/logx"
+)
+
+type GeneratePosterLogic struct {
+	logx.Logger
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+}
+
+// 生成学术海报
+func NewGeneratePosterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GeneratePosterLogic {
+	return &GeneratePosterLogic{
+		Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
+	}
+}
+
+func (l *GeneratePosterLogic) GeneratePoster(req *types.GeneratePosterReq) (resp *types.GeneratePosterResp, err error) {
+	// todo: add your logic here and delete this line
+
+	return
+}

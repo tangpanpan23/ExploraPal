@@ -126,4 +126,106 @@ type (
 		BodySize      int32  `json:"body_size" desc:"正文字号"`
 		HeadingSize   int32  `json:"heading_size" desc:"标题字号"`
 	}
+
+	// 视频处理相关
+	AnalyzeVideoReq {
+		ProjectId     int64  `json:"project_id" desc:"项目ID"`
+		UserId        int64  `json:"user_id" desc:"用户ID"`
+		VideoData     string `json:"video_data" desc:"base64编码的视频数据"`
+		VideoFormat   string `json:"video_format" desc:"视频格式：mp4,avi,mov"`
+		AnalysisType  string `json:"analysis_type,optional,default=content" desc:"分析类型：content,scene,object,emotion"`
+		Duration      float64 `json:"duration,optional" desc:"分析时长(秒)，0表示分析整个视频"`
+	}
+
+	AnalyzeVideoResp {
+		VideoAnalysis VideoAnalysisResult `json:"video_analysis" desc:"视频分析结果"`
+		AchievementId int64               `json:"achievement_id" desc:"成果ID"`
+	}
+
+	VideoAnalysisResult {
+		Scenes    []SceneAnalysis    `json:"scenes" desc:"场景分析结果"`
+		Objects   []ObjectDetection  `json:"objects" desc:"物体检测结果"`
+		Emotions  []EmotionAnalysis  `json:"emotions" desc:"情感分析结果"`
+		Texts     []TextRecognition  `json:"texts" desc:"文字识别结果"`
+		Audio     []AudioAnalysis    `json:"audio" desc:"音频分析结果"`
+		Summary   VideoSummary       `json:"summary" desc:"视频总结"`
+	}
+
+	SceneAnalysis {
+		Timestamp  float64 `json:"timestamp" desc:"时间戳(秒)"`
+		SceneType  string  `json:"scene_type" desc:"场景类型"`
+		Confidence float64 `json:"confidence" desc:"置信度"`
+		Description string `json:"description" desc:"场景描述"`
+	}
+
+	ObjectDetection {
+		Timestamp  float64    `json:"timestamp" desc:"时间戳(秒)"`
+		ObjectName string     `json:"object_name" desc:"物体名称"`
+		Confidence float64    `json:"confidence" desc:"置信度"`
+		Bbox       BoundingBox `json:"bbox" desc:"边界框"`
+	}
+
+	BoundingBox {
+		X      float64 `json:"x" desc:"左上角x坐标"`
+		Y      float64 `json:"y" desc:"左上角y坐标"`
+		Width  float64 `json:"width" desc:"宽度"`
+		Height float64 `json:"height" desc:"高度"`
+	}
+
+	EmotionAnalysis {
+		Timestamp  float64 `json:"timestamp" desc:"时间戳(秒)"`
+		Emotion    string  `json:"emotion" desc:"情感类型"`
+		Confidence float64 `json:"confidence" desc:"置信度"`
+		Description string `json:"description" desc:"情感描述"`
+	}
+
+	TextRecognition {
+		Timestamp  float64    `json:"timestamp" desc:"时间戳(秒)"`
+		Text       string     `json:"text" desc:"识别出的文字"`
+		Language   string     `json:"language" desc:"语言"`
+		Confidence float64    `json:"confidence" desc:"置信度"`
+		Bbox       BoundingBox `json:"bbox" desc:"文字位置"`
+	}
+
+	AudioAnalysis {
+		Timestamp    float64 `json:"timestamp" desc:"时间戳(秒)"`
+		Transcription string `json:"transcription" desc:"语音转文字"`
+		Language     string  `json:"language" desc:"语言"`
+		Confidence   float64 `json:"confidence" desc:"置信度"`
+	}
+
+	VideoSummary {
+		Title       string   `json:"title" desc:"视频标题"`
+		Description string   `json:"description" desc:"视频描述"`
+		Keywords    []string `json:"keywords" desc:"关键词"`
+		Category    string   `json:"category" desc:"视频类别"`
+		Duration    float64  `json:"duration" desc:"视频总时长"`
+	}
+
+	GenerateVideoReq {
+		ProjectId int64    `json:"project_id" desc:"项目ID"`
+		UserId    int64    `json:"user_id" desc:"用户ID"`
+		Script    string   `json:"script" desc:"视频脚本"`
+		Style     string   `json:"style,optional,default=educational" desc:"风格：educational,story,animation"`
+		Duration  float64  `json:"duration,optional,default=60" desc:"期望时长(秒)"`
+		Scenes    []string `json:"scenes,optional" desc:"场景描述"`
+		Voice     string   `json:"voice,optional,default=female" desc:"语音类型"`
+		Language  string   `json:"language,optional,default=zh-CN" desc:"语言"`
+	}
+
+	GenerateVideoResp {
+		VideoData     string       `json:"video_data" desc:"base64编码的视频数据"`
+		Format        string       `json:"format" desc:"视频格式"`
+		Duration      float64      `json:"duration" desc:"实际时长"`
+		Metadata      VideoMetadata `json:"metadata" desc:"视频元数据"`
+		AchievementId int64        `json:"achievement_id" desc:"成果ID"`
+	}
+
+	VideoMetadata {
+		Title          string   `json:"title" desc:"视频标题"`
+		Description    string   `json:"description" desc:"视频描述"`
+		Scenes         []string `json:"scenes" desc:"生成场景列表"`
+		AudioLanguage  string   `json:"audio_language" desc:"音频语言"`
+		Resolution     string   `json:"resolution" desc:"分辨率"`
+	}
 )
