@@ -1,5 +1,5 @@
 Name: project-management.rpc
-ListenOn: 0.0.0.0:8081
+ListenOn: 0.0.0.0:9001
 Mode: dev
 
 # 数据库配置

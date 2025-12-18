@@ -14,21 +14,21 @@ panic: listen tcp 0.0.0.0:8082: bind: address already in use
 ```bash
 cd explorapal
 chmod +x tools/kill_port.sh
-./tools/kill_port.sh 8082
+./tools/kill_port.sh 9002
 ```
 
 **方法2：手动终止进程（macOS）**
 ```bash
-# 查找并终止占用8082端口的进程
-lsof -ti :8082 | xargs kill -9
+# 查找并终止占用9002端口的进程
+lsof -ti :9002 | xargs kill -9
 ```
 
 **方法3：手动终止进程（Linux）**
 ```bash
 # 查找占用端口的进程
-sudo netstat -tlnp | grep :8082
+sudo netstat -tlnp | grep :9002
 # 或
-sudo ss -tlnp | grep :8082
+sudo ss -tlnp | grep :9002
 
 # 终止进程（替换<PID>为实际进程ID）
 sudo kill -9 <PID>
@@ -41,28 +41,28 @@ sudo kill -9 <PID>
 1. **修改AI对话RPC服务端口**
    ```bash
    # 编辑 app/ai-dialogue/rpc/etc/ai-dialogue.yaml
-   # 将 ListenOn: 0.0.0.0:8082 改为 ListenOn: 0.0.0.0:8083
+   # 将 ListenOn: 0.0.0.0:9002 改为其他端口
    ```
 
 2. **修改项目管理RPC服务端口**
    ```bash
    # 编辑 app/project-management/rpc/etc/project-management.yaml
-   # 将 ListenOn: 0.0.0.0:8081 改为 ListenOn: 0.0.0.0:8084
+   # 将 ListenOn: 0.0.0.0:9001 改为其他端口
    ```
 
 3. **修改API服务端口**
    ```bash
    # 编辑 app/api/etc/api.yaml
-   # 将 Port: 9999 改为 Port: 9998
+   # 将 Port: 9003 改为其他端口
    ```
 
 ### 默认端口列表
 
 | 服务 | 端口 | 配置文件 |
 |------|------|----------|
-| 项目管理RPC | 8081 | `app/project-management/rpc/etc/project-management.yaml` |
-| AI对话RPC | 8082 | `app/ai-dialogue/rpc/etc/ai-dialogue.yaml` |
-| API服务 | 9999 | `app/api/etc/api.yaml` |
+| 项目管理RPC | 9001 | `app/project-management/rpc/etc/project-management.yaml` |
+| AI对话RPC | 9002 | `app/ai-dialogue/rpc/etc/ai-dialogue.yaml` |
+| API服务 | 9003 | `app/api/etc/api.yaml` |
 
 ## 其他常见问题
 

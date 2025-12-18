@@ -1,5 +1,5 @@
 Name: ai-dialogue.rpc
-ListenOn: 0.0.0.0:8082
+ListenOn: 0.0.0.0:9002
 Mode: dev
 
 # 内部AI服务配置 (TAL MLOps平台)

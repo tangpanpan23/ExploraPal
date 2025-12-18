@@ -165,12 +165,15 @@ go run api.go
 **启动前检查端口占用：**
 ```bash
 cd explorapal
-chmod +x tools/kill_port.sh
+chmod +x tools/check_ports.sh
 
-# 检查并清理端口占用（如果需要）
-./tools/kill_port.sh 8081  # 项目管理RPC服务
-./tools/kill_port.sh 8082  # AI对话RPC服务
-./tools/kill_port.sh 9999  # API服务
+# 检查所有服务端口状态
+./tools/check_ports.sh
+
+# 如有需要，清理端口占用
+./tools/kill_port.sh 9001  # 项目管理RPC服务
+./tools/kill_port.sh 9002  # AI对话RPC服务
+./tools/kill_port.sh 9003  # API服务
 ```
 
 ```bash
@@ -185,14 +188,14 @@ go run app/api/api.go
 ```
 
 **默认端口配置：**
-- 项目管理RPC服务: `8081`
-- AI对话RPC服务: `8082`
-- API服务: `9999`
+- 项目管理RPC服务: `9001`
+- AI对话RPC服务: `9002`
+- API服务: `9003`
 
 如需修改端口，请编辑对应的配置文件：
-- `app/project-management/rpc/etc/project-management.yaml`
-- `app/ai-dialogue/rpc/etc/ai-dialogue.yaml`
-- `app/api/etc/api.yaml`
+- `app/project-management/rpc/etc/project-management.yaml` (默认: 9001)
+- `app/ai-dialogue/rpc/etc/ai-dialogue.yaml` (默认: 9002)
+- `app/api/etc/api.yaml` (默认: 9003)
 
 ### 数据库初始化
 ```bash

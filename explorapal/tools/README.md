@@ -14,11 +14,14 @@ chmod +x tools/kill_port.sh
 
 **示例：**
 ```bash
-# 终止占用8082端口的进程
-./tools/kill_port.sh 8082
+# 终止占用9002端口的进程（AI对话RPC服务）
+./tools/kill_port.sh 9002
 
-# 终止占用8081端口的进程
-./tools/kill_port.sh 8081
+# 终止占用9001端口的进程（项目管理RPC服务）
+./tools/kill_port.sh 9001
+
+# 终止占用9003端口的进程（API服务）
+./tools/kill_port.sh 9003
 ```
 
 **说明：**
@@ -39,8 +42,14 @@ chmod +x tools/check_port.sh
 
 **示例：**
 ```bash
-# 检查8082端口占用情况
-./tools/check_port.sh 8082
+# 检查9002端口占用情况（AI对话RPC服务）
+./tools/check_port.sh 9002
+
+# 检查9001端口占用情况（项目管理RPC服务）
+./tools/check_port.sh 9001
+
+# 检查9003端口占用情况（API服务）
+./tools/check_port.sh 9003
 ```
 
 **说明：**
