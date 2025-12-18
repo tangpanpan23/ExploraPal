@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package videoprocessing;
-option go_package = "explorapal/app/video-processing/rpc";
+option go_package = "../proto";
 
 // 视频分析请求
 message AnalyzeVideoReq {

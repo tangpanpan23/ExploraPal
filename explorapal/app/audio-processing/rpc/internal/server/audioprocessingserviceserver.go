@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	"explorapal/app/audio-processing/rpc"
+	"explorapal/app/audio-processing/proto"
 	"explorapal/app/audio-processing/rpc/internal/logic"
 	"explorapal/app/audio-processing/rpc/internal/svc"
 )

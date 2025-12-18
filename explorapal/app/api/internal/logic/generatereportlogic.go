@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"strings"
 
 	"explorapal/app/ai-dialogue/rpc/aidialogue"
 	"explorapal/app/api/internal/svc"
@@ -52,7 +53,7 @@ func (l *GenerateReportLogic) GenerateReport(req *types.GenerateReportReq) (resp
 		Content:    rpcResp.Content,
 		Abstract:   rpcResp.Abstract,
 		Conclusion: rpcResp.Conclusion,
-		NextSteps:  rpcResp.NextSteps,
+		NextSteps:  strings.Join(rpcResp.NextSteps, "\n"),
 	}
 
 	return resp, nil

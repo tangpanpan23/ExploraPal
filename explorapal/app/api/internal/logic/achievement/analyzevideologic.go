@@ -6,9 +6,10 @@ import (
 
 	"explorapal/app/api/internal/svc"
 	"explorapal/app/api/internal/types"
-	videoprocessing "explorapal/app/video-processing/rpc"
+	videoprocessing "explorapal/app/video-processing/proto"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type AnalyzeVideoLogic struct {
@@ -35,7 +36,18 @@ func (l *AnalyzeVideoLogic) AnalyzeVideo(req *types.AnalyzeVideoReq) (resp *type
 		return nil, err
 	}
 
-	// 2. 调用视频处理RPC服务
+	// 2. 创建视频处理RPC客户端
+	videoRpcClient, err := zrpc.NewClient(zrpc.RpcClientConf{
+		Endpoints: []string{"127.0.0.1:9005"}, // 视频处理RPC服务地址
+		Timeout:   120000,                     // 120秒超时
+	})
+	if err != nil {
+		l.Logger.Errorf("创建视频处理RPC客户端失败: %v", err)
+		return l.getDefaultAnalyzeVideoResponse(req), nil
+	}
+
+	// 3. 调用视频处理RPC服务
+	videoProcessingClient := videoprocessing.NewVideoProcessingServiceClient(videoRpcClient.Conn())
 	rpcReq := &videoprocessing.AnalyzeVideoReq{
 		VideoData:    videoData,
 		Format:       req.VideoFormat,
@@ -43,7 +55,7 @@ func (l *AnalyzeVideoLogic) AnalyzeVideo(req *types.AnalyzeVideoReq) (resp *type
 		Duration:     req.Duration,
 	}
 
-	rpcResp, err := l.svcCtx.VideoProcessingRpc.AnalyzeVideo(l.ctx, rpcReq)
+	rpcResp, err := videoProcessingClient.AnalyzeVideo(l.ctx, rpcReq)
 	if err != nil {
 		l.Logger.Errorf("调用视频处理RPC服务失败: %v", err)
 		// 返回模拟结果
@@ -69,9 +81,9 @@ func (l *AnalyzeVideoLogic) convertVideoAnalysisResult(rpcResult *videoprocessin
 	scenes := make([]types.SceneAnalysis, len(rpcResult.Scenes))
 	for i, scene := range rpcResult.Scenes {
 		scenes[i] = types.SceneAnalysis{
-			Timestamp:  scene.Timestamp,
-			SceneType:  scene.SceneType,
-			Confidence: scene.Confidence,
+			Timestamp:   scene.Timestamp,
+			SceneType:   scene.SceneType,
+			Confidence:  scene.Confidence,
 			Description: scene.Description,
 		}
 	}
@@ -96,9 +108,9 @@ func (l *AnalyzeVideoLogic) convertVideoAnalysisResult(rpcResult *videoprocessin
 	emotions := make([]types.EmotionAnalysis, len(rpcResult.Emotions))
 	for i, emotion := range rpcResult.Emotions {
 		emotions[i] = types.EmotionAnalysis{
-			Timestamp:  emotion.Timestamp,
-			Emotion:    emotion.Emotion,
-			Confidence: emotion.Confidence,
+			Timestamp:   emotion.Timestamp,
+			Emotion:     emotion.Emotion,
+			Confidence:  emotion.Confidence,
 			Description: emotion.Description,
 		}
 	}
@@ -124,10 +136,10 @@ func (l *AnalyzeVideoLogic) convertVideoAnalysisResult(rpcResult *videoprocessin
 	audio := make([]types.AudioAnalysis, len(rpcResult.Audio))
 	for i, audioItem := range rpcResult.Audio {
 		audio[i] = types.AudioAnalysis{
-			Timestamp:    audioItem.Timestamp,
+			Timestamp:     audioItem.Timestamp,
 			Transcription: audioItem.Transcription,
-			Language:     audioItem.Language,
-			Confidence:   audioItem.Confidence,
+			Language:      audioItem.Language,
+			Confidence:    audioItem.Confidence,
 		}
 	}
 
@@ -156,9 +168,9 @@ func (l *AnalyzeVideoLogic) getDefaultAnalyzeVideoResponse(req *types.AnalyzeVid
 		VideoAnalysis: types.VideoAnalysisResult{
 			Scenes: []types.SceneAnalysis{
 				{
-					Timestamp:  0.0,
-					SceneType:  "educational",
-					Confidence: 0.85,
+					Timestamp:   0.0,
+					SceneType:   "educational",
+					Confidence:  0.85,
 					Description: "视频分析中，由于AI服务暂时不可用，显示默认分析结果",
 				},
 			},

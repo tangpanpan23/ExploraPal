@@ -4,14 +4,11 @@ import (
 	"net/http"
 
 	"explorapal/app/api/internal/config"
-	"explorapal/app/audio-processing/rpc"
 	"explorapal/app/model/hps"
-	"explorapal/app/video-processing/rpc"
 	"explorapal/third/openai"
 
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
 	"github.com/zeromicro/go-zero/rest"
-	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type ServiceContext struct {
@@ -27,12 +24,6 @@ type ServiceContext struct {
 
 	// AI服务客户端
 	AIClient *openai.Client
-
-	// 音频处理RPC客户端
-	AudioProcessingRpc audioprocessing.AudioProcessingServiceClient
-
-	// 视频处理RPC客户端
-	VideoProcessingRpc videoprocessing.VideoProcessingServiceClient
 
 	// 中间件
 	JwtAuthMiddleware rest.Middleware
@@ -52,26 +43,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	}
 	aiClient := openai.NewClient(aiConfig)
 
-	// 初始化音频处理RPC客户端
-	audioRpcClient, err := zrpc.NewClient(zrpc.RpcClientConf{
-		Endpoints: []string{"127.0.0.1:9004"}, // 音频处理RPC服务地址
-		Timeout:   75000,                      // 75秒超时
-	})
-	if err != nil {
-		panic("failed to create audio processing rpc client: " + err.Error())
-	}
-	audioProcessingClient := audioprocessing.NewAudioProcessingServiceClient(audioRpcClient.Conn())
-
-	// 初始化视频处理RPC客户端
-	videoRpcClient, err := zrpc.NewClient(zrpc.RpcClientConf{
-		Endpoints: []string{"127.0.0.1:9005"}, // 视频处理RPC服务地址
-		Timeout:   120000,                     // 120秒超时
-	})
-	if err != nil {
-		panic("failed to create video processing rpc client: " + err.Error())
-	}
-	videoProcessingClient := videoprocessing.NewVideoProcessingServiceClient(videoRpcClient.Conn())
-
 	return &ServiceContext{
 		Config: c,
 
@@ -85,12 +56,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 		// AI服务
 		AIClient: aiClient,
-
-		// 音频处理RPC客户端
-		AudioProcessingRpc: audioProcessingClient,
-
-		// 视频处理RPC客户端
-		VideoProcessingRpc: videoProcessingClient,
 
 		// 中间件
 		JwtAuthMiddleware: func(next http.HandlerFunc) http.HandlerFunc {

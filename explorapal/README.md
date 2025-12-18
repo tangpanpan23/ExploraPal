@@ -11,24 +11,31 @@
 - **多模态交互**：支持图像识别、语音处理、AI对话
 - **项目式学习**：将探索过程组织为完整的"研究项目"
 
-## MVP功能 - 发现口袋：恐龙篇
+## 核心功能
 
-### 核心流程：观察 → 提问 → 表达
+### 🎯 MVP版本：发现口袋 - 恐龙篇
 
-1. **观察阶段**
+#### 完整学习流程：观察 → 提问 → 表达 → 创作
+
+1. **观察阶段** 🔍
    - 孩子拍照上传恐龙图片
    - AI图像识别分析恐龙特征
    - 生成AR增强信息和观察建议
 
-2. **提问引导**
+2. **提问引导** ❓
    - 基于观察结果生成个性化问题
    - 问题类型：观察、推理、实验、比较
    - AI提供答案和延伸思考
 
-3. **表达阶段**
-   - 语音转文字记录想法
+3. **表达阶段** 🎤
+   - 语音转文字记录想法（新增）
    - AI润色生成研究笔记
-   - 自动生成分享卡片
+   - 文字转语音播报内容（新增）
+
+4. **创作阶段** 🎬
+   - 生成研究报告
+   - 视频内容分析（新增）
+   - AI视频创作（新增）
 
 ## 技术架构
 
@@ -36,19 +43,19 @@
 - **框架**: Go + go-zero 微服务框架
 - **数据库**: MySQL
 - **缓存**: Redis
-- **AI服务**: 阿里云Qwen系列大模型 (qwen3-vl-plus, qwen-flash, qwen3-max)
-- **架构**: API服务 + RPC服务 微服务架构
+- **AI服务**: 阿里云Qwen系列大模型 (qwen3-vl-plus, qwen-flash, qwen3-max, qwen3-omni-flash, qwen-vl-plus)
+- **多媒体**: 系统TTS/STT + AI视频处理
+- **架构**: 5个微服务 (API + 4个RPC服务)
 
 ### 项目结构
 ```
 explorapal/
 ├── app/
-│   ├── api/                    # REST API服务
-│   ├── project-management/rpc/ # 项目管理RPC服务
-│   ├── image-recognition/rpc/  # 图像识别RPC服务（预留）
-│   ├── audio-processing/rpc/   # 语音处理RPC服务
-│   ├── video-processing/rpc/   # 视频处理RPC服务
-│   └── ai-dialogue/rpc/        # AI对话RPC服务
+│   ├── api/                    # REST API服务 (Port 9003)
+│   ├── project-management/rpc/ # 项目管理RPC服务 (Port 9001)
+│   ├── ai-dialogue/rpc/        # AI对话RPC服务 (Port 9002)
+│   ├── audio-processing/rpc/   # 语音处理RPC服务 (Port 9004)
+│   └── video-processing/rpc/   # 视频处理RPC服务 (Port 9005)
 ├── common/                     # 通用工具
 ├── constant/                   # 常量定义
 ├── database/migrations/        # 数据库迁移
@@ -66,8 +73,20 @@ explorapal/
 - **观察记录(Observations)**: 图像分析结果
 - **问题记录(Questions)**: AI生成的问题和回答
 - **表达记录(Expressions)**: 孩子的表达内容
-- **成果(Achievements)**: 生成的研究报告、纪录片等
+- **成果(Achievements)**: 生成的研究报告、纪录片、AI视频等
 - **项目活动(ProjectActivities)**: 用户操作记录
+
+### 多媒体功能
+
+#### 🎵 语音处理
+- **语音转文字**: 支持WAV、MP3、OGG等多种音频格式
+- **文字转语音**: 支持中英文，多种语音类型和语速调节
+- **AI增强**: 结合Qwen多模态模型提升识别准确性
+
+#### 🎬 视频处理
+- **视频分析**: 多维度分析（场景、物体、情感、文字、音频）
+- **视频生成**: 基于脚本自动生成教育、故事、动画视频
+- **智能创作**: 支持自定义风格和时长
 
 ## API接口设计
 
@@ -88,15 +107,15 @@ explorapal/
 - `POST /api/expression/speech/text` - 语音转文字
 - `POST /api/expression/note/polish` - AI润色笔记
 
-### 语音处理
-- `POST /api/audio/text-to-speech` - 文字转语音
+### 语音处理 🎵
+- `POST /api/audio/text-to-speech` - 文字转语音播报
 
-### 成果生成
+### 成果生成 🎬
 - `POST /api/achievement/report/generate` - 生成研究报告
-- `POST /api/achievement/documentary/generate` - 生成纪录片
+- `POST /api/achievement/documentary/generate` - 生成纪录片脚本
 - `POST /api/achievement/poster/generate` - 生成学术海报
-- `POST /api/achievement/video/analyze` - 视频内容分析
-- `POST /api/achievement/video/generate` - AI视频生成
+- `POST /api/achievement/video/analyze` - 深度视频内容分析
+- `POST /api/achievement/video/generate` - AI视频创作
 
 ## AI能力集成
 
@@ -107,16 +126,22 @@ explorapal/
 - **qwen3-omni-flash** (48K): 多模态大模型，支持语音转文字、文字转语音和音频分析
 - **qwen-vl-plus** (系列): 视频理解和生成，支持多媒体内容创作
 
-### 开发环境降级机制
-当AI服务不可用时，系统会自动降级到模拟响应模式：
-- ✅ 图像分析：返回合理的默认分析结果
-- ✅ 视频分析：提供多维度分析结果（场景、物体、情感、文字、音频）
-- ✅ 问题生成：提供预设的教育性问题
-- ✅ 笔记润色：保持原始内容并添加基本结构
-- ✅ 语音转文字：返回模拟识别结果
-- ✅ 文字转语音：返回模拟音频数据
-- ✅ 视频生成：生成模板化视频内容
-- ✅ 报告生成：生成模板化的研究报告
+### 多媒体降级机制
+当AI服务不可用时，系统会自动降级到模拟响应：
+
+#### 🎨 视觉处理
+- ✅ **图像分析**: 返回合理的默认分析结果
+- ✅ **视频分析**: 提供多维度分析结果（场景、物体、情感、文字、音频）
+
+#### 🎵 语音处理
+- ✅ **语音转文字**: 返回模拟识别结果
+- ✅ **文字转语音**: 返回模拟音频数据（base64编码）
+
+#### 📝 内容生成
+- ✅ **问题生成**: 提供预设的教育性问题
+- ✅ **笔记润色**: 保持原始内容并添加基本结构
+- ✅ **视频生成**: 生成模板化视频内容和元数据
+- ✅ **报告生成**: 生成模板化的研究报告
 
 这样确保即使在没有外部AI服务的情况下，MVP演示功能也能正常运行。
 

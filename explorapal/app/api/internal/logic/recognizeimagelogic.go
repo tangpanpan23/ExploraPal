@@ -61,7 +61,7 @@ func (l *RecognizeImageLogic) RecognizeImage(req *types.RecognizeImageReq) (resp
 	resp = &types.RecognizeImageResp{
 		ObjectName:    rpcResp.ObjectName,
 		Category:      rpcResp.Category,
-		Confidence:    rpcResp.Confidence,
+		Confidence:    float64(rpcResp.Confidence),
 		Description:   rpcResp.Description,
 		KeyFeatures:   rpcResp.KeyFeatures,
 		ScientificName: rpcResp.ScientificName,

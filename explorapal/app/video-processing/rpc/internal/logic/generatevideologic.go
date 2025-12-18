@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 
-	videoprocessing "explorapal/app/video-processing/rpc"
+	videoprocessing "explorapal/app/video-processing/proto"
 	"explorapal/app/video-processing/rpc/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"

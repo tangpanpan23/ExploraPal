@@ -41,7 +41,7 @@ func (l *GenerateQuestionsLogic) GenerateQuestions(req *types.GenerateQuestionsR
 	rpcResp, err := aiClient.GenerateQuestions(l.ctx, &aidialogue.GenerateQuestionsReq{
 		ContextInfo: req.ContextInfo,
 		Category:    req.Category,
-		UserAge:     req.UserAge,
+		UserAge:     int64(req.UserAge),
 	})
 	if err != nil {
 		l.Logger.Errorf("调用AI生成问题服务失败: %v", err)
@@ -49,9 +49,9 @@ func (l *GenerateQuestionsLogic) GenerateQuestions(req *types.GenerateQuestionsR
 	}
 
 	// 转换响应格式
-	questions := make([]types.QuestionItem, 0, len(rpcResp.Questions))
+	questions := make([]types.Question, 0, len(rpcResp.Questions))
 	for _, item := range rpcResp.Questions {
-		questions = append(questions, types.QuestionItem{
+		questions = append(questions, types.Question{
 			Content:    item.Content,
 			Type:       item.Type,
 			Difficulty: item.Difficulty,

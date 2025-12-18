@@ -42,7 +42,7 @@ func (l *PolishNoteLogic) PolishNote(req *types.PolishNoteReq) (resp *types.Poli
 		RawContent:  req.RawContent,
 		ContextInfo: req.ContextInfo,
 		Category:    req.Category,
-		UserAge:     req.UserAge,
+		UserAge:     int64(req.UserAge),
 	})
 	if err != nil {
 		l.Logger.Errorf("调用AI笔记润色服务失败: %v", err)

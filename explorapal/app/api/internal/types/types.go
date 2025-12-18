@@ -162,9 +162,12 @@ type GeneratePosterResp struct {
 }
 
 type GenerateQuestionsReq struct {
-	ProjectId     int64 `json:"project_id" desc:"项目ID"`
-	UserId        int64 `json:"user_id" desc:"用户ID"`
-	ObservationId int64 `json:"observation_id" desc:"观察记录ID"`
+	ProjectId     int64  `json:"project_id" desc:"项目ID"`
+	UserId        int64  `json:"user_id" desc:"用户ID"`
+	ObservationId int64  `json:"observation_id" desc:"观察记录ID"`
+	ContextInfo   string `json:"context_info" desc:"观察上下文信息"`
+	Category      string `json:"category" desc:"项目类别"`
+	UserAge       int32  `json:"user_age" desc:"用户年龄"`
 }
 
 type GenerateQuestionsResp struct {
@@ -172,14 +175,20 @@ type GenerateQuestionsResp struct {
 }
 
 type GenerateReportReq struct {
-	ProjectId int64 `json:"project_id" desc:"项目ID"`
-	UserId    int64 `json:"user_id" desc:"用户ID"`
+	ProjectId   int64  `json:"project_id" desc:"项目ID"`
+	UserId      int64  `json:"user_id" desc:"用户ID"`
+	ProjectData string `json:"project_data" desc:"项目数据"`
+	Category    string `json:"category" desc:"项目类别"`
 }
 
 type GenerateReportResp struct {
-	Report        ResearchReport `json:"report" desc:"研究报告"`
-	AchievementId int64          `json:"achievement_id" desc:"成果ID"`
-	ShareUrl      string         `json:"share_url" desc:"分享URL"`
+	Title         string `json:"title" desc:"报告标题"`
+	Content       string `json:"content" desc:"报告内容"`
+	Abstract      string `json:"abstract" desc:"报告摘要"`
+	Conclusion    string `json:"conclusion" desc:"结论"`
+	NextSteps     string `json:"next_steps" desc:"下一步建议"`
+	AchievementId int64  `json:"achievement_id" desc:"成果ID"`
+	ShareUrl      string `json:"share_url" desc:"分享URL"`
 }
 
 type GenerateVideoReq struct {
@@ -242,20 +251,26 @@ type ObservationInfo struct {
 }
 
 type PolishNoteReq struct {
-	ProjectId   int64       `json:"project_id" desc:"项目ID"`
-	UserId      int64       `json:"user_id" desc:"用户ID"`
-	QuestionId  int64       `json:"question_id" desc:"相关问题ID"`
-	RawContent  string      `json:"raw_content" desc:"原始内容"`
-	ContentType string      `json:"content_type" desc:"内容类型：speech,text"`
-	ContextInfo ContextInfo `json:"context_info,optional" desc:"上下文信息"`
+	ProjectId   int64  `json:"project_id" desc:"项目ID"`
+	UserId      int64  `json:"user_id" desc:"用户ID"`
+	QuestionId  int64  `json:"question_id" desc:"相关问题ID"`
+	RawContent  string `json:"raw_content" desc:"原始内容"`
+	ContentType string `json:"content_type" desc:"内容类型：speech,text"`
+	ContextInfo string `json:"context_info,optional" desc:"上下文信息"`
+	Category    string `json:"category" desc:"项目类别"`
+	UserAge     int32  `json:"user_age" desc:"用户年龄"`
 }
 
 type PolishNoteResp struct {
-	OriginalContent string       `json:"original_content" desc:"原始内容"`
-	PolishedNote    PolishedNote `json:"polished_note" desc:"润色后的笔记"`
-	ExpressionId    int64        `json:"expression_id" desc:"表达记录ID"`
-	Suggestions     []string     `json:"suggestions" desc:"改进建议"`
-	KeyLearnings    []string     `json:"key_learnings" desc:"关键学习点"`
+	Title            string   `json:"title" desc:"笔记标题"`
+	Summary          string   `json:"summary" desc:"内容总结"`
+	KeyPoints        []string `json:"key_points" desc:"关键要点"`
+	FormattedText    string   `json:"formatted_text" desc:"格式化文本"`
+	OriginalContent  string   `json:"original_content" desc:"原始内容"`
+	PolishedNote     PolishedNote `json:"polished_note" desc:"润色后的笔记"`
+	ExpressionId     int64    `json:"expression_id" desc:"表达记录ID"`
+	Suggestions      []string `json:"suggestions" desc:"改进建议"`
+	KeyLearnings     []string `json:"key_learnings" desc:"关键学习点"`
 }
 
 type PolishedNote struct {
@@ -366,17 +381,26 @@ type RecognitionResult struct {
 }
 
 type RecognizeImageReq struct {
-	ObservationId int64 `json:"observation_id" desc:"观察记录ID"`
-	ProjectId     int64 `json:"project_id" desc:"项目ID"`
-	UserId        int64 `json:"user_id" desc:"用户ID"`
+	ObservationId int64  `json:"observation_id" desc:"观察记录ID"`
+	ProjectId     int64  `json:"project_id" desc:"项目ID"`
+	UserId        int64  `json:"user_id" desc:"用户ID"`
+	ImageUrl      string `json:"image_url" desc:"图片URL"`
+	Prompt        string `json:"prompt,optional" desc:"分析提示"`
+	Category      string `json:"category" desc:"项目类别"`
 }
 
 type RecognizeImageResp struct {
-	ObservationId    int64             `json:"observation_id" desc:"观察记录ID"`
+	ObjectName       string   `json:"object_name" desc:"识别出的物体名称"`
+	Category         string   `json:"category" desc:"物体类别"`
+	Confidence       float64  `json:"confidence" desc:"识别置信度"`
+	Description      string   `json:"description" desc:"物体描述"`
+	KeyFeatures      []string `json:"key_features" desc:"关键特征"`
+	ScientificName   string   `json:"scientific_name,optional" desc:"科学名称"`
+	ObservationId    int64    `json:"observation_id" desc:"观察记录ID"`
 	Recognition      RecognitionResult `json:"recognition" desc:"识别结果"`
-	Suggestions      []string          `json:"suggestions" desc:"AI建议的观察要点"`
-	NextActions      []string          `json:"next_actions" desc:"建议的下一步行动"`
-	InterestingFacts []string          `json:"interesting_facts" desc:"有趣的事实"`
+	Suggestions      []string `json:"suggestions" desc:"AI建议的观察要点"`
+	NextActions      []string `json:"next_actions" desc:"建议的下一步行动"`
+	InterestingFacts []string `json:"interesting_facts" desc:"有趣的事实"`
 }
 
 type Reference struct {

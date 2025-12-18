@@ -3,14 +3,14 @@ package server
 import (
 	"context"
 
-	videoprocessing "explorapal/app/video-processing/rpc"
+	videoprocessing "explorapal/app/video-processing/proto"
 	"explorapal/app/video-processing/rpc/internal/logic"
 	"explorapal/app/video-processing/rpc/internal/svc"
 )
 
 type VideoProcessingServiceServer struct {
 	svcCtx *svc.ServiceContext
-	rpc.UnimplementedVideoProcessingServiceServer
+	videoprocessing.UnimplementedVideoProcessingServiceServer
 }
 
 func NewVideoProcessingServiceServer(svcCtx *svc.ServiceContext) *VideoProcessingServiceServer {

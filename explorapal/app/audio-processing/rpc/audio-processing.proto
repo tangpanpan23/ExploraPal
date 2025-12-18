@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package audioprocessing;
-option go_package = "explorapal/app/audio-processing/rpc";
+option go_package = "explorapal/app/audio-processing/proto";
 
 // 语音转文字请求
 message SpeechToTextReq {

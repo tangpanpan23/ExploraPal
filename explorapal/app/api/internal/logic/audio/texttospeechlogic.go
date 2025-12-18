@@ -6,9 +6,10 @@ import (
 
 	"explorapal/app/api/internal/svc"
 	"explorapal/app/api/internal/types"
-	"explorapal/app/audio-processing/rpc"
+	audioprocessing "explorapal/app/audio-processing/proto"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type TextToSpeechLogic struct {
@@ -28,7 +29,18 @@ func NewTextToSpeechLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Text
 func (l *TextToSpeechLogic) TextToSpeech(req *types.TextToSpeechReq) (resp *types.TextToSpeechResp, err error) {
 	// TODO: 实现文字转语音逻辑
 
-	// 1. 准备RPC请求
+	// 1. 创建音频处理RPC客户端
+	audioRpcClient, err := zrpc.NewClient(zrpc.RpcClientConf{
+		Endpoints: []string{"127.0.0.1:9004"}, // 音频处理RPC服务地址
+		Timeout:   75000,                      // 75秒超时
+	})
+	if err != nil {
+		l.Logger.Errorf("创建语音处理RPC客户端失败: %v", err)
+		return l.getDefaultTextToSpeechResponse(req), nil
+	}
+
+	// 2. 准备RPC请求
+	audioProcessingClient := audioprocessing.NewAudioProcessingServiceClient(audioRpcClient.Conn())
 	rpcReq := &audioprocessing.TextToSpeechReq{
 		Text:     req.Text,
 		Voice:    req.Voice,
@@ -36,15 +48,15 @@ func (l *TextToSpeechLogic) TextToSpeech(req *types.TextToSpeechReq) (resp *type
 		Speed:    req.Speed,
 	}
 
-	// 2. 调用音频处理RPC服务
-	rpcResp, err := l.svcCtx.AudioProcessingRpc.TextToSpeech(l.ctx, rpcReq)
+	// 3. 调用音频处理RPC服务
+	rpcResp, err := audioProcessingClient.TextToSpeech(l.ctx, rpcReq)
 	if err != nil {
 		l.Logger.Errorf("调用语音处理RPC服务失败: %v", err)
 		// 返回模拟响应
 		return l.getDefaultTextToSpeechResponse(req), nil
 	}
 
-	// 3. 将音频数据编码为base64
+	// 4. 将音频数据编码为base64
 	audioDataBase64 := base64.StdEncoding.EncodeToString(rpcResp.AudioData)
 
 	return &types.TextToSpeechResp{

@@ -3,7 +3,7 @@ package logic
 import (
 	"context"
 
-	videoprocessing "explorapal/app/video-processing/rpc"
+	videoprocessing "explorapal/app/video-processing/proto"
 	"explorapal/app/video-processing/rpc/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"

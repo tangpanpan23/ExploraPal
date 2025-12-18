@@ -9,9 +9,11 @@
 ## 核心功能流程
 
 ```
-观察阶段 → 提问引导 → 表达阶段 → 成果生成
-   ↓          ↓          ↓          ↓
- 图片分析    AI问题     笔记润色   研究报告
+观察阶段 → 提问引导 → 表达阶段 → 成果生成 → 多媒体创作
+   ↓          ↓          ↓          ↓          ↓
+ 图片分析    AI问题     语音交互   研究报告   视频创作
+   ↓          ↓          ↓          ↓          ↓
+ 视频分析    深度思考   内容润色   纪录片     AI视频
 ```
 
 ## 快速开始
@@ -220,6 +222,156 @@ curl -X POST "http://localhost:9003/api/project/status/update" \
   }'
 ```
 
+#### 步骤6：语音交互 - 文字转语音播报
+
+```bash
+# 将研究总结转换为语音播报
+curl -X POST "http://localhost:9003/api/audio/text-to-speech" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "project_id": 1,
+    "user_id": 1,
+    "text": "小明通过探索三角龙，学习到了恐龙的基本特征和生活习性。原来三角龙是草食性恐龙，有三只角和颈部骨板来保护自己。",
+    "voice": "female",
+    "language": "zh-CN",
+    "speed": 1.0
+  }'
+```
+
+**响应示例**:
+```json
+{
+  "status": 200,
+  "msg": "文字转语音成功",
+  "audio_data": "UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmQbBzeR1/LNeS0F",
+  "format": "wav",
+  "duration": 12.5,
+  "expression_id": 0
+}
+```
+
+#### 步骤7：多媒体创作 - AI视频生成
+
+```bash
+# 基于项目内容生成教学视频
+curl -X POST "http://localhost:9003/api/achievement/video/generate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "project_id": 1,
+    "user_id": 1,
+    "script": "欢迎来到恐龙世界！今天我们来学习三角龙。三角龙是一种古老的爬行动物，有三只角和坚硬的骨板...",
+    "style": "educational",
+    "duration": 60.0,
+    "scenes": [
+      "三角龙外形介绍",
+      "生活习性展示",
+      "生存环境再现"
+    ],
+    "voice": "female",
+    "language": "zh-CN"
+  }'
+```
+
+**响应示例**:
+```json
+{
+  "status": 200,
+  "msg": "视频生成成功",
+  "video_data": "AAAFMHN1Ym1oYXJ0YmVhdAFtZXRhZGF0YQABAA...",
+  "format": "mp4",
+  "duration": 60.0,
+  "metadata": {
+    "title": "三角龙探秘视频",
+    "description": "AI生成的三角龙教学视频",
+    "scenes": [
+      "三角龙外形介绍",
+      "生活习性展示",
+      "生存环境再现"
+    ],
+    "audio_language": "zh-CN",
+    "resolution": "1920x1080"
+  },
+  "achievement_id": 0
+}
+```
+
+#### 步骤8：内容分析 - 深度视频理解
+
+```bash
+# 分析用户上传的恐龙视频
+curl -X POST "http://localhost:9003/api/achievement/video/analyze" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "project_id": 1,
+    "user_id": 1,
+    "video_data": "AAAFMHN1Ym1oYXJ0YmVhdAFtZXRhZGF0YQABAA...",
+    "video_format": "mp4",
+    "analysis_type": "content",
+    "duration": 30.0
+  }'
+```
+
+**响应示例**:
+```json
+{
+  "status": 200,
+  "msg": "视频分析成功",
+  "video_analysis": {
+    "scenes": [
+      {
+        "timestamp": 0.0,
+        "scene_type": "educational",
+        "confidence": 0.92,
+        "description": "教室场景，老师在讲解恐龙知识"
+      }
+    ],
+    "objects": [
+      {
+        "timestamp": 5.0,
+        "object_name": "三角龙模型",
+        "confidence": 0.88,
+        "bbox": {
+          "x": 200,
+          "y": 150,
+          "width": 400,
+          "height": 300
+        }
+      }
+    ],
+    "texts": [
+      {
+        "timestamp": 10.0,
+        "text": "三角龙Triceratops",
+        "language": "zh-CN",
+        "confidence": 0.95,
+        "bbox": {
+          "x": 100,
+          "y": 50,
+          "width": 300,
+          "height": 60
+        }
+      }
+    ],
+    "audio": [
+      {
+        "timestamp": 15.0,
+        "transcription": "三角龙是白垩纪晚期的恐龙",
+        "language": "zh-CN",
+        "confidence": 0.91
+      }
+    ],
+    "summary": {
+      "title": "恐龙纪录片分析",
+      "description": "视频主要介绍了三角龙的特征和习性",
+      "keywords": ["三角龙", "恐龙", "白垩纪", "草食性"],
+      "category": "educational",
+      "duration": 30.0
+    }
+  },
+  "achievement_id": 0
+}
+```
+
 ## API 接口列表
 
 ### 项目管理
@@ -333,4 +485,22 @@ curl -X POST "http://localhost:9003/api/observation/image/recognize" \
 
 **演示完成！** 🎉
 
-这个MVP展示了完整的AI辅助儿童学习流程，从观察图片开始，通过AI引导生成问题，再到润色表达，最终生成研究报告，帮助孩子将兴趣转化为系统的学习成果。
+这个MVP展示了完整的AI辅助儿童学习生态系统：
+
+#### 🔍 核心学习流程
+- **观察阶段**: 图像识别 + 视频内容分析
+- **提问引导**: AI生成个性化学习问题
+- **表达阶段**: 语音交互 + 内容创作
+- **成果生成**: 多媒体内容创作
+
+#### 🎵 多媒体创新
+- **语音交互**: 语音转文字 + 文字转语音
+- **视频创作**: AI视频生成 + 深度内容分析
+- **沉浸式学习**: 视觉、听觉、交互多维体验
+
+#### 🤖 AI能力展示
+- **多模态理解**: 文本、图像、语音、视频全覆盖
+- **个性化学习**: 根据儿童年龄和兴趣定制内容
+- **创作赋能**: 从被动学习到主动创作的转变
+
+探索伙伴不仅是学习工具，更是儿童创意表达的AI伙伴！🚀✨

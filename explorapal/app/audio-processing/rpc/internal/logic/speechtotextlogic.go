@@ -3,7 +3,7 @@ package logic
 import (
 	"context"
 
-	"explorapal/app/audio-processing/rpc"
+	"explorapal/app/audio-processing/proto"
 	"explorapal/app/audio-processing/rpc/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"

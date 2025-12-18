@@ -6,9 +6,10 @@ import (
 
 	"explorapal/app/api/internal/svc"
 	"explorapal/app/api/internal/types"
-	videoprocessing "explorapal/app/video-processing/rpc"
+	videoprocessing "explorapal/app/video-processing/proto"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type GenerateVideoLogic struct {
@@ -28,7 +29,18 @@ func NewGenerateVideoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Gen
 func (l *GenerateVideoLogic) GenerateVideo(req *types.GenerateVideoReq) (resp *types.GenerateVideoResp, err error) {
 	// TODO: 实现视频生成逻辑
 
-	// 1. 调用视频处理RPC服务
+	// 1. 创建视频处理RPC客户端
+	videoRpcClient, err := zrpc.NewClient(zrpc.RpcClientConf{
+		Endpoints: []string{"127.0.0.1:9005"}, // 视频处理RPC服务地址
+		Timeout:   120000,                     // 120秒超时
+	})
+	if err != nil {
+		l.Logger.Errorf("创建视频处理RPC客户端失败: %v", err)
+		return l.getDefaultGenerateVideoResponse(req), nil
+	}
+
+	// 2. 调用视频处理RPC服务
+	videoProcessingClient := videoprocessing.NewVideoProcessingServiceClient(videoRpcClient.Conn())
 	rpcReq := &videoprocessing.GenerateVideoReq{
 		Script:  req.Script,
 		Style:   req.Style,
@@ -38,7 +50,7 @@ func (l *GenerateVideoLogic) GenerateVideo(req *types.GenerateVideoReq) (resp *t
 		Language: req.Language,
 	}
 
-	rpcResp, err := l.svcCtx.VideoProcessingRpc.GenerateVideo(l.ctx, rpcReq)
+	rpcResp, err := videoProcessingClient.GenerateVideo(l.ctx, rpcReq)
 	if err != nil {
 		l.Logger.Errorf("调用视频处理RPC服务失败: %v", err)
 		// 返回模拟结果
