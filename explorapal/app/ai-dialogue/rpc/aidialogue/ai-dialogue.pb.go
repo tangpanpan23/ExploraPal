@@ -807,6 +807,5 @@ func file_ai_dialogue_proto_init() {
 		MessageInfos:      file_ai_dialogue_proto_msgTypes,
 	}.Build()
 	File_ai_dialogue_proto = out.File
-	file_ai_dialogue_proto_msgTypes = nil
-	file_ai_dialogue_proto_depIdxs = nil
+	// Keep the arrays for ProtoReflect to work
 }

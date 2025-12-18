@@ -64,7 +64,86 @@ sudo kill -9 <PID>
 | AI对话RPC | 9002 | `app/ai-dialogue/rpc/etc/ai-dialogue.yaml` |
 | API服务 | 9003 | `app/api/etc/api.yaml` |
 
-## 其他常见问题
+### RPC调用超时错误
+
+**错误信息：**
+```
+rpc error: code = DeadlineExceeded desc = context deadline exceeded
+```
+
+**说明：**
+RPC客户端默认超时时间为2秒，已调整为60秒以匹配AI服务的超时设置。
+
+**错误信息：**
+```
+context deadline exceeded
+Qwen多模态API调用失败: Post "http://ai-service.tal.com/...": context deadline exceeded
+```
+
+**说明：**
+AI服务调用超时时间设置为60秒。如果在60秒内没有收到响应，系统会自动降级到模拟响应，确保用户体验不受影响。
+
+**解决方案：**
+
+1. **检查网络连接和AI服务可用性**
+   ```bash
+   # 测试AI服务连接
+   curl -m 5 "http://ai-service.tal.com/openai-compatible/v1/chat/completions" \
+     -H "Authorization: Bearer 300000712:9ffb0776d5409f4131f0a314fd5cb80e" \
+     -d '{"model":"qwen-flash","messages":[{"role":"user","content":"test"}]}'
+   ```
+
+2. **系统已自动降级处理**
+   - 当AI服务不可用时，系统会自动返回模拟响应
+   - 模拟响应包含合理的内容，适合演示和测试
+   - 查看日志确认降级是否生效
+
+3. **修改超时配置**
+   ```yaml
+   # 在配置文件中调整超时时间（如果需要）
+   AIService:
+     Timeout: 60  # 当前设置为60秒
+   ```
+
+4. **开发环境模拟模式**
+   - 系统已内置模拟响应，无需外部AI服务即可演示完整功能
+   - 模拟响应会根据输入内容提供相应的默认结果
+
+### API路由404错误
+
+**错误信息：**
+```
+[HTTP] 404 - POST /api/project/create
+```
+
+**可能原因和解决方案：**
+
+1. **API服务未运行**
+   ```bash
+   cd explorapal/app/api
+   go run api.go
+   ```
+
+2. **路由未正确注册**
+   - 检查 `app/api/internal/handler/routes.go` 中的 `registerProjectHandlers` 函数
+   - 确保路径包含完整的前缀：`/api/project/create`
+
+3. **项目管理RPC服务未运行**
+   ```bash
+   cd explorapal/app/project-management/rpc
+   go run projectmanagementservice.go
+   ```
+
+4. **配置问题**
+   - 检查 `app/api/etc/api.yaml` 中的端口配置（应该是9003）
+   - 检查 `app/project-management/rpc/etc/project-management.yaml` 中的端口配置（应该是9001）
+
+5. **测试API**
+   ```bash
+   # 运行测试脚本
+   chmod +x test_api.sh
+   ./test_api.sh
+   ```
 
 ### Protobuf代码未生成
 

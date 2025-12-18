@@ -1,11 +1,14 @@
 package svc
 
 import (
+	"net/http"
+
 	"explorapal/app/api/internal/config"
 	"explorapal/app/model/hps"
 	"explorapal/third/openai"
 
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"github.com/zeromicro/go-zero/rest"
 )
 
 type ServiceContext struct {
@@ -21,6 +24,9 @@ type ServiceContext struct {
 
 	// AI服务客户端
 	AIClient *openai.Client
+
+	// 中间件
+	JwtAuthMiddleware rest.Middleware
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -50,5 +56,14 @@ func NewServiceContext(c config.Config) *ServiceContext {
 
 		// AI服务
 		AIClient: aiClient,
+
+		// 中间件
+		JwtAuthMiddleware: func(next http.HandlerFunc) http.HandlerFunc {
+			return func(w http.ResponseWriter, r *http.Request) {
+				// 暂时跳过JWT验证，直接调用下一个处理器
+				// TODO: 实现JWT认证逻辑
+				next(w, r)
+			}
+		},
 	}
 }

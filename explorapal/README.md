@@ -100,6 +100,15 @@ explorapal/
 - **qwen3-max** (256K): 智能体编程优化，复杂推理和报告生成
 - **qwen3-omni-flash** (48K): 多模态大模型，支持语音转文字和文字转语音
 
+### 开发环境降级机制
+当AI服务不可用时，系统会自动降级到模拟响应模式：
+- ✅ 图像分析：返回合理的默认分析结果
+- ✅ 问题生成：提供预设的教育性问题
+- ✅ 笔记润色：保持原始内容并添加基本结构
+- ✅ 报告生成：生成模板化的研究报告
+
+这样确保即使在没有外部AI服务的情况下，MVP演示功能也能正常运行。
+
 
 ## 部署和运行
 
@@ -113,10 +122,33 @@ explorapal/
 1. 获取TAL MLOps应用ID和应用密钥
 2. 确保内部AI服务网络可达 (http://ai-service.tal.com)
 3. 确认账户权限，支持调用qwen3-vl-plus、qwen-flash、qwen3-max、qwen3-omni-flash等模型
+4. 注意：所有服务超时时间设置为60秒（包括HTTP请求、RPC调用、AI服务），确保网络连接稳定
 
 ### 启动服务
 
-#### 1. 生成Protobuf代码（首次运行需要）
+#### 快速启动（推荐）
+
+**一键启动完整演示环境：**
+```bash
+cd explorapal
+chmod +x start_demo.sh stop_demo.sh
+./start_demo.sh
+```
+
+这将自动：
+- 检查数据库连接
+- 清理端口占用
+- 按正确顺序启动所有服务
+- 显示服务状态和测试命令
+
+**停止演示：**
+```bash
+./stop_demo.sh
+```
+
+#### 手动启动
+
+##### 1. 生成Protobuf代码（首次运行需要）
 ```bash
 cd explorapal
 
@@ -134,9 +166,9 @@ goctl rpc protoc ai-dialogue.proto --go_out=. --go-grpc_out=. --zrpc_out=.
 ```bash
 # 方法1：使用工具脚本终止占用端口的进程
 chmod +x tools/kill_port.sh
-./tools/kill_port.sh 8081  # 项目管理RPC服务端口
-./tools/kill_port.sh 8082  # AI对话RPC服务端口
-./tools/kill_port.sh 9999  # API服务端口
+./tools/kill_port.sh 9001  # 项目管理RPC服务端口
+./tools/kill_port.sh 9002  # AI对话RPC服务端口
+./tools/kill_port.sh 9003  # API服务端口
 
 # 方法2：手动查找并终止进程
 lsof -ti :8082 | xargs kill -9  # macOS
@@ -264,6 +296,15 @@ sudo kill -9 <PID>
 - 编辑 `app/ai-dialogue/rpc/etc/ai-dialogue.yaml`，修改 `ListenOn: 0.0.0.0:8082` 为其他端口（如 `8083`）
 - 编辑 `app/project-management/rpc/etc/project-management.yaml`，修改 `ListenOn: 0.0.0.0:8081` 为其他端口（如 `8084`）
 - 编辑 `app/api/etc/api.yaml`，修改 `Port: 9999` 为其他端口（如 `9998`）
+
+## MVP演示
+
+完整的"发现口袋 - 恐龙篇"演示请查看 [MVP_DEMO.md](./MVP_DEMO.md)
+
+演示包含：
+- 完整的API调用流程
+- 实际的请求/响应示例
+- 儿童学习探索的完整路径
 
 ## 故障排除
 

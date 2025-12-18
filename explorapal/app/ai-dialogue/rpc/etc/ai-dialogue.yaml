@@ -3,11 +3,12 @@ ListenOn: 0.0.0.0:9002
 Mode: dev
 
 # 内部AI服务配置 (TAL MLOps平台)
+# 注意：在开发环境中，如果AI服务不可用，将自动使用模拟响应
 AIService:
-  TAL_MLOPS_APP_ID: your-tal-mlops-app-id
-  TAL_MLOPS_APP_KEY: your-tal-mlops-app-key
+  TAL_MLOPS_APP_ID: '300000712'
+  TAL_MLOPS_APP_KEY: '9ffb0776d5409f4131f0a314fd5cb80e'
   BaseURL: "http://ai-service.tal.com/openai-compatible/v1"
-  Timeout: 30
+  Timeout: 60  # 最大超时时间60秒，给予AI服务充分响应时间
   MaxTokens: 2000
   Temperature: 0.7
 

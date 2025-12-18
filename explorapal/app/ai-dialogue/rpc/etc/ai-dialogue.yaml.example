@@ -7,7 +7,7 @@ AIService:
   TAL_MLOPS_APP_ID: your-tal-mlops-app-id
   TAL_MLOPS_APP_KEY: your-tal-mlops-app-key
   BaseURL: "http://ai-service.tal.com/openai-compatible/v1"
-  Timeout: 30
+  Timeout: 60
   MaxTokens: 2000
   Temperature: 0.7
 
