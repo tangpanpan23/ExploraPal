@@ -4,8 +4,9 @@ import (
 	"context"
 
 	videoprocessing "explorapal/app/video-processing/proto"
-	"explorapal/app/video-processing/rpc/internal/logic"
 	"explorapal/app/video-processing/rpc/internal/svc"
+
+	logic "explorapal/app/video-processing/rpc/internal/logic"
 )
 
 type VideoProcessingServiceServer struct {
