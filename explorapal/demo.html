@@ -394,6 +394,71 @@
             font-weight: 600;
         }
 
+        /* Markdown内容样式 */
+        .markdown-content {
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .markdown-content h2 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 20px 0 10px 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+
+        .markdown-content h3 {
+            color: #34495e;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 15px 0 8px 0;
+        }
+
+        .markdown-content h4 {
+            color: #34495e;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 12px 0 6px 0;
+        }
+
+        .markdown-content p {
+            margin: 10px 0;
+        }
+
+        .markdown-content strong {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .markdown-content ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .markdown-content li {
+            margin: 5px 0;
+            list-style-type: disc;
+        }
+
+        .markdown-content blockquote {
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin: 15px 0;
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-style: italic;
+            color: #555;
+        }
+
+        .markdown-content hr {
+            border: none;
+            border-top: 1px solid #e9ecef;
+            margin: 20px 0;
+        }
+
         .response-details {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -1057,6 +1122,8 @@
                     style="margin-left: 10px;">直接跳到步骤2</button>
                 <button class="btn btn-outline-info" onclick="testAllStepResponses()"
                     style="margin-left: 10px;">测试所有响应</button>
+                <button class="btn btn-outline-success" onclick="testMarkdownRendering()"
+                    style="margin-left: 10px;">测试Markdown</button>
 
                 <div class="result" id="result-1">
                     <h3>创建结果</h3>
@@ -3075,6 +3142,55 @@ API响应格式: { project_id: number, project_code: string, status: string }
             console.log('\n🎉 所有步骤响应显示测试完成');
         }
 
+        // 测试Markdown渲染
+        function testMarkdownRendering() {
+            console.log('🧪 测试Markdown渲染功能');
+
+            const testMarkdown = `# 霸王龙（Tyrannosaurus rex）分析报告
+
+这张图片展示的是一只霸王龙（Tyrannosaurus rex），也常被称为"T. rex"。它是白垩纪晚期最著名的肉食性恐龙之一，也是大众文化中最广为人知的恐龙形象。
+
+## ✅ 识别依据
+
+1. **体型与比例**：巨大的头骨、粗壮的后肢、短小的前肢、长而平衡的尾巴
+2. **头部特征**：宽大厚重的颅骨，布满锋利锯齿状牙齿
+3. **皮肤纹理**：灰绿或棕褐等保护色，并带有斑点或条纹
+
+## 🌿 特征描述
+
+- **体型**：成年霸王龙体长可达12–13米，高约4–5米，体重约8–14吨
+- **头部**：头骨长度可达1.5米，咬合力极强
+- **四肢**：前肢极短，仅有两指；后肢肌肉发达
+
+## 🍖 习性推测
+
+顶级掠食者，主要捕食大型植食性恐龙。也有学者认为它可能是机会主义清道夫，但主流观点支持其主动狩猎行为。
+
+> 图中恐龙为霸王龙（Tyrannosaurus rex） —— 一种体型庞大、力量惊人的顶级掠食者，生存于晚白垩世北美大陆，是恐龙时代的"终极王者"。
+
+---
+
+如果你对其他恐龙种类或具体细节感兴趣，欢迎继续提问！ 🦖`;
+
+            const rendered = renderMarkdown(testMarkdown);
+            console.log('📄 Markdown渲染结果:', rendered);
+
+            // 显示渲染结果
+            const testDiv = document.createElement('div');
+            testDiv.innerHTML = `
+                <div class="api-response-card">
+                    <h4>🧪 Markdown渲染测试</h4>
+                    <div class="markdown-content">${rendered}</div>
+                </div>
+            `;
+
+            // 添加到页面
+            const container = document.querySelector('.container') || document.body;
+            container.appendChild(testDiv);
+
+            console.log('✅ Markdown渲染测试完成');
+        }
+
         // 测试步骤2响应显示
         function testStep2ResponseDisplay() {
             console.log('🧪 测试步骤2响应显示功能');
@@ -3084,7 +3200,7 @@ API响应格式: { project_id: number, project_code: string, status: string }
                 object_name: '这张图片展示的是一只**霸王龙（Tyrannosaurus rex）**，也常被称为"T. rex"',
                 category: 'dinosaur',
                 confidence: 0.95,
-                description: '这张图片展示的是一只**霸王龙（Tyrannosaurus rex）**，也常被称为"T. rex"。霸王龙是史上最著名的恐龙之一，生活在大约6800万年前的白垩纪晚期，是当时陆地上的顶级掠食者。\n\n--- \n\n如果你对某一方面（如牙齿结构、演化关系、与其他暴龙科对比）想深入了解，欢迎继续提问！',
+                description: `# 霸王龙（Tyrannosaurus rex）分析报告\n\n这张图片展示的是一只霸王龙（Tyrannosaurus rex），也常被称为"T. rex"。它是白垩纪晚期最著名的肉食性恐龙之一，也是大众文化中最广为人知的恐龙形象。\n\n## ✅ 识别依据\n\n1. **体型与比例**：巨大的头骨、粗壮的后肢、短小的前肢、长而平衡的尾巴\n2. **头部特征**：宽大厚重的颅骨，布满锋利锯齿状牙齿\n3. **皮肤纹理**：灰绿或棕褐等保护色，并带有斑点或条纹\n\n## 🌿 特征描述\n\n- **体型**：成年霸王龙体长可达12–13米，高约4–5米，体重约8–14吨\n- **头部**：头骨长度可达1.5米，咬合力极强\n- **四肢**：前肢极短，仅有两指；后肢肌肉发达\n\n## 🍖 习性推测\n\n顶级掠食者，主要捕食大型植食性恐龙。\n\n> 图中恐龙为霸王龙（Tyrannosaurus rex） —— 一种体型庞大、力量惊人的顶级掠食者，生存于晚白垩世北美大陆，是恐龙时代的"终极王者"。\n\n---\n\n如果你对其他恐龙种类或具体细节感兴趣，欢迎继续提问！ 🦖`,
                 key_features: ["头部有三只角", "颈部有大骨板"]
             };
 
@@ -3846,6 +3962,44 @@ ${conclusion}
         }
 
         // 格式化图片分析响应
+        // 简单的Markdown渲染函数
+        function renderMarkdown(text) {
+            if (!text) return '';
+
+            // 转义HTML字符
+            text = text.replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+
+            // 处理引用
+            text = text.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+
+            // 处理标题
+            text = text.replace(/^### (.+)$/gm, '<h4>$1</h4>');
+            text = text.replace(/^## (.+)$/gm, '<h3>$1</h3>');
+            text = text.replace(/^# (.+)$/gm, '<h2>$1</h2>');
+
+            // 处理粗体
+            text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+            // 处理列表
+            text = text.replace(/^- (.+)$/gm, '<li>$1</li>');
+            text = text.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+
+            // 处理分隔线
+            text = text.replace(/^---+$/gm, '<hr>');
+
+            // 处理段落（将双换行转换为段落）
+            text = text.replace(/\n\n/g, '</p><p>');
+            text = '<p>' + text + '</p>';
+
+            // 清理空的段落
+            text = text.replace(/<p><\/p>/g, '');
+            text = text.replace(/<p>(<hr>)<\/p>/g, '$1');
+
+            return text;
+        }
+
         function formatImageAnalysisResponse(data) {
             console.log('🎨 formatImageAnalysisResponse 处理数据:', data);
 
@@ -3889,7 +4043,7 @@ ${conclusion}
                     ${data.description ? `
                         <div class="description-section">
                             <h5>📝 详细描述</h5>
-                            <p>${data.description.replace(/\*\*/g, '').replace(/---/g, '')}</p>
+                            <div class="markdown-content">${renderMarkdown(data.description)}</div>
                         </div>
                     ` : ''}
                     ${data.key_features && data.key_features.length ? `
