@@ -1,0 +1,85 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go executable files
+api
+rpc
+project-management
+ai-dialogue
+audio-processing
+video-processing
+image-recognition
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (uncomment if you use dep)
+# vendor/
+
+# Go workspace file
+go.work
+go.work.sum
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Database files (if using local SQLite)
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration files with sensitive data
+*.key
+*.pem
+*.crt
+*secret*
+*config.local*
+
+# Build artifacts
+dist/
+build/
+
+# Node modules (if any frontend code)
+node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Coverage reports
+coverage.html
+coverage.xml
+*.cover
+
+# Environment files
+.env
+.env.local
+.env.*.local

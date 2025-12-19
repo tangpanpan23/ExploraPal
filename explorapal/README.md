@@ -157,9 +157,14 @@ explorapal/
 ### 内部AI服务配置 (TAL MLOps平台)
 1. 获取TAL MLOps应用ID和应用密钥
 2. 确保内部AI服务网络可达 (http://ai-service.tal.com)
-3. 确认账户权限，支持调用qwen3-vl-plus、qwen-flash、qwen3-max、qwen3-omni-flash等模型
-4. 注意：所有服务超时时间设置为60秒（包括HTTP请求、RPC调用、AI服务），确保网络连接稳定
-5. 慢调用阈值：AI对话服务设置为5秒，项目管理服务设置为2秒，避免正常业务调用被误报为慢调用
+3. 确认账户权限，支持调用qwen3-vl-plus、qwen-flash、qwen3-max、qwen3-omni-flash、qwen-vl-plus等模型
+4. 注意：所有服务超时时间设置为70-120秒，确保AI处理有充分时间
+5. 慢调用阈值：AI对话服务设置为10秒，音频/视频处理设置为30秒，项目管理设置为5秒
+
+### Git提交注意事项
+- ⚠️ **不要提交编译后的可执行文件**：`api`、`rpc`、`*-processing` 等可执行文件已被 `.gitignore` 排除
+- 🔄 **提交前清理**：使用 `git status` 检查是否有不应提交的大文件
+- 📦 **仅提交源码**：项目应该只包含源代码、配置文件和文档
 
 ### 启动服务
 
