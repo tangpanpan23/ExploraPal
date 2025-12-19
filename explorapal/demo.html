@@ -1055,6 +1055,8 @@
                 <button class="btn" onclick="createProject()">创建项目</button>
                 <button class="btn btn-outline-secondary" onclick="switchStep(2)"
                     style="margin-left: 10px;">直接跳到步骤2</button>
+                <button class="btn btn-outline-info" onclick="testAllStepResponses()"
+                    style="margin-left: 10px;">测试所有响应</button>
 
                 <div class="result" id="result-1">
                     <h3>创建结果</h3>
@@ -1087,6 +1089,8 @@
                 </div>
 
                 <button class="btn" onclick="console.log('按钮被点击'); analyzeImage()" id="analyze-btn">开始分析</button>
+                <button class="btn btn-outline-info" onclick="testStep2ResponseDisplay()"
+                    style="margin-left: 10px;">测试步骤2响应</button>
 
                 <div class="progress-bar" id="progress-2">
                     <div class="progress-fill"></div>
@@ -1121,6 +1125,8 @@
                 </div>
 
                 <button class="btn" onclick="generateQuestions()">生成问题</button>
+                <button class="btn btn-outline-info" onclick="testStep3ResponseDisplay()"
+                    style="margin-left: 10px;">测试步骤3响应</button>
 
                 <div class="result" id="result-3">
                     <h3>生成的问题</h3>
@@ -1146,6 +1152,8 @@
                 </div>
 
                 <button class="btn" onclick="polishNote()">润色内容</button>
+                <button class="btn btn-outline-info" onclick="testStep4ResponseDisplay()"
+                    style="margin-left: 10px;">测试步骤4响应</button>
 
                 <div class="result" id="result-4">
                     <h3>润色结果</h3>
@@ -1180,6 +1188,8 @@
                 </div>
 
                 <button class="btn" onclick="speechToText()">转换文字</button>
+                <button class="btn btn-outline-info" onclick="testStep5ResponseDisplay()"
+                    style="margin-left: 10px;">测试步骤5响应</button>
 
                 <div class="progress-bar" id="progress-5">
                     <div class="progress-fill"></div>
@@ -1213,6 +1223,8 @@
                 </div>
 
                 <button class="btn" onclick="generateReport()">生成报告</button>
+                <button class="btn btn-outline-info" onclick="testStep6ResponseDisplay()"
+                    style="margin-left: 10px;">测试步骤6响应</button>
 
                 <div class="result" id="result-6">
                     <h3>研究报告</h3>
@@ -1239,6 +1251,8 @@
                 </div>
 
                 <button class="btn" onclick="analyzeVideo()">开始分析</button>
+                <button class="btn btn-outline-info" onclick="testStep7ResponseDisplay()"
+                    style="margin-left: 10px;">测试步骤7响应</button>
 
                 <div class="progress-bar" id="progress-7">
                     <div class="progress-fill"></div>
@@ -1290,6 +1304,8 @@
                 </div>
 
                 <button class="btn" onclick="generateVideo()">生成视频</button>
+                <button class="btn btn-outline-info" onclick="testStep8ResponseDisplay()"
+                    style="margin-left: 10px;">测试步骤8响应</button>
 
                 <div class="progress-bar" id="progress-8">
                     <div class="progress-fill"></div>
@@ -1358,13 +1374,18 @@
                     observationData = context.observationData || null;
                     stepStatus = context.stepStatus || {};
 
-                    // 如果有保存的项目数据，恢复表单
-                    if (projectData) {
-                        document.getElementById('project-title').value = projectData.title || '';
-                        document.getElementById('project-desc').value = projectData.description || '';
-                        document.getElementById('project-category').value = projectData.category || 'dinosaur';
-                        document.getElementById('project-tags').value = (projectData.tags || []).join(', ');
-                    }
+                    console.log('📊 从本地存储恢复的步骤状态:', stepStatus);
+
+                    // 恢复表单数据
+                    const formData = context.formData || {};
+                    Object.keys(formData).forEach(fieldId => {
+                        const element = document.getElementById(fieldId);
+                        if (element && formData[fieldId]) {
+                            element.value = formData[fieldId];
+                        }
+                    });
+
+                    console.log('✅ 从本地存储恢复表单数据');
 
                     console.log('📦 已从本地存储恢复上下文数据:', {
                         currentProjectId,
@@ -1380,12 +1401,26 @@
         // 保存上下文数据到localStorage
         function saveContextToStorage() {
             try {
+                // 保存当前表单数据
+                const formData = {
+                    'project-title': document.getElementById('project-title')?.value || '',
+                    'project-desc': document.getElementById('project-desc')?.value || '',
+                    'project-category': document.getElementById('project-category')?.value || 'dinosaur',
+                    'project-tags': document.getElementById('project-tags')?.value || '',
+                    'analysis-prompt': document.getElementById('analysis-prompt')?.value || '',
+                    'context-info': document.getElementById('context-info')?.value || '',
+                    'raw-content': document.getElementById('raw-content')?.value || '',
+                    'report-context': document.getElementById('report-context')?.value || '',
+                    'video-script': document.getElementById('video-script')?.value || ''
+                };
+
                 const context = {
                     currentProjectId,
                     currentObservationId,
                     projectData,
                     observationData,
                     stepStatus,
+                    formData,
                     timestamp: new Date().toISOString()
                 };
                 localStorage.setItem('explorapal_demo_context', JSON.stringify(context));
@@ -1577,12 +1612,30 @@
         // 用户手动继续到下一步
         function continueToNextStep(currentStep) {
             console.log(`👆 用户点击继续下一步: 从步骤 ${currentStep} 到 ${currentStep + 1}`);
+            console.log(`📊 当前stepStatus状态:`, JSON.stringify(stepStatus, null, 2));
 
             if (currentStep < 8) {
                 const nextStepNum = currentStep + 1;
 
-                // 简化逻辑：直接尝试切换，不做过多检查
-                console.log(`🔄 尝试切换到步骤 ${nextStepNum}...`);
+                // 确保当前步骤已完成
+                if (stepStatus[currentStep] !== 'completed') {
+                    console.error(`❌ 当前步骤 ${currentStep} 状态不是已完成:`, stepStatus[currentStep]);
+                    // 强制标记为完成（以防万一）
+                    stepStatus[currentStep] = 'completed';
+                    console.log(`🔧 强制设置步骤 ${currentStep} 为已完成`);
+                }
+
+                // 检查是否可以访问下一步
+                const canAccess = canAccessStep(nextStepNum);
+                console.log(`🔍 检查是否可以访问步骤 ${nextStepNum}:`, canAccess);
+
+                if (!canAccess) {
+                    console.error(`❌ 无法访问步骤 ${nextStepNum}，stepStatus[${nextStepNum - 1}]:`, stepStatus[nextStepNum - 1]);
+                    showError(`步骤 ${nextStepNum} 依赖检查失败，请确保步骤 ${nextStepNum - 1} 已完成`);
+                    return;
+                }
+
+                console.log(`✅ 验证通过，准备切换到步骤 ${nextStepNum}`);
 
                 // 隐藏当前步骤的结果
                 const currentResult = document.getElementById(`result-${currentStep}`);
@@ -1924,16 +1977,16 @@
                 console.log('✅ 项目创建成功 - project_id:', projectId);
                 console.log('✅ 项目创建成功 - currentProjectId已设置为:', currentProjectId);
 
-                const buttonHtml = '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(1)">继续下一步 →</button></div>';
-                console.log('🔘 生成按钮HTML:', buttonHtml);
-                document.getElementById('result-content-1').innerHTML = formatJsonResponse(result, 1) + buttonHtml;
-                document.getElementById('result-1').classList.add('show');
+                // 标记步骤完成但不自动继续
+                console.log('📝 准备标记步骤1为完成...');
+                markStepCompleted(1, false);
+                console.log('✅ 步骤1已标记为完成，当前stepStatus:', JSON.stringify(stepStatus, null, 2));
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(1, result);
 
-                // 标记步骤完成但不自动继续
-                markStepCompleted(1, false);
+                // 使用统一函数显示响应
+                displayStepResponse(1, result);
             } catch (error) {
                 showError('创建项目失败: ' + error.message);
             }
@@ -2026,7 +2079,26 @@
                 observationData = result;
                 currentObservationId = result?.observation_id;
 
-                console.log('✅ 图片分析成功 - 观察ID:', currentObservationId, '完整响应:', result);
+                console.log('✅ 图片分析成功 - 观察ID:', currentObservationId);
+                console.log('📊 图片分析完整响应:', JSON.stringify(result, null, 2));
+                console.log('🔍 响应数据结构检查:', {
+                    hasObjectName: !!result.object_name,
+                    hasCategory: !!result.category,
+                    hasDescription: !!result.description,
+                    objectNameType: typeof result.object_name,
+                    objectNameLength: result.object_name ? result.object_name.length : 0,
+                    responseKeys: Object.keys(result)
+                });
+
+                // 检查object_name的值
+                if (result.object_name) {
+                    console.log('📝 object_name原始内容:', result.object_name);
+                    console.log('📏 object_name长度:', result.object_name.length);
+                }
+
+                // 验证数据格式是否符合预期
+                const isValidFormat = result.object_name && result.category && typeof result.confidence === 'number';
+                console.log('✅ 数据格式验证:', isValidFormat ? '格式正确' : '格式可能有问题');
 
                 // 保存上下文到本地存储
                 saveContextToStorage();
@@ -2034,15 +2106,16 @@
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
 
-                document.getElementById('result-content-2').innerHTML = formatJsonResponse(result, 2) +
-                    '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(2)">继续下一步 →</button></div>';
-                document.getElementById('result-2').classList.add('show');
+                // 标记步骤完成但不自动继续
+                console.log('📝 准备标记步骤2为完成...');
+                markStepCompleted(2, false);
+                console.log('✅ 步骤2已标记为完成，当前stepStatus:', JSON.stringify(stepStatus, null, 2));
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(2, result);
 
-                // 标记步骤完成但不自动继续
-                markStepCompleted(2, false);
+                // 使用统一函数显示响应
+                displayStepResponse(2, result);
             } catch (error) {
                 document.getElementById('progress-2').classList.remove('show');
                 showError('图片分析失败: ' + error.message);
@@ -2089,15 +2162,14 @@
 
                 const result = await response.json();
 
-                document.getElementById('result-content-3').innerHTML = formatJsonResponse(result, 3) +
-                    '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(3)">继续下一步 →</button></div>';
-                document.getElementById('result-3').classList.add('show');
+                // 标记步骤完成
+                markStepCompleted(3, false);
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(3, result);
 
-                // 标记步骤完成
-                markStepCompleted(3, false);
+                // 使用统一函数显示响应
+                displayStepResponse(3, result);
             } catch (error) {
                 showError('生成问题失败: ' + error.message);
             }
@@ -2154,15 +2226,14 @@
 
                 const result = await response.json();
 
-                document.getElementById('result-content-4').innerHTML = formatJsonResponse(result, 4) +
-                    '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(4)">继续下一步 →</button></div>';
-                document.getElementById('result-4').classList.add('show');
+                // 标记步骤完成
+                markStepCompleted(4, false);
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(4, result);
 
-                // 标记步骤完成
-                markStepCompleted(4, false);
+                // 使用统一函数显示响应
+                displayStepResponse(4, result);
             } catch (error) {
                 showError('内容润色失败: ' + error.message);
             }
@@ -2233,21 +2304,14 @@
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
 
-                // 为语音转文字步骤添加音频下载功能
-                let downloadButton = '';
-                if (result && result.audio_data) {
-                    downloadButton = '<button class="btn btn-success" onclick="downloadAudio(\'' + result.audio_data + '\', \'' + (result.format || 'wav') + '\')">📥 下载音频</button>';
-                }
-
-                document.getElementById('result-content-5').innerHTML = formatJsonResponse(result, 5) +
-                    '<div class="step-controls">' + downloadButton + '<button class="btn btn-primary" onclick="continueToNextStep(5)">继续下一步 →</button></div>';
-                document.getElementById('result-5').classList.add('show');
+                // 标记步骤完成
+                markStepCompleted(5, false);
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(5, result);
 
-                // 标记步骤完成
-                markStepCompleted(5, false);
+                // 使用统一函数显示响应（会自动处理下载按钮）
+                displayStepResponse(5, result);
             } catch (error) {
                 document.getElementById('progress-5').classList.remove('show');
                 showError('语音转换失败: ' + error.message);
@@ -2289,15 +2353,14 @@
 
                 const result = await response.json();
 
-                document.getElementById('result-content-6').innerHTML = formatJsonResponse(result, 6) +
-                    '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(6)">继续下一步 →</button></div>';
-                document.getElementById('result-6').classList.add('show');
+                // 标记步骤完成
+                markStepCompleted(6, false);
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(6, result);
 
-                // 标记步骤完成
-                markStepCompleted(6, false);
+                // 使用统一函数显示响应
+                displayStepResponse(6, result);
             } catch (error) {
                 showError('生成报告失败: ' + error.message);
             }
@@ -2369,15 +2432,14 @@
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
 
-                document.getElementById('result-content-7').innerHTML = formatJsonResponse(result, 7) +
-                    '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(7)">继续下一步 →</button></div>';
-                document.getElementById('result-7').classList.add('show');
+                // 标记步骤完成
+                markStepCompleted(7, false);
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(7, result);
 
-                // 标记步骤完成
-                markStepCompleted(7, false);
+                // 使用统一函数显示响应
+                displayStepResponse(7, result);
             } catch (error) {
                 document.getElementById('progress-7').classList.remove('show');
                 showError('视频分析失败: ' + error.message);
@@ -2447,21 +2509,14 @@
                     displayGeneratedVideo(generatedVideoData, result.data.format || 'mp4');
                 }
 
-                // 为视频生成步骤添加视频下载功能
-                let downloadButton = '';
-                if (result && result.video_data) {
-                    downloadButton = '<button class="btn btn-success" onclick="downloadVideo(\'' + result.video_data + '\', \'' + (result.format || 'mp4') + '\')">📥 下载视频</button>';
-                }
-
-                document.getElementById('result-content-8').innerHTML = formatJsonResponse(result, 8) +
-                    '<div class="step-controls">' + downloadButton + '<button class="btn btn-primary" onclick="continueToNextStep(8)">完成演示 🎉</button></div>';
-                document.getElementById('result-8').classList.add('show');
+                // 标记步骤完成
+                markStepCompleted(8, false);
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(8, result);
 
-                // 标记步骤完成
-                markStepCompleted(8, false);
+                // 使用统一函数显示响应（会自动处理下载按钮）
+                displayStepResponse(8, result);
 
             } catch (error) {
                 document.getElementById('progress-8').classList.remove('show');
@@ -2800,6 +2855,312 @@ API响应格式: { project_id: number, project_code: string, status: string }
             switchStep(2);
         }
 
+        // 测试响应显示
+        function testResponseDisplay() {
+            console.log('🧪 测试响应显示功能');
+
+            // 测试项目创建响应
+            const testProjectResponse = {
+                project_id: 123,
+                project_code: "P20241220001",
+                status: "active"
+            };
+
+            const formatted = formatJsonResponse(testProjectResponse, 1);
+            console.log('📄 格式化结果:', formatted);
+
+            // 显示在结果区域
+            document.getElementById('result-content-1').innerHTML = formatted +
+                '<div class="step-controls"><button class="btn btn-warning" onclick="document.getElementById(\'result-1\').classList.remove(\'show\')">隐藏测试结果</button></div>';
+            document.getElementById('result-1').classList.add('show');
+
+            console.log('✅ 测试响应已显示');
+        }
+
+        // 测试所有步骤的响应显示
+        function testAllStepResponses() {
+            console.log('🧪 测试所有步骤的响应显示功能');
+
+            // 测试数据
+            const testData = {
+                1: { project_id: 123, project_code: "P20241220001", status: "active" },
+                2: {
+                    object_name: '这张图片展示的是一只**霸王龙（Tyrannosaurus rex）**',
+                    category: 'dinosaur',
+                    confidence: 0.95,
+                    description: '霸王龙是史上最著名的恐龙之一...',
+                    key_features: ["头部有三只角"]
+                },
+                3: {
+                    questions: [
+                        { content: "你觉得三角龙的角有什么用处？", type: "reasoning" },
+                        { content: "我们可以从化石上看到三角龙吃什么吗？", type: "observation" }
+                    ]
+                },
+                4: {
+                    title: "三角龙探秘笔记",
+                    summary: "小明学习了三角龙的基本特征",
+                    key_points: ["三角龙有三只角", "是草食性恐龙"],
+                    formatted_text: "今天我学习了三角龙..."
+                },
+                5: {
+                    text: "三角龙有三只角，脖子上有骨板",
+                    confidence: 0.95,
+                    language: "zh-CN",
+                    audio_data: "test_audio_data"
+                },
+                6: {
+                    title: "小明的三角龙探索报告",
+                    abstract: "通过观察化石图片学习恐龙知识",
+                    content: "详细的研究报告内容...",
+                    conclusion: "三角龙是白垩纪最有趣的恐龙之一"
+                },
+                7: {
+                    video_analysis: {
+                        scenes: [{ timestamp: 0.0, scene_type: "educational", description: "讲解恐龙知识" }],
+                        summary: { title: "恐龙纪录片分析", description: "视频介绍了三角龙特征", keywords: ["三角龙"] }
+                    }
+                },
+                8: {
+                    video_data: "test_video_data",
+                    format: "mp4",
+                    metadata: { title: "三角龙探秘视频", description: "AI生成的教学视频" }
+                }
+            };
+
+            // 测试每个步骤
+            for (let step = 1; step <= 8; step++) {
+                console.log(`\n🔍 测试步骤${step}...`);
+                const success = displayStepResponse(step, testData[step]);
+                if (success) {
+                    console.log(`✅ 步骤${step}响应显示成功`);
+                } else {
+                    console.error(`❌ 步骤${step}响应显示失败`);
+                }
+            }
+
+            console.log('\n🎉 所有步骤响应显示测试完成');
+        }
+
+        // 测试步骤2响应显示
+        function testStep2ResponseDisplay() {
+            console.log('🧪 测试步骤2响应显示功能');
+
+            // 使用用户提供的实际响应数据
+            const testImageResponse = {
+                object_name: '这张图片展示的是一只**霸王龙（Tyrannosaurus rex）**，也常被称为"T. rex"',
+                category: 'dinosaur',
+                confidence: 0.95,
+                description: '这张图片展示的是一只**霸王龙（Tyrannosaurus rex）**，也常被称为"T. rex"。霸王龙是史上最著名的恐龙之一，生活在大约6800万年前的白垩纪晚期，是当时陆地上的顶级掠食者。\n\n--- \n\n如果你对某一方面（如牙齿结构、演化关系、与其他暴龙科对比）想深入了解，欢迎继续提问！',
+                key_features: ["头部有三只角", "颈部有大骨板"]
+            };
+
+            console.log('📊 测试数据（模拟用户实际响应）:', JSON.stringify(testImageResponse, null, 2));
+
+            const formatted = formatJsonResponse(testImageResponse, 2);
+            console.log('📄 步骤2格式化结果长度:', formatted.length);
+
+            // 显示在结果区域
+            document.getElementById('result-content-2').innerHTML = formatted +
+                '<div class="step-controls"><button class="btn btn-warning" onclick="document.getElementById(\'result-2\').classList.remove(\'show\')">隐藏测试结果</button></div>';
+            document.getElementById('result-2').classList.add('show');
+
+            console.log('✅ 步骤2测试响应已显示');
+        }
+
+        // 测试步骤3响应显示
+        function testStep3ResponseDisplay() {
+            console.log('🧪 测试步骤3响应显示功能');
+
+            // 测试问题生成响应
+            const testQuestionsResponse = {
+                questions: [
+                    {
+                        content: "你觉得三角龙的角有什么用处？",
+                        type: "reasoning",
+                        difficulty: "intermediate",
+                        purpose: "培养推理能力和想象力"
+                    },
+                    {
+                        content: "我们可以从化石上看到三角龙吃什么吗？",
+                        type: "observation",
+                        difficulty: "basic",
+                        purpose: "学习观察细节"
+                    }
+                ]
+            };
+
+            console.log('📊 测试数据:', JSON.stringify(testQuestionsResponse, null, 2));
+
+            const formatted = formatJsonResponse(testQuestionsResponse, 3);
+            console.log('📄 步骤3格式化结果长度:', formatted.length);
+
+            document.getElementById('result-content-3').innerHTML = formatted +
+                '<div class="step-controls"><button class="btn btn-warning" onclick="document.getElementById(\'result-3\').classList.remove(\'show\')">隐藏测试结果</button></div>';
+            document.getElementById('result-3').classList.add('show');
+
+            console.log('✅ 步骤3测试响应已显示');
+        }
+
+        // 测试步骤4响应显示
+        function testStep4ResponseDisplay() {
+            console.log('🧪 测试步骤4响应显示功能');
+
+            // 测试笔记润色响应
+            const testPolishResponse = {
+                title: "三角龙探秘笔记",
+                summary: "小明学习了三角龙的基本特征和生活习性",
+                key_points: [
+                    "三角龙有三只角和颈部骨板",
+                    "是草食性恐龙",
+                    "生活在白垩纪晚期"
+                ],
+                formatted_text: "今天我学习了三角龙！三角龙是一种非常有趣的恐龙，它头上长着三只角，脖子后面有大大的骨板..."
+            };
+
+            console.log('📊 测试数据:', JSON.stringify(testPolishResponse, null, 2));
+
+            const formatted = formatJsonResponse(testPolishResponse, 4);
+            console.log('📄 步骤4格式化结果长度:', formatted.length);
+
+            document.getElementById('result-content-4').innerHTML = formatted +
+                '<div class="step-controls"><button class="btn btn-warning" onclick="document.getElementById(\'result-4\').classList.remove(\'show\')">隐藏测试结果</button></div>';
+            document.getElementById('result-4').classList.add('show');
+
+            console.log('✅ 步骤4测试响应已显示');
+        }
+
+        // 测试步骤5响应显示
+        function testStep5ResponseDisplay() {
+            console.log('🧪 测试步骤5响应显示功能');
+
+            // 测试语音转文字响应
+            const testSpeechResponse = {
+                text: "三角龙有三只角，脖子上有骨板，是草食性恐龙",
+                confidence: 0.95,
+                language: "zh-CN",
+                duration: 3.2,
+                audio_data: "base64_audio_data_here"
+            };
+
+            console.log('📊 测试数据:', JSON.stringify(testSpeechResponse, null, 2));
+
+            const formatted = formatJsonResponse(testSpeechResponse, 5);
+            console.log('📄 步骤5格式化结果长度:', formatted.length);
+
+            const downloadButton = '<button class="btn btn-success" onclick="downloadAudio(\'test_audio_data\', \'wav\')">📥 下载音频</button>';
+            document.getElementById('result-content-5').innerHTML = formatted +
+                '<div class="step-controls">' + downloadButton + '<button class="btn btn-warning" onclick="document.getElementById(\'result-5\').classList.remove(\'show\')">隐藏测试结果</button></div>';
+            document.getElementById('result-5').classList.add('show');
+
+            console.log('✅ 步骤5测试响应已显示');
+        }
+
+        // 测试步骤6响应显示
+        function testStep6ResponseDisplay() {
+            console.log('🧪 测试步骤6响应显示功能');
+
+            // 测试报告生成响应
+            const testReportResponse = {
+                title: "小明的三角龙探索报告",
+                abstract: "通过观察化石图片和AI引导提问，小明深入了解了三角龙的生活习性",
+                content: "详细的研究报告内容...",
+                conclusion: "三角龙是白垩纪最有趣的恐龙之一",
+                next_steps: "探索其他种类的恐龙，学习恐龙灭绝的原因"
+            };
+
+            console.log('📊 测试数据:', JSON.stringify(testReportResponse, null, 2));
+
+            const formatted = formatJsonResponse(testReportResponse, 6);
+            console.log('📄 步骤6格式化结果长度:', formatted.length);
+
+            document.getElementById('result-content-6').innerHTML = formatted +
+                '<div class="step-controls"><button class="btn btn-warning" onclick="document.getElementById(\'result-6\').classList.remove(\'show\')">隐藏测试结果</button></div>';
+            document.getElementById('result-6').classList.add('show');
+
+            console.log('✅ 步骤6测试响应已显示');
+        }
+
+        // 测试步骤7响应显示
+        function testStep7ResponseDisplay() {
+            console.log('🧪 测试步骤7响应显示功能');
+
+            // 测试视频分析响应
+            const testVideoAnalysisResponse = {
+                video_analysis: {
+                    scenes: [
+                        {
+                            timestamp: 0.0,
+                            scene_type: "educational",
+                            confidence: 0.92,
+                            description: "教室场景，老师在讲解恐龙知识"
+                        }
+                    ],
+                    objects: [
+                        {
+                            timestamp: 5.0,
+                            object_name: "三角龙模型",
+                            confidence: 0.88,
+                            bbox: { x: 200, y: 150, width: 400, height: 300 }
+                        }
+                    ],
+                    summary: {
+                        title: "恐龙纪录片分析",
+                        description: "视频主要介绍了三角龙的特征和习性",
+                        keywords: ["三角龙", "恐龙", "白垩纪", "草食性"],
+                        category: "educational",
+                        duration: 30.0
+                    }
+                }
+            };
+
+            console.log('📊 测试数据:', JSON.stringify(testVideoAnalysisResponse, null, 2));
+
+            const formatted = formatJsonResponse(testVideoAnalysisResponse, 7);
+            console.log('📄 步骤7格式化结果长度:', formatted.length);
+
+            document.getElementById('result-content-7').innerHTML = formatted +
+                '<div class="step-controls"><button class="btn btn-warning" onclick="document.getElementById(\'result-7\').classList.remove(\'show\')">隐藏测试结果</button></div>';
+            document.getElementById('result-7').classList.add('show');
+
+            console.log('✅ 步骤7测试响应已显示');
+        }
+
+        // 测试步骤8响应显示
+        function testStep8ResponseDisplay() {
+            console.log('🧪 测试步骤8响应显示功能');
+
+            // 测试视频生成响应
+            const testVideoGenerationResponse = {
+                video_data: "base64_video_data_here",
+                format: "mp4",
+                duration: 60.0,
+                metadata: {
+                    title: "三角龙探秘视频",
+                    description: "AI生成的三角龙教学视频",
+                    scenes: [
+                        "三角龙外形介绍",
+                        "生活习性展示",
+                        "生存环境再现"
+                    ],
+                    audio_language: "zh-CN",
+                    resolution: "1920x1080"
+                }
+            };
+
+            console.log('📊 测试数据:', JSON.stringify(testVideoGenerationResponse, null, 2));
+
+            const formatted = formatJsonResponse(testVideoGenerationResponse, 8);
+            console.log('📄 步骤8格式化结果长度:', formatted.length);
+
+            const downloadButton = '<button class="btn btn-success" onclick="downloadVideo(\'test_video_data\', \'mp4\')">📥 下载视频</button>';
+            document.getElementById('result-content-8').innerHTML = formatted +
+                '<div class="step-controls">' + downloadButton + '<button class="btn btn-warning" onclick="document.getElementById(\'result-8\').classList.remove(\'show\')">隐藏测试结果</button></div>';
+            document.getElementById('result-8').classList.add('show');
+
+            console.log('✅ 步骤8测试响应已显示');
+        }
+
         // 测试项目创建响应格式
         async function testProjectCreation() {
             console.log('🧪 测试项目创建响应格式...');
@@ -3114,6 +3475,63 @@ ${conclusion}
             }
         }
 
+        // 统一的步骤响应显示函数
+        function displayStepResponse(stepNumber, result) {
+            console.log(`🎯 displayStepResponse: 步骤${stepNumber}开始处理响应`);
+
+            try {
+                // 格式化响应
+                const formattedResponse = formatJsonResponse(result, stepNumber);
+                console.log(`📄 步骤${stepNumber}格式化响应长度:`, formattedResponse.length);
+
+                // 生成按钮HTML
+                let buttonHtml = '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(' + stepNumber + ')">继续下一步 →</button></div>';
+
+                // 特殊处理步骤5和步骤8（有下载功能）
+                if (stepNumber === 5 && result && result.audio_data) {
+                    const downloadButton = '<button class="btn btn-success" onclick="downloadAudio(\'' + result.audio_data + '\', \'' + (result.format || 'wav') + '\')">📥 下载音频</button>';
+                    buttonHtml = '<div class="step-controls">' + downloadButton + '<button class="btn btn-primary" onclick="continueToNextStep(' + stepNumber + ')">继续下一步 →</button></div>';
+                } else if (stepNumber === 8) {
+                    if (result && result.video_data) {
+                        const downloadButton = '<button class="btn btn-success" onclick="downloadVideo(\'' + result.video_data + '\', \'' + (result.format || 'mp4') + '\')">📥 下载视频</button>';
+                        buttonHtml = '<div class="step-controls">' + downloadButton + '<button class="btn btn-primary" onclick="continueToNextStep(' + stepNumber + ')">完成演示 🎉</button></div>';
+                    } else {
+                        buttonHtml = '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(' + stepNumber + ')">完成演示 🎉</button></div>';
+                    }
+                }
+
+                console.log(`🔘 步骤${stepNumber}按钮HTML:`, buttonHtml);
+
+                // 组合完整HTML
+                const fullHtml = formattedResponse + buttonHtml;
+                console.log(`📦 步骤${stepNumber}完整HTML长度:`, fullHtml.length);
+
+                // 设置到结果区域
+                const resultElement = document.getElementById(`result-${stepNumber}`);
+                const resultContentElement = document.getElementById(`result-content-${stepNumber}`);
+
+                if (!resultElement) {
+                    console.error(`❌ 找不到结果区域: result-${stepNumber}`);
+                    return false;
+                }
+
+                if (!resultContentElement) {
+                    console.error(`❌ 找不到结果内容区域: result-content-${stepNumber}`);
+                    return false;
+                }
+
+                resultContentElement.innerHTML = fullHtml;
+                resultElement.classList.add('show');
+
+                console.log(`✅ 步骤${stepNumber}响应显示成功`);
+                return true;
+
+            } catch (error) {
+                console.error(`❌ 步骤${stepNumber}响应显示失败:`, error);
+                return false;
+            }
+        }
+
         // 显示响应数据选项供用户选择
         function showResponseDataOptions(stepNumber, responseData, options) {
             console.log(`📋 为步骤 ${stepNumber} 显示 ${options.length} 个数据选项`);
@@ -3214,36 +3632,50 @@ ${conclusion}
 
         // 格式化JSON响应为HTML
         function formatJsonResponse(data, stepNumber) {
-            if (!data) return '<span class="json-null">null</span>';
+            console.log(`🎨 formatJsonResponse 被调用: 步骤${stepNumber}, 数据:`, data);
+
+            if (!data) {
+                console.log('⚠️ 数据为空，返回null');
+                return '<span class="json-null">null</span>';
+            }
 
             // 针对不同步骤的特殊处理
-            if (stepNumber === 1 && data.data) {
-                // 项目创建响应
+            if (stepNumber === 1) {
+                // 项目创建响应 - go-zero直接返回响应对象
+                console.log('✅ 使用项目创建响应格式化');
                 return formatProjectResponse(data);
-            } else if (stepNumber === 2 && data.object_name) {
+            } else if (stepNumber === 2) {
                 // 图片分析响应
+                console.log('✅ 使用图片分析响应格式化');
                 return formatImageAnalysisResponse(data);
-            } else if (stepNumber === 3 && data.questions) {
+            } else if (stepNumber === 3) {
                 // 问题生成响应
+                console.log('✅ 使用问题生成响应格式化');
                 return formatQuestionsResponse(data);
-            } else if (stepNumber === 4 && data.title) {
+            } else if (stepNumber === 4) {
                 // 笔记润色响应
+                console.log('✅ 使用笔记润色响应格式化');
                 return formatPolishResponse(data);
             } else if (stepNumber === 5) {
                 // 语音转文字响应
+                console.log('✅ 使用语音转文字响应格式化');
                 return formatSpeechToTextResponse(data);
-            } else if (stepNumber === 6 && data.title) {
+            } else if (stepNumber === 6) {
                 // 生成报告响应
+                console.log('✅ 使用生成报告响应格式化');
                 return formatReportResponse(data);
-            } else if (stepNumber === 7 && data.scenes) {
+            } else if (stepNumber === 7) {
                 // 视频分析响应
+                console.log('✅ 使用视频分析响应格式化');
                 return formatVideoAnalysisResponse(data);
-            } else if (stepNumber === 8 && data.video_data) {
+            } else if (stepNumber === 8) {
                 // 视频生成响应
+                console.log('✅ 使用视频生成响应格式化');
                 return formatVideoGenerationResponse(data);
             }
 
             // 默认的JSON格式化
+            console.log('⚠️ 使用默认JSON格式化');
             return formatJsonValue(data, 0, false);
         }
 
@@ -3279,13 +3711,31 @@ ${conclusion}
 
         // 格式化图片分析响应
         function formatImageAnalysisResponse(data) {
+            console.log('🎨 formatImageAnalysisResponse 处理数据:', data);
+
+            // 处理object_name，如果它看起来像是一个长描述，则尝试提取对象名称
+            let objectName = data.object_name || 'N/A';
+            if (objectName !== 'N/A' && objectName.length > 50) {
+                // 如果object_name很长，尝试提取其中的对象名称
+                const matches = objectName.match(/[*]*([^*]+)[*]*/);
+                if (matches && matches[1]) {
+                    objectName = matches[1].trim();
+                }
+                // 如果还是很长，取前50个字符
+                if (objectName.length > 50) {
+                    objectName = objectName.substring(0, 47) + '...';
+                }
+            }
+
+            console.log('📝 处理后的objectName:', objectName);
+
             return `
                 <div class="api-response-card">
                     <h4>🔍 图片分析结果</h4>
                     <div class="response-details">
                         <div class="detail-item">
                             <span class="label">识别对象:</span>
-                            <span class="value object-name">${data.object_name || 'N/A'}</span>
+                            <span class="value object-name">${objectName}</span>
                         </div>
                         <div class="detail-item">
                             <span class="label">类别:</span>
@@ -3303,7 +3753,7 @@ ${conclusion}
                     ${data.description ? `
                         <div class="description-section">
                             <h5>📝 详细描述</h5>
-                            <p>${data.description}</p>
+                            <p>${data.description.replace(/\*\*/g, '').replace(/---/g, '')}</p>
                         </div>
                     ` : ''}
                     ${data.key_features && data.key_features.length ? `
