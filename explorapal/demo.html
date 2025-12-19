@@ -1354,6 +1354,74 @@
         // API基础URL
         const API_BASE = 'http://localhost:9003';
 
+        // API调用超时配置 - 按操作类型设置不同超时时间
+        const API_TIMEOUTS = {
+            // 简单操作（项目管理、健康检查等）
+            simple: 30000,     // 30秒
+
+            // 中等操作（文本处理、问题生成等）
+            medium: 60000,     // 1分钟
+
+            // 复杂AI操作（图片识别、语音转文字等）
+            ai_heavy: 180000,  // 3分钟
+
+            // 超重AI操作（视频分析、视频生成等）
+            ai_ultra: 300000   // 5分钟
+        };
+
+        // 带超时的fetch函数，避免异步响应错误
+        async function fetchWithTimeout(url, options = {}, timeoutMs = API_TIMEOUTS.simple) {
+            console.log(`🌐 开始API请求: ${url} (超时: ${timeoutMs}ms)`);
+
+            // 创建AbortController用于超时控制
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => {
+                console.warn(`⏰ API请求超时 (${timeoutMs}ms): ${url}`);
+                controller.abort();
+            }, timeoutMs);
+
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+                console.log(`✅ API响应状态: ${response.status} ${response.statusText}`);
+
+                return response;
+            } catch (error) {
+                clearTimeout(timeoutId);
+
+                if (error.name === 'AbortError') {
+                    throw new Error(`请求超时 (${timeoutMs}ms): ${url}`);
+                }
+
+                throw error;
+            }
+        }
+
+        // 安全的JSON解析函数
+        async function safeJsonParse(response) {
+            try {
+                const text = await response.text();
+                console.log(`📄 原始响应内容长度: ${text.length}`);
+
+                // 尝试解析JSON
+                return JSON.parse(text);
+            } catch (jsonError) {
+                console.error('❌ JSON解析失败:', jsonError);
+                console.error('❌ 响应内容预览:', text.substring(0, 200) + (text.length > 200 ? '...' : ''));
+
+                // 如果是HTML错误页面，返回结构化的错误信息
+                if (text.includes('<html>') || text.includes('<!DOCTYPE')) {
+                    throw new Error(`服务器返回HTML错误页面，可能服务不可用: ${response.status} ${response.statusText}`);
+                }
+
+                throw new Error(`响应格式错误，无法解析为JSON: ${jsonError.message}`);
+            }
+        }
+
         // 初始化
         document.addEventListener('DOMContentLoaded', function () {
             loadContextFromStorage(); // 从localStorage加载上下文
@@ -1946,15 +2014,22 @@
             };
 
             try {
-                const response = await fetch(`${API_BASE}/api/project/create`, {
+                const response = await fetchWithTimeout(`${API_BASE}/api/project/create`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
-                });
+                }, API_TIMEOUTS.simple); // 30秒 - 简单操作
 
-                const result = await response.json();
+                // 检查响应状态
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ API响应错误:', response.status, response.statusText, errorText);
+                    throw new Error(`API请求失败: ${response.status} ${response.statusText} - ${errorText}`);
+                }
+
+                const result = await safeJsonParse(response);
 
                 // 验证API响应格式 - go-zero直接返回JSON对象，不包装在data字段中
                 if (!result || typeof result.project_id === 'undefined') {
@@ -1982,11 +2057,11 @@
                 markStepCompleted(1, false);
                 console.log('✅ 步骤1已标记为完成，当前stepStatus:', JSON.stringify(stepStatus, null, 2));
 
-                // 处理响应数据作为下一步输入
-                handleApiResponse(1, result);
-
-                // 使用统一函数显示响应
+                // 先使用统一函数显示响应
                 displayStepResponse(1, result);
+
+                // 然后处理响应数据作为下一步输入
+                handleApiResponse(1, result);
             } catch (error) {
                 showError('创建项目失败: ' + error.message);
             }
@@ -2065,17 +2140,26 @@
                 }, 200);
 
                 console.log('🌐 开始发送API请求...');
-                const response = await fetch(`${API_BASE}/api/observation/image/recognize`, {
+                showMessage('正在分析图片，请稍候（可能需要2-3分钟）...', 'info');
+
+                const response = await fetchWithTimeout(`${API_BASE}/api/observation/image/recognize`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
-                });
+                }, API_TIMEOUTS.ai_heavy); // 3分钟 - AI密集操作
 
                 console.log('📥 API响应状态:', response.status, response.statusText);
 
-                const result = await response.json();
+                // 检查响应状态
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ API响应错误:', response.status, response.statusText, errorText);
+                    throw new Error(`API请求失败: ${response.status} ${response.statusText} - ${errorText}`);
+                }
+
+                const result = await safeJsonParse(response);
                 observationData = result;
                 currentObservationId = result?.observation_id;
 
@@ -2111,11 +2195,11 @@
                 markStepCompleted(2, false);
                 console.log('✅ 步骤2已标记为完成，当前stepStatus:', JSON.stringify(stepStatus, null, 2));
 
-                // 处理响应数据作为下一步输入
-                handleApiResponse(2, result);
-
-                // 使用统一函数显示响应
+                // 先使用统一函数显示响应
                 displayStepResponse(2, result);
+
+                // 然后处理响应数据作为下一步输入
+                handleApiResponse(2, result);
             } catch (error) {
                 document.getElementById('progress-2').classList.remove('show');
                 showError('图片分析失败: ' + error.message);
@@ -2152,24 +2236,31 @@
             console.log('📤 问题生成请求数据:', data);
 
             try {
-                const response = await fetch(`${API_BASE}/api/questioning/questions/generate`, {
+                const response = await fetchWithTimeout(`${API_BASE}/api/questioning/questions/generate`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
-                });
+                }, API_TIMEOUTS.medium); // 1分钟 - 中等操作
 
-                const result = await response.json();
+                // 检查响应状态
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ API响应错误:', response.status, response.statusText, errorText);
+                    throw new Error(`API请求失败: ${response.status} ${response.statusText} - ${errorText}`);
+                }
+
+                const result = await safeJsonParse(response);
 
                 // 标记步骤完成
                 markStepCompleted(3, false);
 
-                // 处理响应数据作为下一步输入
-                handleApiResponse(3, result);
-
-                // 使用统一函数显示响应
+                // 先使用统一函数显示响应
                 displayStepResponse(3, result);
+
+                // 然后处理响应数据作为下一步输入
+                handleApiResponse(3, result);
             } catch (error) {
                 showError('生成问题失败: ' + error.message);
             }
@@ -2216,24 +2307,31 @@
             });
 
             try {
-                const response = await fetch(`${API_BASE}/api/expression/note/polish`, {
+                const response = await fetchWithTimeout(`${API_BASE}/api/expression/note/polish`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
-                });
+                }, API_TIMEOUTS.medium); // 1分钟 - 中等操作
 
-                const result = await response.json();
+                // 检查响应状态
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ API响应错误:', response.status, response.statusText, errorText);
+                    throw new Error(`API请求失败: ${response.status} ${response.statusText} - ${errorText}`);
+                }
+
+                const result = await safeJsonParse(response);
 
                 // 标记步骤完成
                 markStepCompleted(4, false);
 
-                // 处理响应数据作为下一步输入
-                handleApiResponse(4, result);
-
-                // 使用统一函数显示响应
+                // 先使用统一函数显示响应
                 displayStepResponse(4, result);
+
+                // 然后处理响应数据作为下一步输入
+                handleApiResponse(4, result);
             } catch (error) {
                 showError('内容润色失败: ' + error.message);
             }
@@ -2291,15 +2389,24 @@
                     if (progress >= 90) clearInterval(progressInterval);
                 }, 300);
 
-                const response = await fetch(`${API_BASE}/api/expression/speech/text`, {
+                showMessage('正在转换语音为文字，请稍候（可能需要2-3分钟）...', 'info');
+
+                const response = await fetchWithTimeout(`${API_BASE}/api/expression/speech/text`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
-                });
+                }, API_TIMEOUTS.ai_heavy); // 3分钟 - AI密集操作
 
-                const result = await response.json();
+                // 检查响应状态
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ API响应错误:', response.status, response.statusText, errorText);
+                    throw new Error(`API请求失败: ${response.status} ${response.statusText} - ${errorText}`);
+                }
+
+                const result = await safeJsonParse(response);
 
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
@@ -2307,11 +2414,11 @@
                 // 标记步骤完成
                 markStepCompleted(5, false);
 
-                // 处理响应数据作为下一步输入
-                handleApiResponse(5, result);
-
-                // 使用统一函数显示响应（会自动处理下载按钮）
+                // 先使用统一函数显示响应（会自动处理下载按钮）
                 displayStepResponse(5, result);
+
+                // 然后处理响应数据作为下一步输入
+                handleApiResponse(5, result);
             } catch (error) {
                 document.getElementById('progress-5').classList.remove('show');
                 showError('语音转换失败: ' + error.message);
@@ -2343,24 +2450,31 @@
             console.log('📤 报告生成请求数据:', data);
 
             try {
-                const response = await fetch(`${API_BASE}/api/achievement/report/generate`, {
+                const response = await fetchWithTimeout(`${API_BASE}/api/achievement/report/generate`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
-                });
+                }, API_TIMEOUTS.medium); // 1分钟 - 中等操作
 
-                const result = await response.json();
+                // 检查响应状态
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ API响应错误:', response.status, response.statusText, errorText);
+                    throw new Error(`API请求失败: ${response.status} ${response.statusText} - ${errorText}`);
+                }
+
+                const result = await safeJsonParse(response);
 
                 // 标记步骤完成
                 markStepCompleted(6, false);
 
-                // 处理响应数据作为下一步输入
-                handleApiResponse(6, result);
-
-                // 使用统一函数显示响应
+                // 先使用统一函数显示响应
                 displayStepResponse(6, result);
+
+                // 然后处理响应数据作为下一步输入
+                handleApiResponse(6, result);
             } catch (error) {
                 showError('生成报告失败: ' + error.message);
             }
@@ -2419,15 +2533,24 @@
                     if (progress >= 90) clearInterval(progressInterval);
                 }, 500);
 
-                const response = await fetch(`${API_BASE}/api/achievement/video/analyze`, {
+                showMessage('正在分析视频内容，请稍候（可能需要3-5分钟）...', 'info');
+
+                const response = await fetchWithTimeout(`${API_BASE}/api/achievement/video/analyze`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
-                });
+                }, API_TIMEOUTS.ai_ultra); // 5分钟 - 超重AI操作
 
-                const result = await response.json();
+                // 检查响应状态
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ API响应错误:', response.status, response.statusText, errorText);
+                    throw new Error(`API请求失败: ${response.status} ${response.statusText} - ${errorText}`);
+                }
+
+                const result = await safeJsonParse(response);
 
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
@@ -2435,10 +2558,11 @@
                 // 标记步骤完成
                 markStepCompleted(7, false);
 
-                // 处理响应数据作为下一步输入
-                handleApiResponse(7, result);
+                // 先使用统一函数显示响应
+                displayStepResponse(7, result);
 
-                // 使用统一函数显示响应
+                // 然后处理响应数据作为下一步输入
+                handleApiResponse(7, result);
                 displayStepResponse(7, result);
             } catch (error) {
                 document.getElementById('progress-7').classList.remove('show');
@@ -2487,15 +2611,24 @@
                     if (progress >= 95) clearInterval(progressInterval);
                 }, 1000);
 
-                const response = await fetch(`${API_BASE}/api/achievement/video/generate`, {
+                showMessage('正在生成AI视频，请稍候（可能需要3-5分钟）...', 'info');
+
+                const response = await fetchWithTimeout(`${API_BASE}/api/achievement/video/generate`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
-                });
+                }, API_TIMEOUTS.ai_ultra); // 5分钟 - 超重AI操作
 
-                const result = await response.json();
+                // 检查响应状态
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ API响应错误:', response.status, response.statusText, errorText);
+                    throw new Error(`API请求失败: ${response.status} ${response.statusText} - ${errorText}`);
+                }
+
+                const result = await safeJsonParse(response);
 
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
@@ -2512,11 +2645,11 @@
                 // 标记步骤完成
                 markStepCompleted(8, false);
 
-                // 处理响应数据作为下一步输入
-                handleApiResponse(8, result);
-
-                // 使用统一函数显示响应（会自动处理下载按钮）
+                // 先使用统一函数显示响应（会自动处理下载按钮）
                 displayStepResponse(8, result);
+
+                // 然后处理响应数据作为下一步输入
+                handleApiResponse(8, result);
 
             } catch (error) {
                 document.getElementById('progress-8').classList.remove('show');
@@ -3184,7 +3317,7 @@ API响应格式: { project_id: number, project_code: string, status: string }
 
                 console.log('📥 响应状态:', response.status, response.statusText);
 
-                const result = await response.json();
+                const result = await safeJsonParse(response);
                 console.log('📄 完整响应:', result);
                 console.log('🔍 响应结构分析:');
                 console.log('  - 类型:', typeof result);
@@ -3520,7 +3653,10 @@ ${conclusion}
                     return false;
                 }
 
+                // 将格式化后的响应内容设置到json-data元素内部，而不是覆盖整个result-content
                 resultContentElement.innerHTML = fullHtml;
+
+                // 显示结果区域
                 resultElement.classList.add('show');
 
                 console.log(`✅ 步骤${stepNumber}响应显示成功`);
