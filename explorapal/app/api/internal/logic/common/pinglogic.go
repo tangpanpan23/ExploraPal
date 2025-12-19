@@ -2,10 +2,20 @@ package common
 
 import (
 	"context"
+	"time"
 
 	"explorapal/app/api/internal/svc"
 	"github.com/zeromicro/go-zero/core/logx"
 )
+
+// PingResp 健康检查响应
+type PingResp struct {
+	Status    string    `json:"status"`
+	Message   string    `json:"message"`
+	Timestamp time.Time `json:"timestamp"`
+	Version   string    `json:"version"`
+	Service   string    `json:"service"`
+}
 
 type PingLogic struct {
 	logx.Logger
@@ -22,8 +32,21 @@ func NewPingLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PingLogic {
 	}
 }
 
-func (l *PingLogic) Ping() error {
-	// todo: add your logic here and delete this line
+func (l *PingLogic) Ping() (*PingResp, error) {
+	// 健康检查逻辑
+	l.Infof("健康检查请求 - 服务状态正常")
 
-	return nil
+	// 返回健康检查响应
+	resp := &PingResp{
+		Status:    "ok",
+		Message:   "ExploraPal API服务运行正常",
+		Timestamp: time.Now(),
+		Version:   "1.0.0",
+		Service:   "explorapal-api",
+	}
+
+	// 这里可以添加更多的健康检查逻辑
+	// 比如检查数据库连接、缓存连接等
+
+	return resp, nil
 }

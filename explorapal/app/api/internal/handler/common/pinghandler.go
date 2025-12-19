@@ -12,11 +12,11 @@ import (
 func PingHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		l := common.NewPingLogic(r.Context(), svcCtx)
-		err := l.Ping()
+		resp, err := l.Ping()
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {
-			httpx.Ok(w)
+			httpx.OkJsonCtx(r.Context(), w, resp)
 		}
 	}
 }

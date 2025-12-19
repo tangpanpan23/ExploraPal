@@ -25,7 +25,29 @@ func NewGetProjectDetailLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *GetProjectDetailLogic) GetProjectDetail(req *types.GetProjectDetailReq) (resp *types.GetProjectDetailResp, err error) {
-	// todo: add your logic here and delete this line
+	// 获取项目详情
+	project, err := l.svcCtx.ProjectModel.FindOneByProjectId(l.ctx, req.ProjectId)
+	if err != nil {
+		l.Errorf("获取项目详情失败: %v", err)
+		return nil, err
+	}
 
-	return
+	// 转换响应格式
+	resp = &types.GetProjectDetailResp{
+		ProjectId:   project.ProjectId,
+		ProjectCode: project.ProjectCode,
+		UserId:      project.UserId,
+		Title:       project.Title,
+		Description: project.Description.String, // sql.NullString
+		Category:    project.Category.String,     // sql.NullString
+		Status:      project.Status,
+		Progress:    int32(project.Progress), // int64 -> int32
+		Tags:        []string{},              // TODO: 解析JSON标签
+		CreateTime:  project.CreateTime.Unix(),
+		UpdateTime:  project.UpdateTime.Unix(),
+	}
+
+	l.Infof("获取项目详情成功: ID=%d, Title=%s", req.ProjectId, project.Title)
+
+	return resp, nil
 }

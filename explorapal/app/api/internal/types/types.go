@@ -381,7 +381,7 @@ type RecognitionResult struct {
 }
 
 type RecognizeImageReq struct {
-	ObservationId int64  `json:"observation_id" desc:"观察记录ID"`
+	ObservationId int64  `json:"observation_id,optional" desc:"观察记录ID（可选，不提供时自动创建）"`
 	ProjectId     int64  `json:"project_id" desc:"项目ID"`
 	UserId        int64  `json:"user_id" desc:"用户ID"`
 	ImageUrl      string `json:"image_url" desc:"图片URL"`

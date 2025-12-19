@@ -76,6 +76,8 @@ curl -X POST "http://localhost:9003/api/project/create" \
 curl -X POST "http://localhost:9003/api/observation/image/recognize" \
   -H "Content-Type: application/json" \
   -d '{
+    "project_id": 1,
+    "user_id": 1,
     "image_url": "https://example.com/dinosaur-fossil.jpg",
     "prompt": "请分析这张恐龙化石图片，识别恐龙种类，描述特征",
     "category": "dinosaur"
@@ -104,6 +106,9 @@ curl -X POST "http://localhost:9003/api/observation/image/recognize" \
 curl -X POST "http://localhost:9003/api/questioning/questions/generate" \
   -H "Content-Type: application/json" \
   -d '{
+    "project_id": 1,
+    "user_id": 1,
+    "observation_id": 1,
     "context_info": "小明观察到了一块三角龙化石，上面有三只角和骨板",
     "category": "dinosaur",
     "user_age": 8
@@ -142,10 +147,15 @@ curl -X POST "http://localhost:9003/api/questioning/questions/generate" \
 curl -X POST "http://localhost:9003/api/expression/note/polish" \
   -H "Content-Type: application/json" \
   -d '{
+    "project_id": 1,
+    "user_id": 1,
     "raw_content": "三角龙有3只角 头上有骨板 吃植物 很厉害",
-    "context_info": "孩子观察恐龙化石后的随手笔记",
-    "category": "dinosaur",
-    "user_age": 8
+    "content_type": "speech",
+    "context_info": {
+      "observation_results": "三角龙化石，三只角，骨板",
+      "previous_answers": "防御，草食性",
+      "project_category": "dinosaur"
+    }
   }'
 ```
 
