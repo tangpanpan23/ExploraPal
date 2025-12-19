@@ -12,7 +12,7 @@ type Observation struct {
 	ObservationID int64  `gorm:"column:observation_id;uniqueIndex;not null;comment:观察记录ID"`
 	ProjectID     int64  `gorm:"column:project_id;index;not null;comment:项目ID"`
 	UserID        int64  `gorm:"column:user_id;index;not null;comment:用户ID"`
-	ImageURL      string `gorm:"column:image_url;size:500;not null;comment:图片URL"`
+	ImageURL      string `gorm:"column:image_url;size:5242880;not null;comment:图片URL或Base64数据"`
 	ImageName     string `gorm:"column:image_name;size:200;comment:图片名称"`
 	ImageType     string `gorm:"column:image_type;size:10;comment:图片类型：jpeg,png,jpg"`
 	ImageSize     int64  `gorm:"column:image_size;comment:图片大小(字节)"`

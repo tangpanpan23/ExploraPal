@@ -42,6 +42,35 @@
             opacity: 0.9;
         }
 
+        .status-bar {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 10px;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #555;
+            margin-right: 8px;
+        }
+
+        .status-value {
+            color: #2196f3;
+            font-weight: 500;
+        }
+
         .demo-flow {
             display: flex;
             justify-content: space-between;
@@ -93,6 +122,28 @@
         .step p {
             color: #666;
             line-height: 1.6;
+        }
+
+        .step.completed {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            border-left: 4px solid #4caf50;
+        }
+
+        .step.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .step.disabled:hover {
+            transform: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .step-marker {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 18px;
         }
 
         .demo-content {
@@ -259,6 +310,318 @@
             border-radius: 8px;
             padding: 15px;
             color: #333;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .json-formatter {
+            position: relative;
+        }
+
+        .json-formatter .json-toggle {
+            cursor: pointer;
+            user-select: none;
+            margin-right: 4px;
+        }
+
+        .json-formatter .json-bracket {
+            color: #0066cc;
+            font-weight: bold;
+        }
+
+        .json-formatter .json-key {
+            color: #881391;
+        }
+
+        .json-formatter .json-string {
+            color: #0b7500;
+        }
+
+        .json-formatter .json-number {
+            color: #1c00cf;
+        }
+
+        .json-formatter .json-boolean {
+            color: #994500;
+            font-weight: bold;
+        }
+
+        .json-formatter .json-null {
+            color: #994500;
+            font-style: italic;
+        }
+
+        .json-formatter .json-collapsed {
+            color: #666;
+            font-style: italic;
+        }
+
+        .json-formatter .json-indent {
+            display: inline-block;
+            width: 20px;
+        }
+
+        .json-formatter .json-line {
+            white-space: nowrap;
+        }
+
+        .json-formatter .json-comma {
+            color: #666;
+        }
+
+        .json-formatter .json-colon {
+            color: #666;
+            margin: 0 2px;
+        }
+
+        /* API响应卡片样式 */
+        .api-response-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .api-response-card h4 {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .response-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .detail-item .label {
+            font-weight: 600;
+            color: #555;
+            min-width: 80px;
+            margin-right: 12px;
+        }
+
+        .detail-item .value {
+            color: #333;
+            flex: 1;
+        }
+
+        .detail-item .value.project-id {
+            color: #2196f3;
+            font-weight: 600;
+            font-family: monospace;
+        }
+
+        .detail-item .value.object-name {
+            color: #4caf50;
+            font-weight: 600;
+        }
+
+        .detail-item .value.confidence {
+            color: #ff9800;
+            font-weight: 600;
+        }
+
+        .detail-item .value.scientific {
+            color: #9c27b0;
+            font-style: italic;
+        }
+
+        .detail-item .value.status-active {
+            color: #4caf50;
+            font-weight: 600;
+        }
+
+        .description-section,
+        .summary-section,
+        .features-section,
+        .transcription-section,
+        .content-section,
+        .metadata-section,
+        .scenes-section,
+        .questions-list,
+        .formatted-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .description-section h5,
+        .summary-section h5,
+        .features-section h5,
+        .transcription-section h5,
+        .content-section h5,
+        .metadata-section h5,
+        .scenes-section h5,
+        .formatted-section h5 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .description-section p,
+        .summary-section p,
+        .transcription-text,
+        .report-content,
+        .formatted-text {
+            margin: 0;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .features-section ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .features-section li {
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .questions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .question-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .question-number {
+            font-weight: 600;
+            color: #2196f3;
+            min-width: 20px;
+        }
+
+        .question-type {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .question-difficulty.basic {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .question-difficulty.intermediate {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .question-difficulty.advanced {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .question-content {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .question-purpose {
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        .scenes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .scene-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .scene-time {
+            font-family: monospace;
+            font-weight: 600;
+            color: #2196f3;
+            min-width: 60px;
+        }
+
+        .scene-type {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .scene-desc {
+            flex: 1;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .raw-json {
+            margin-top: 15px;
+        }
+
+        .raw-json details {
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .raw-json summary {
+            padding: 12px 15px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            user-select: none;
+        }
+
+        .raw-json summary:hover {
+            background: #e9ecef;
+        }
+
+        .raw-json details[open] summary {
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 10px;
         }
 
         .loading {
@@ -302,18 +665,40 @@
             background: #218838;
         }
 
-        .error {
+        .message {
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .message.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-            display: none;
         }
 
-        .error.show {
-            display: block;
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .progress-bar {
@@ -361,6 +746,30 @@
         <div class="header">
             <h1>🦕 探索伙伴</h1>
             <p>AI驱动的儿童学习助手 - 让好奇心变成深度探索</p>
+        </div>
+
+        <!-- 状态栏 -->
+        <div class="status-bar" id="status-bar">
+            <div class="status-item">
+                <span class="status-label">当前用户:</span>
+                <span class="status-value" id="current-user">用户 #1</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">当前项目:</span>
+                <span class="status-value" id="current-project">未创建</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">观察记录:</span>
+                <span class="status-value" id="current-observation">无</span>
+            </div>
+            <div class="status-item">
+                <button class="btn btn-secondary" onclick="showContextInfo()" style="margin-left: 10px; padding: 8px 16px; font-size: 14px;">
+                    ℹ️ 上下文信息
+                </button>
+                <button class="btn btn-secondary" onclick="resetDemo()" style="margin-left: 10px; padding: 8px 16px; font-size: 14px;">
+                    🔄 重置演示
+                </button>
+            </div>
         </div>
 
         <div class="demo-flow">
@@ -456,7 +865,7 @@
                     <div class="file-upload" id="image-upload">
                         <input type="file" id="image-file" accept="image/*" onchange="handleFileSelect(this)">
                         <div class="upload-text">📸 点击选择图片或拖拽到此处</div>
-                        <div class="upload-hint">支持 JPG、PNG、GIF 格式</div>
+                        <div class="upload-hint">支持 JPG、PNG、GIF 格式，文件大小 ≤ 5MB（大图将自动压缩）</div>
                     </div>
                     <div id="image-preview" style="margin-top: 20px; display: none;">
                         <img id="preview-img" style="max-width: 300px; max-height: 300px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
@@ -542,7 +951,7 @@
                     <div class="file-upload" id="audio-upload">
                         <input type="file" id="audio-file" accept="audio/*" onchange="handleAudioSelect(this)">
                         <div class="upload-text">🎵 点击选择音频或拖拽到此处</div>
-                        <div class="upload-hint">支持 MP3、WAV、M4A 等格式</div>
+                        <div class="upload-hint">支持 MP3、WAV、M4A 等格式，文件大小 ≤ 10MB</div>
                     </div>
                     <div id="audio-preview" style="margin-top: 20px; display: none;">
                         <audio id="preview-audio" controls style="width: 100%; max-width: 400px;"></audio>
@@ -608,7 +1017,7 @@
                     <div class="file-upload" id="video-upload">
                         <input type="file" id="video-file" accept="video/*" onchange="handleVideoSelect(this)">
                         <div class="upload-text">🎬 点击选择视频或拖拽到此处</div>
-                        <div class="upload-hint">支持 MP4、AVI、MOV 等格式</div>
+                        <div class="upload-hint">支持 MP4、AVI、MOV 等格式，文件大小 ≤ 20MB</div>
                     </div>
                     <div id="video-preview" style="margin-top: 20px; display: none;">
                         <video id="preview-video" controls style="max-width: 400px; max-height: 300px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);"></video>
@@ -687,6 +1096,9 @@
     <script>
         // 全局变量
         let currentStep = 1;
+        let currentUserId = 1; // 默认用户ID
+        let currentProjectId = null; // 当前项目ID
+        let currentObservationId = null; // 当前观察记录ID
         let projectData = null;
         let observationData = null;
         let selectedImageFile = null;
@@ -694,15 +1106,62 @@
         let selectedVideoFile = null;
         let generatedAudioData = null;
         let generatedVideoData = null;
+        let stepStatus = {}; // 步骤完成状态
 
         // API基础URL
         const API_BASE = 'http://localhost:9003';
 
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
+            loadContextFromStorage(); // 从localStorage加载上下文
             initSteps();
             initDragAndDrop();
+            updateStepAvailability();
         });
+
+        // 从localStorage加载上下文数据
+        function loadContextFromStorage() {
+            try {
+                const savedContext = localStorage.getItem('explorapal_demo_context');
+                if (savedContext) {
+                    const context = JSON.parse(savedContext);
+                    currentProjectId = context.currentProjectId || null;
+                    currentObservationId = context.currentObservationId || null;
+                    projectData = context.projectData || null;
+                    observationData = context.observationData || null;
+                    stepStatus = context.stepStatus || {};
+
+                    // 如果有保存的项目数据，恢复表单
+                    if (projectData) {
+                        document.getElementById('project-title').value = projectData.title || '';
+                        document.getElementById('project-desc').value = projectData.description || '';
+                        document.getElementById('project-category').value = projectData.category || 'dinosaur';
+                        document.getElementById('project-tags').value = (projectData.tags || []).join(', ');
+                    }
+
+                    console.log('已从本地存储恢复上下文数据');
+                }
+            } catch (error) {
+                console.warn('无法从本地存储加载上下文数据:', error);
+            }
+        }
+
+        // 保存上下文数据到localStorage
+        function saveContextToStorage() {
+            try {
+                const context = {
+                    currentProjectId,
+                    currentObservationId,
+                    projectData,
+                    observationData,
+                    stepStatus,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('explorapal_demo_context', JSON.stringify(context));
+            } catch (error) {
+                console.warn('无法保存上下文数据到本地存储:', error);
+            }
+        }
 
         // 初始化步骤
         function initSteps() {
@@ -738,6 +1197,12 @@
 
         // 切换步骤
         function switchStep(stepNum) {
+            // 检查步骤依赖关系
+            if (!canAccessStep(stepNum)) {
+                showError(`请先完成第${stepNum - 1}步，再进行第${stepNum}步`);
+                return;
+            }
+
             // 更新步骤状态
             document.querySelectorAll('.step').forEach(step => {
                 step.classList.remove('active');
@@ -751,6 +1216,90 @@
             document.getElementById(`section-${stepNum}`).classList.add('active');
 
             currentStep = stepNum;
+
+            // 更新步骤可用性显示
+            updateStepAvailability();
+        }
+
+        // 检查是否可以访问某个步骤
+        function canAccessStep(stepNum) {
+            if (stepNum === 1) return true; // 第一步总是可以访问
+
+            // 检查前一个步骤是否已完成
+            return stepStatus[stepNum - 1] === 'completed';
+        }
+
+        // 更新步骤可用性显示
+        function updateStepAvailability() {
+            for (let i = 1; i <= 8; i++) {
+                const stepElement = document.querySelector(`[data-step="${i}"]`);
+                const isCompleted = stepStatus[i] === 'completed';
+                const canAccess = canAccessStep(i);
+
+                stepElement.classList.toggle('completed', isCompleted);
+                stepElement.classList.toggle('disabled', !canAccess);
+
+                // 添加完成标记
+                let marker = stepElement.querySelector('.step-marker');
+                if (!marker) {
+                    marker = document.createElement('div');
+                    marker.className = 'step-marker';
+                    stepElement.appendChild(marker);
+                }
+
+                if (isCompleted) {
+                    marker.innerHTML = '✅';
+                    marker.style.color = '#4caf50';
+                } else if (canAccess) {
+                    marker.innerHTML = '○';
+                    marker.style.color = '#2196f3';
+                } else {
+                    marker.innerHTML = '🔒';
+                    marker.style.color = '#9e9e9e';
+                }
+            }
+
+            // 更新状态栏
+            updateStatusBar();
+        }
+
+        // 更新状态栏显示
+        function updateStatusBar() {
+            // 更新项目信息
+            const projectElement = document.getElementById('current-project');
+            if (currentProjectId) {
+                projectElement.textContent = `项目 #${currentProjectId}`;
+                projectElement.style.color = '#4caf50';
+            } else {
+                projectElement.textContent = '未创建';
+                projectElement.style.color = '#ff9800';
+            }
+
+            // 更新观察记录信息
+            const observationElement = document.getElementById('current-observation');
+            if (currentObservationId) {
+                observationElement.textContent = `记录 #${currentObservationId}`;
+                observationElement.style.color = '#4caf50';
+            } else {
+                observationElement.textContent = '无';
+                observationElement.style.color = '#9e9e9e';
+            }
+
+            // 保存上下文到本地存储
+            saveContextToStorage();
+        }
+
+        // 标记步骤完成
+        function markStepCompleted(stepNum) {
+            stepStatus[stepNum] = 'completed';
+            updateStepAvailability();
+
+            // 自动进入下一步（如果不是最后一步）
+            if (stepNum < 8) {
+                setTimeout(() => {
+                    switchStep(stepNum + 1);
+                }, 2000);
+            }
         }
 
         // 拖拽事件处理
@@ -766,23 +1315,50 @@
 
         // 文件选择处理
         function handleFileSelect(input) {
-            selectedImageFile = input.files[0];
-            if (selectedImageFile) {
-                displayImagePreview(selectedImageFile);
+            const file = input.files[0];
+            if (file) {
+                // 检查文件大小 (5MB限制)
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                if (file.size > maxSize) {
+                    showError(`图片文件过大 (${(file.size / 1024 / 1024).toFixed(1)}MB)，请上传小于5MB的图片`);
+                    input.value = ''; // 清空选择
+                    return;
+                }
+
+                selectedImageFile = file;
+                displayImagePreview(file);
             }
         }
 
         function handleAudioSelect(input) {
-            selectedAudioFile = input.files[0];
-            if (selectedAudioFile) {
-                displayAudioPreview(selectedAudioFile);
+            const file = input.files[0];
+            if (file) {
+                // 检查文件大小 (10MB限制)
+                const maxSize = 10 * 1024 * 1024; // 10MB
+                if (file.size > maxSize) {
+                    showError(`音频文件过大 (${(file.size / 1024 / 1024).toFixed(1)}MB)，请上传小于10MB的音频文件`);
+                    input.value = ''; // 清空选择
+                    return;
+                }
+
+                selectedAudioFile = file;
+                displayAudioPreview(file);
             }
         }
 
         function handleVideoSelect(input) {
-            selectedVideoFile = input.files[0];
-            if (selectedVideoFile) {
-                displayVideoPreview(selectedVideoFile);
+            const file = input.files[0];
+            if (file) {
+                // 检查文件大小 (20MB限制)
+                const maxSize = 20 * 1024 * 1024; // 20MB
+                if (file.size > maxSize) {
+                    showError(`视频文件过大 (${(file.size / 1024 / 1024).toFixed(1)}MB)，请上传小于20MB的视频文件`);
+                    input.value = ''; // 清空选择
+                    return;
+                }
+
+                selectedVideoFile = file;
+                displayVideoPreview(file);
             }
         }
 
@@ -823,17 +1399,73 @@
             }
         }
 
-        // 显示图片预览
+        // 显示图片预览（带压缩）
         function displayImagePreview(file) {
             const preview = document.getElementById('image-preview');
             const img = document.getElementById('preview-img');
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                img.src = e.target.result;
-                preview.style.display = 'block';
+                const originalDataUrl = e.target.result;
+
+                // 如果图片大于2MB，进行压缩
+                if (file.size > 2 * 1024 * 1024) {
+                    compressImage(originalDataUrl, function(compressedDataUrl) {
+                        img.src = compressedDataUrl;
+                        preview.style.display = 'block';
+
+                        // 更新selectedImageFile为压缩后的图片
+                        fetch(compressedDataUrl)
+                            .then(res => res.blob())
+                            .then(blob => {
+                                selectedImageFile = new File([blob], file.name, { type: file.type });
+                                console.log(`图片已压缩: ${(file.size / 1024 / 1024).toFixed(1)}MB → ${(blob.size / 1024 / 1024).toFixed(1)}MB`);
+                            });
+                    });
+                } else {
+                    img.src = originalDataUrl;
+                    preview.style.display = 'block';
+                }
             };
             reader.readAsDataURL(file);
+        }
+
+        // 压缩图片
+        function compressImage(dataUrl, callback) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                // 计算压缩后的尺寸（保持宽高比，最大边长800px）
+                const maxDimension = 800;
+                let { width, height } = img;
+
+                if (width > height) {
+                    if (width > maxDimension) {
+                        height = (height * maxDimension) / width;
+                        width = maxDimension;
+                    }
+                } else {
+                    if (height > maxDimension) {
+                        width = (width * maxDimension) / height;
+                        height = maxDimension;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                // 绘制压缩后的图片
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // 转换为blob，质量设为0.8
+                canvas.toBlob(function(blob) {
+                    const compressedDataUrl = URL.createObjectURL(blob);
+                    callback(compressedDataUrl);
+                }, 'image/jpeg', 0.8);
+            };
+            img.src = dataUrl;
         }
 
         // 显示音频预览
@@ -870,7 +1502,7 @@
             const tags = document.getElementById('project-tags').value.split(',').map(tag => tag.trim());
 
             const data = {
-                user_id: 1,
+                user_id: currentUserId,
                 title: title,
                 description: description,
                 category: category,
@@ -888,12 +1520,16 @@
 
                 const result = await response.json();
                 projectData = result.data;
+                currentProjectId = result.data?.project_id;
 
-                document.getElementById('result-content-1').textContent = JSON.stringify(result, null, 2);
+                // 保存上下文到本地存储
+                saveContextToStorage();
+
+                document.getElementById('result-content-1').innerHTML = formatJsonResponse(result, 1);
                 document.getElementById('result-1').classList.add('show');
 
-                // 自动切换到下一步
-                setTimeout(() => switchStep(2), 2000);
+                // 标记步骤完成
+                markStepCompleted(1);
             } catch (error) {
                 showError('创建项目失败: ' + error.message);
             }
@@ -917,9 +1553,15 @@
                 const base64Data = await fileToBase64(selectedImageFile);
                 const imageUrl = `data:${selectedImageFile.type};base64,${base64Data}`;
 
+                // 确保项目ID已设置
+                if (!currentProjectId) {
+                    showError('请先创建项目');
+                    return;
+                }
+
                 const data = {
-                    project_id: projectData?.project_id || 1,
-                    user_id: 1,
+                    project_id: currentProjectId,
+                    user_id: currentUserId,
                     image_url: imageUrl,
                     prompt: prompt,
                     category: document.getElementById('project-category').value
@@ -943,15 +1585,19 @@
 
                 const result = await response.json();
                 observationData = result;
+                currentObservationId = result?.observation_id;
+
+                // 保存上下文到本地存储
+                saveContextToStorage();
 
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
 
-                document.getElementById('result-content-2').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-content-2').innerHTML = formatJsonResponse(result, 2);
                 document.getElementById('result-2').classList.add('show');
 
-                // 自动切换到下一步
-                setTimeout(() => switchStep(3), 3000);
+                // 标记步骤完成
+                markStepCompleted(2);
             } catch (error) {
                 document.getElementById('progress-2').classList.remove('show');
                 showError('图片分析失败: ' + error.message);
@@ -959,13 +1605,23 @@
         }
 
         async function generateQuestions() {
+            // 确保必要的上下文数据存在
+            if (!currentProjectId) {
+                showError('请先创建项目');
+                return;
+            }
+            if (!currentObservationId) {
+                showError('请先上传图片进行观察分析');
+                return;
+            }
+
             const userAge = parseInt(document.getElementById('user-age').value);
             const contextInfo = document.getElementById('context-info').value;
 
             const data = {
-                project_id: projectData?.project_id || 1,
-                user_id: 1,
-                observation_id: observationData?.observation_id || 1,
+                project_id: currentProjectId,
+                user_id: currentUserId,
+                observation_id: currentObservationId,
                 context_info: contextInfo,
                 category: document.getElementById('project-category').value,
                 user_age: userAge
@@ -982,17 +1638,18 @@
 
                 const result = await response.json();
 
-                document.getElementById('result-content-3').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-content-3').innerHTML = formatJsonResponse(result, 3);
                 document.getElementById('result-3').classList.add('show');
 
-                // 自动切换到下一步
-                setTimeout(() => switchStep(4), 2000);
+                // 标记步骤完成
+                markStepCompleted(3);
             } catch (error) {
                 showError('生成问题失败: ' + error.message);
             }
         }
 
         async function polishNote() {
+            // 笔记润色可以不依赖具体的项目或观察记录，作为独立的表达功能
             const rawContent = document.getElementById('raw-content').value;
             const contextInfoStr = document.getElementById('polish-context').value;
 
@@ -1001,6 +1658,14 @@
                 contextInfo = JSON.parse(contextInfoStr);
             } catch (e) {
                 contextInfo = { raw_context: contextInfoStr };
+            }
+
+            // 如果有项目上下文，添加到context_info中
+            if (currentProjectId) {
+                contextInfo.project_id = currentProjectId;
+            }
+            if (currentObservationId) {
+                contextInfo.observation_id = currentObservationId;
             }
 
             const data = {
@@ -1021,11 +1686,11 @@
 
                 const result = await response.json();
 
-                document.getElementById('result-content-4').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-content-4').innerHTML = formatJsonResponse(result, 4);
                 document.getElementById('result-4').classList.add('show');
 
-                // 自动切换到下一步
-                setTimeout(() => switchStep(5), 2000);
+                // 标记步骤完成
+                markStepCompleted(4);
             } catch (error) {
                 showError('内容润色失败: ' + error.message);
             }
@@ -1037,6 +1702,7 @@
                 return;
             }
 
+            // 语音转文字可以独立进行，但会记录到当前项目中（如果有的话）
             const language = document.getElementById('audio-language').value;
 
             // 显示进度条
@@ -1075,11 +1741,11 @@
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
 
-                document.getElementById('result-content-5').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-content-5').innerHTML = formatJsonResponse(result, 5);
                 document.getElementById('result-5').classList.add('show');
 
-                // 自动切换到下一步
-                setTimeout(() => switchStep(6), 2000);
+                // 标记步骤完成
+                markStepCompleted(5);
             } catch (error) {
                 document.getElementById('progress-5').classList.remove('show');
                 showError('语音转换失败: ' + error.message);
@@ -1087,16 +1753,23 @@
         }
 
         async function generateReport() {
+            // 确保项目上下文存在
+            if (!currentProjectId) {
+                showError('请先创建项目');
+                return;
+            }
+
             const context = document.getElementById('report-context').value;
             const goals = document.getElementById('learning-goals').value;
 
             const data = {
-                project_id: projectData?.project_id || 1,
-                user_id: 1,
+                project_id: currentProjectId,
+                user_id: currentUserId,
                 context_info: {
                     content: context,
                     learning_goals: goals,
-                    category: document.getElementById('project-category').value
+                    category: document.getElementById('project-category').value,
+                    observation_id: currentObservationId // 如果有观察记录，也包含在内
                 }
             };
 
@@ -1111,11 +1784,11 @@
 
                 const result = await response.json();
 
-                document.getElementById('result-content-6').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-content-6').innerHTML = formatJsonResponse(result, 6);
                 document.getElementById('result-6').classList.add('show');
 
-                // 自动切换到下一步
-                setTimeout(() => switchStep(7), 2000);
+                // 标记步骤完成
+                markStepCompleted(6);
             } catch (error) {
                 showError('生成报告失败: ' + error.message);
             }
@@ -1126,6 +1799,8 @@
                 showError('请先选择视频文件');
                 return;
             }
+
+            // 视频分析可以独立进行，但结果会记录到当前项目中（如果有的话）
 
             // 显示进度条
             const progressBar = document.getElementById('progress-7');
@@ -1162,11 +1837,11 @@
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
 
-                document.getElementById('result-content-7').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-content-7').innerHTML = formatJsonResponse(result, 7);
                 document.getElementById('result-7').classList.add('show');
 
-                // 自动切换到下一步
-                setTimeout(() => switchStep(8), 3000);
+                // 标记步骤完成
+                markStepCompleted(7);
             } catch (error) {
                 document.getElementById('progress-7').classList.remove('show');
                 showError('视频分析失败: ' + error.message);
@@ -1189,6 +1864,12 @@
                 voice: voice,
                 language: language
             };
+
+            // 如果有项目上下文，添加到上下文中用于关联
+            if (currentProjectId) {
+                data.project_id = currentProjectId;
+                data.user_id = currentUserId;
+            }
 
             // 显示进度条
             const progressBar = document.getElementById('progress-8');
@@ -1217,14 +1898,17 @@
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
 
-                document.getElementById('result-content-8').textContent = JSON.stringify(result, null, 2);
-                document.getElementById('result-8').classList.add('show');
-
                 // 如果有视频数据，显示播放器
                 if (result.data && result.data.video_data) {
                     generatedVideoData = result.data.video_data;
                     displayGeneratedVideo(generatedVideoData, result.data.format || 'mp4');
                 }
+
+                document.getElementById('result-content-8').innerHTML = formatJsonResponse(result, 8);
+                document.getElementById('result-8').classList.add('show');
+
+                // 标记步骤完成
+                markStepCompleted(8);
 
             } catch (error) {
                 document.getElementById('progress-8').classList.remove('show');
@@ -1283,24 +1967,533 @@
             URL.revokeObjectURL(url);
         }
 
+        // 重置演示
+        function resetDemo() {
+            if (!confirm('确定要重置演示吗？这将清除所有数据和进度。')) {
+                return;
+            }
+
+            // 重置全局变量
+            currentProjectId = null;
+            currentObservationId = null;
+            projectData = null;
+            observationData = null;
+            selectedImageFile = null;
+            selectedAudioFile = null;
+            selectedVideoFile = null;
+            generatedAudioData = null;
+            generatedVideoData = null;
+            stepStatus = {};
+
+            // 清除本地存储的上下文数据
+            localStorage.removeItem('explorapal_demo_context');
+
+            // 重置表单
+            document.getElementById('project-title').value = '小明的恐龙探索之旅';
+            document.getElementById('project-desc').value = '跟随小明一起探索古老的恐龙世界，发现恐龙的奥秘，学习古生物知识。';
+            document.getElementById('project-category').value = 'dinosaur';
+            document.getElementById('project-tags').value = '恐龙,古生物,探索';
+
+            // 清除所有结果显示
+            for (let i = 1; i <= 8; i++) {
+                const resultElement = document.getElementById(`result-${i}`);
+                const contentElement = document.getElementById(`result-content-${i}`);
+                if (resultElement) resultElement.classList.remove('show');
+                if (contentElement) contentElement.textContent = '';
+            }
+
+            // 清除文件预览
+            document.getElementById('image-preview').style.display = 'none';
+            document.getElementById('audio-preview').style.display = 'none';
+            document.getElementById('video-preview').style.display = 'none';
+
+            // 清除媒体播放器
+            document.getElementById('audio-player').style.display = 'none';
+            document.getElementById('video-player').style.display = 'none';
+
+            // 重置到第一步
+            switchStep(1);
+
+            showSuccess('演示已重置，请从头开始体验！');
+        }
+
+        // 显示上下文信息
+        function showContextInfo() {
+            const contextInfo = {
+                当前用户ID: currentUserId,
+                当前项目ID: currentProjectId || '未设置',
+                当前观察记录ID: currentObservationId || '未设置',
+                项目数据: projectData ? `项目 "${projectData.title}" (#${projectData.project_id})` : '无',
+                观察数据: observationData ? `观察记录 #${observationData.observation_id}` : '无',
+                步骤状态: stepStatus,
+                已选择的图片: selectedImageFile ? selectedImageFile.name : '无',
+                已选择的音频: selectedAudioFile ? selectedAudioFile.name : '无',
+                已选择的视频: selectedVideoFile ? selectedVideoFile.name : '无',
+                生成的音频数据: generatedAudioData ? '已生成' : '无',
+                生成的视频数据: generatedVideoData ? '已生成' : '无'
+            };
+
+            const contextText = Object.entries(contextInfo)
+                .map(([key, value]) => `${key}: ${JSON.stringify(value, null, 2)}`)
+                .join('\n');
+
+            // 创建一个模态对话框显示信息
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            `;
+
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                border-radius: 10px;
+                padding: 20px;
+                max-width: 600px;
+                max-height: 80vh;
+                overflow-y: auto;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            `;
+
+            content.innerHTML = `
+                <h3 style="margin-top: 0; color: #333;">📊 当前上下文信息</h3>
+                <pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 12px; white-space: pre-wrap; border: 1px solid #e9ecef;">${contextText}</pre>
+                <div style="text-align: right; margin-top: 15px;">
+                    <button onclick="this.closest('div').parentElement.remove()" class="btn" style="padding: 8px 16px; font-size: 14px;">关闭</button>
+                </div>
+            `;
+
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+        }
+
+        // 显示成功消息
+        function showSuccess(message) {
+            showMessage(message, 'success');
+        }
+
+        // 显示错误消息
         function showError(message) {
-            // 移除现有的错误信息
-            const existingErrors = document.querySelectorAll('.error');
-            existingErrors.forEach(error => error.remove());
+            showMessage(message, 'error');
+        }
 
-            // 创建新的错误信息
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error show';
-            errorDiv.innerHTML = `<strong>错误：</strong>${message}`;
+        // 格式化JSON响应为HTML
+        function formatJsonResponse(data, stepNumber) {
+            if (!data) return '<span class="json-null">null</span>';
 
-            // 添加到当前活动步骤中
-            const activeSection = document.querySelector('.section.active');
-            activeSection.appendChild(errorDiv);
+            // 针对不同步骤的特殊处理
+            if (stepNumber === 1 && data.data) {
+                // 项目创建响应
+                return formatProjectResponse(data);
+            } else if (stepNumber === 2 && data.object_name) {
+                // 图片分析响应
+                return formatImageAnalysisResponse(data);
+            } else if (stepNumber === 3 && data.questions) {
+                // 问题生成响应
+                return formatQuestionsResponse(data);
+            } else if (stepNumber === 4 && data.title) {
+                // 笔记润色响应
+                return formatPolishResponse(data);
+            } else if (stepNumber === 5) {
+                // 语音转文字响应
+                return formatSpeechToTextResponse(data);
+            } else if (stepNumber === 6 && data.title) {
+                // 生成报告响应
+                return formatReportResponse(data);
+            } else if (stepNumber === 7 && data.scenes) {
+                // 视频分析响应
+                return formatVideoAnalysisResponse(data);
+            } else if (stepNumber === 8 && data.video_data) {
+                // 视频生成响应
+                return formatVideoGenerationResponse(data);
+            }
+
+            // 默认的JSON格式化
+            return formatJsonValue(data, 0, false);
+        }
+
+        // 格式化项目创建响应
+        function formatProjectResponse(data) {
+            if (!data.data) return formatJsonValue(data, 0, false);
+
+            const project = data.data;
+            return `
+                <div class="api-response-card">
+                    <h4>🎯 项目创建成功</h4>
+                    <div class="response-details">
+                        <div class="detail-item">
+                            <span class="label">项目ID:</span>
+                            <span class="value project-id">${project.project_id || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">项目代码:</span>
+                            <span class="value">${project.project_code || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">项目标题:</span>
+                            <span class="value">${project.title || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">项目状态:</span>
+                            <span class="value status-active">${project.status || 'active'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="raw-json">
+                    <details>
+                        <summary>查看原始JSON响应</summary>
+                        ${formatJsonValue(data, 0, false)}
+                    </details>
+                </div>
+            `;
+        }
+
+        // 格式化图片分析响应
+        function formatImageAnalysisResponse(data) {
+            return `
+                <div class="api-response-card">
+                    <h4>🔍 图片分析结果</h4>
+                    <div class="response-details">
+                        <div class="detail-item">
+                            <span class="label">识别对象:</span>
+                            <span class="value object-name">${data.object_name || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">类别:</span>
+                            <span class="value">${data.category || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">置信度:</span>
+                            <span class="value confidence">${data.confidence ? (data.confidence * 100).toFixed(1) + '%' : 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">学名:</span>
+                            <span class="value scientific">${data.scientific_name || 'N/A'}</span>
+                        </div>
+                    </div>
+                    ${data.description ? `
+                        <div class="description-section">
+                            <h5>📝 详细描述</h5>
+                            <p>${data.description}</p>
+                        </div>
+                    ` : ''}
+                    ${data.key_features && data.key_features.length ? `
+                        <div class="features-section">
+                            <h5>⭐ 关键特征</h5>
+                            <ul>
+                                ${data.key_features.map(feature => `<li>${feature}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="raw-json">
+                    <details>
+                        <summary>查看原始JSON响应</summary>
+                        ${formatJsonValue(data, 0, false)}
+                    </details>
+                </div>
+            `;
+        }
+
+        // 格式化问题生成响应
+        function formatQuestionsResponse(data) {
+            if (!data.questions || !Array.isArray(data.questions)) {
+                return formatJsonValue(data, 0, false);
+            }
+
+            return `
+                <div class="api-response-card">
+                    <h4>❓ 生成的问题列表</h4>
+                    <div class="questions-list">
+                        ${data.questions.map((question, index) => `
+                            <div class="question-item">
+                                <div class="question-header">
+                                    <span class="question-number">${index + 1}.</span>
+                                    <span class="question-type">${getQuestionTypeLabel(question.type)}</span>
+                                    <span class="question-difficulty ${question.difficulty}">${getDifficultyLabel(question.difficulty)}</span>
+                                </div>
+                                <div class="question-content">${question.content}</div>
+                                <div class="question-purpose">🎯 ${question.purpose}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="raw-json">
+                    <details>
+                        <summary>查看原始JSON响应</summary>
+                        ${formatJsonValue(data, 0, false)}
+                    </details>
+                </div>
+            `;
+        }
+
+        // 格式化笔记润色响应
+        function formatPolishResponse(data) {
+            return `
+                <div class="api-response-card">
+                    <h4>✨ 笔记润色结果</h4>
+                    <div class="response-details">
+                        <div class="detail-item">
+                            <span class="label">标题:</span>
+                            <span class="value">${data.title || data.polished_title || 'N/A'}</span>
+                        </div>
+                        ${data.summary || data.polished_summary ? `
+                            <div class="summary-section">
+                                <h5>📋 内容总结</h5>
+                                <p>${data.summary || data.polished_summary}</p>
+                            </div>
+                        ` : ''}
+                        ${data.formatted || data.polished_formatted ? `
+                            <div class="formatted-section">
+                                <h5>📝 格式化文本</h5>
+                                <div class="formatted-text">${(data.formatted || data.polished_formatted).replace(/\n/g, '<br>')}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="raw-json">
+                    <details>
+                        <summary>查看原始JSON响应</summary>
+                        ${formatJsonValue(data, 0, false)}
+                    </details>
+                </div>
+            `;
+        }
+
+        // 格式化语音转文字响应
+        function formatSpeechToTextResponse(data) {
+            return `
+                <div class="api-response-card">
+                    <h4>🎤 语音转文字结果</h4>
+                    <div class="response-details">
+                        ${data.transcription ? `
+                            <div class="transcription-section">
+                                <h5>📝 识别文本</h5>
+                                <div class="transcription-text">${data.transcription}</div>
+                            </div>
+                        ` : ''}
+                        <div class="detail-item">
+                            <span class="label">语言:</span>
+                            <span class="value">${data.language || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">置信度:</span>
+                            <span class="value confidence">${data.confidence ? (data.confidence * 100).toFixed(1) + '%' : 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="raw-json">
+                    <details>
+                        <summary>查看原始JSON响应</summary>
+                        ${formatJsonValue(data, 0, false)}
+                    </details>
+                </div>
+            `;
+        }
+
+        // 格式化报告生成响应
+        function formatReportResponse(data) {
+            return `
+                <div class="api-response-card">
+                    <h4>📋 研究报告</h4>
+                    <div class="response-details">
+                        <div class="detail-item">
+                            <span class="label">报告标题:</span>
+                            <span class="value">${data.title || 'N/A'}</span>
+                        </div>
+                        ${data.description ? `
+                            <div class="description-section">
+                                <h5>📝 报告描述</h5>
+                                <p>${data.description}</p>
+                            </div>
+                        ` : ''}
+                        ${data.content ? `
+                            <div class="content-section">
+                                <h5>📄 报告内容</h5>
+                                <div class="report-content">${data.content.replace(/\n/g, '<br>')}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="raw-json">
+                    <details>
+                        <summary>查看原始JSON响应</summary>
+                        ${formatJsonValue(data, 0, false)}
+                    </details>
+                </div>
+            `;
+        }
+
+        // 格式化视频分析响应
+        function formatVideoAnalysisResponse(data) {
+            return `
+                <div class="api-response-card">
+                    <h4>🎥 视频分析结果</h4>
+                    <div class="response-details">
+                        ${data.summary ? `
+                            <div class="summary-section">
+                                <h5>📊 视频总结</h5>
+                                <p><strong>标题:</strong> ${data.summary.title || 'N/A'}</p>
+                                <p><strong>描述:</strong> ${data.summary.description || 'N/A'}</p>
+                                <p><strong>时长:</strong> ${data.summary.duration ? data.summary.duration + '秒' : 'N/A'}</p>
+                            </div>
+                        ` : ''}
+                        ${data.scenes && data.scenes.length ? `
+                            <div class="scenes-section">
+                                <h5>🎬 场景分析</h5>
+                                <div class="scenes-list">
+                                    ${data.scenes.slice(0, 3).map(scene => `
+                                        <div class="scene-item">
+                                            <span class="scene-time">${scene.timestamp}s</span>
+                                            <span class="scene-type">${scene.scene_type}</span>
+                                            <span class="scene-desc">${scene.description}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="raw-json">
+                    <details>
+                        <summary>查看原始JSON响应</summary>
+                        ${formatJsonValue(data, 0, false)}
+                    </details>
+                </div>
+            `;
+        }
+
+        // 格式化视频生成响应
+        function formatVideoGenerationResponse(data) {
+            return `
+                <div class="api-response-card">
+                    <h4>🎬 视频生成结果</h4>
+                    <div class="response-details">
+                        <div class="detail-item">
+                            <span class="label">视频格式:</span>
+                            <span class="value">${data.format || 'mp4'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">视频时长:</span>
+                            <span class="value">${data.duration ? data.duration + '秒' : 'N/A'}</span>
+                        </div>
+                        ${data.metadata ? `
+                            <div class="metadata-section">
+                                <h5>📋 视频信息</h5>
+                                <p><strong>标题:</strong> ${data.metadata.title || 'N/A'}</p>
+                                <p><strong>描述:</strong> ${data.metadata.description || 'N/A'}</p>
+                                <p><strong>分辨率:</strong> ${data.metadata.resolution || 'N/A'}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="raw-json">
+                    <details>
+                        <summary>查看原始JSON响应</summary>
+                        ${formatJsonValue(data, 0, false)}
+                    </details>
+                </div>
+            `;
+        }
+
+        // 通用的JSON值格式化
+        function formatJsonValue(value, indent = 0, isLast = false) {
+            const indentStr = '  '.repeat(indent);
+
+            if (value === null) {
+                return `<span class="json-null">null</span>${isLast ? '' : ','}`;
+            }
+
+            if (typeof value === 'boolean') {
+                return `<span class="json-boolean">${value}</span>${isLast ? '' : ','}`;
+            }
+
+            if (typeof value === 'number') {
+                return `<span class="json-number">${value}</span>${isLast ? '' : ','}`;
+            }
+
+            if (typeof value === 'string') {
+                return `<span class="json-string">"${value.replace(/"/g, '\\"')}"</span>${isLast ? '' : ','}`;
+            }
+
+            if (Array.isArray(value)) {
+                if (value.length === 0) {
+                    return `[]${isLast ? '' : ','}`;
+                }
+
+                let html = `[\n`;
+                value.forEach((item, index) => {
+                    html += `${'  '.repeat(indent + 1)}${formatJsonValue(item, indent + 1, index === value.length - 1)}\n`;
+                });
+                html += `${indentStr}]${isLast ? '' : ','}`;
+                return html;
+            }
+
+            if (typeof value === 'object') {
+                const keys = Object.keys(value);
+                if (keys.length === 0) {
+                    return `{}${isLast ? '' : ','}`;
+                }
+
+                let html = `{\n`;
+                keys.forEach((key, index) => {
+                    const isLastItem = index === keys.length - 1;
+                    html += `${'  '.repeat(indent + 1)}<span class="json-key">"${key}"</span><span class="json-colon">:</span> ${formatJsonValue(value[key], indent + 1, isLastItem)}\n`;
+                });
+                html += `${indentStr}}${isLast ? '' : ','}`;
+                return html;
+            }
+
+            return `${value}${isLast ? '' : ','}`;
+        }
+
+        // 辅助函数
+        function getQuestionTypeLabel(type) {
+            const typeMap = {
+                'observation': '观察',
+                'reasoning': '推理',
+                'experiment': '实验',
+                'comparison': '比较'
+            };
+            return typeMap[type] || type;
+        }
+
+        function getDifficultyLabel(difficulty) {
+            const difficultyMap = {
+                'basic': '基础',
+                'intermediate': '中等',
+                'advanced': '高级'
+            };
+            return difficultyMap[difficulty] || difficulty;
+        }
+
+        // 显示消息的通用函数
+        function showMessage(message, type) {
+            // 移除现有的消息
+            const existingMessages = document.querySelectorAll('.message');
+            existingMessages.forEach(msg => msg.remove());
+
+            // 创建新的消息
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type} show`;
+            messageDiv.innerHTML = `<strong>${type === 'success' ? '✅' : '❌'}：</strong>${message}`;
+
+            // 添加到页面顶部
+            const container = document.querySelector('.container');
+            container.insertBefore(messageDiv, container.firstChild);
 
             // 3秒后自动隐藏
             setTimeout(() => {
-                errorDiv.classList.remove('show');
-                setTimeout(() => errorDiv.remove(), 300);
+                messageDiv.classList.remove('show');
+                setTimeout(() => messageDiv.remove(), 300);
             }, 3000);
         }
     </script>
