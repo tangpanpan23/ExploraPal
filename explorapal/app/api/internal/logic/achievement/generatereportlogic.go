@@ -2,6 +2,7 @@ package achievement
 
 import (
 	"context"
+	"strings"
 
 	"explorapal/app/api/internal/svc"
 	"explorapal/app/api/internal/types"
@@ -38,7 +39,7 @@ func (l *GenerateReportLogic) GenerateReport(req *types.GenerateReportReq) (resp
 		Content:     aiReport.Content,
 		Abstract:    aiReport.Abstract,
 		Conclusion:  aiReport.Conclusion,
-		NextSteps:   aiReport.NextSteps,
+		NextSteps:   strings.Join(aiReport.NextSteps, "; "), // 将数组转换为分号分隔的字符串
 	}
 
 	l.Infof("研究报告生成完成: 标题=%s", aiReport.Title)

@@ -2,10 +2,11 @@ package expression
 
 import (
 	"context"
+	"encoding/base64"
 
 	"explorapal/app/api/internal/svc"
 	"explorapal/app/api/internal/types"
-	"explorapal/app/audio-processing/proto"
+	audioprocessing "explorapal/app/audio-processing/proto"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/zrpc"
@@ -27,16 +28,23 @@ func NewSpeechToTextLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Spee
 }
 
 func (l *SpeechToTextLogic) SpeechToText(req *types.SpeechToTextReq) (resp *types.SpeechToTextResp, err error) {
+	// 解码base64音频数据
+	audioBytes, err := base64.StdEncoding.DecodeString(req.AudioData)
+	if err != nil {
+		l.Errorf("解码音频数据失败: %v", err)
+		return nil, err
+	}
+
 	// 创建语音处理RPC客户端
 	conn := zrpc.MustNewClient(zrpc.RpcClientConf{
 		Endpoints: []string{"127.0.0.1:9004"}, // 语音处理服务地址
 		Timeout:   10000,                       // 10秒超时
 	})
-	client := proto.NewAudioProcessingServiceClient(conn.Conn())
+	client := audioprocessing.NewAudioProcessingServiceClient(conn.Conn())
 
 	// 调用语音转文字RPC
-	rpcReq := &proto.SpeechToTextReq{
-		AudioData: req.AudioData,
+	rpcReq := &audioprocessing.SpeechToTextReq{
+		AudioData: audioBytes, // []byte 类型
 		Format:    req.AudioFormat,
 		Language:  req.Language,
 	}

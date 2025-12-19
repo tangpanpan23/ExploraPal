@@ -66,8 +66,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo ""
     echo "📚 保留的核心文档："
     echo "  - README.md (项目说明)"
-    echo "  - MVP_DEMO.md (演示指南)"
-    echo "  - MULTIMODAL_DEMO.md (多模态功能)"
+    echo "  - MVP_DEMO.md (完整演示指南)"
 else
     echo "❌ 操作已取消"
 fi

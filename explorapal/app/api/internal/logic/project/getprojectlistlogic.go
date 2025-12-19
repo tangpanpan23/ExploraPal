@@ -64,19 +64,19 @@ func (l *GetProjectListLogic) GetProjectList(req *types.GetProjectListReq) (resp
 			ProjectCode: project.ProjectCode,
 			Title:       project.Title,
 			Description: project.Description.String,
-			Category:    project.Category.String,
+			Category:    project.Category, // string 类型
 			Status:      project.Status,
 			Progress:    int32(project.Progress),
-			CreateTime:  project.CreateTime.Unix(),
-			UpdateTime:  project.UpdateTime.Unix(),
+			CreateTime:  project.CreateTime.Format("2006-01-02 15:04:05"), // 格式化为字符串
+			UpdateTime:  project.UpdateTime.Format("2006-01-02 15:04:05"), // 格式化为字符串
 		}
 	}
 
 	resp = &types.GetProjectListResp{
-		Projects: projectList,
-		Total:    int32(total), // TODO: 获取总数
-		Page:     int32(page),
-		PageSize: int32(pageSize),
+		List:     projectList,
+		Total:    total, // int64 类型
+		Page:     int64(page), // int64 类型
+		PageSize: int64(pageSize), // int64 类型
 	}
 
 	l.Infof("获取项目列表成功: 用户ID=%d, 返回%d个项目", req.UserId, len(projectList))

@@ -34,17 +34,20 @@ func (l *GetProjectDetailLogic) GetProjectDetail(req *types.GetProjectDetailReq)
 
 	// 转换响应格式
 	resp = &types.GetProjectDetailResp{
-		ProjectId:   project.ProjectId,
-		ProjectCode: project.ProjectCode,
-		UserId:      project.UserId,
-		Title:       project.Title,
-		Description: project.Description.String, // sql.NullString
-		Category:    project.Category.String,     // sql.NullString
-		Status:      project.Status,
-		Progress:    int32(project.Progress), // int64 -> int32
-		Tags:        []string{},              // TODO: 解析JSON标签
-		CreateTime:  project.CreateTime.Unix(),
-		UpdateTime:  project.UpdateTime.Unix(),
+		Project: types.ProjectDetail{
+			ProjectId:   project.ProjectId,
+			ProjectCode: project.ProjectCode,
+			Title:       project.Title,
+			Description: project.Description.String, // sql.NullString
+			Category:    project.Category,           // string 类型
+			Status:      project.Status,
+			Progress:    int32(project.Progress), // int64 -> int32
+			CreateTime:  project.CreateTime.Format("2006-01-02 15:04:05"),
+			UpdateTime:  project.UpdateTime.Format("2006-01-02 15:04:05"),
+			Tags:        []string{}, // TODO: 解析JSON标签
+		},
+		Activities:   []types.ProjectActivity{},   // TODO: 获取项目活动
+		Achievements: []types.ProjectAchievement{}, // TODO: 获取项目成果
 	}
 
 	l.Infof("获取项目详情成功: ID=%d, Title=%s", req.ProjectId, project.Title)

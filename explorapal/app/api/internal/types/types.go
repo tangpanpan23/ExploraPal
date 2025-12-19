@@ -251,14 +251,14 @@ type ObservationInfo struct {
 }
 
 type PolishNoteReq struct {
-	ProjectId   int64  `json:"project_id" desc:"项目ID"`
-	UserId      int64  `json:"user_id" desc:"用户ID"`
-	QuestionId  int64  `json:"question_id" desc:"相关问题ID"`
-	RawContent  string `json:"raw_content" desc:"原始内容"`
-	ContentType string `json:"content_type" desc:"内容类型：speech,text"`
-	ContextInfo string `json:"context_info,optional" desc:"上下文信息"`
-	Category    string `json:"category" desc:"项目类别"`
-	UserAge     int32  `json:"user_age" desc:"用户年龄"`
+	ProjectId   int64                 `json:"project_id" desc:"项目ID"`
+	UserId      int64                 `json:"user_id" desc:"用户ID"`
+	QuestionId  int64                 `json:"question_id" desc:"相关问题ID"`
+	RawContent  string                `json:"raw_content" desc:"原始内容"`
+	ContentType string                `json:"content_type" desc:"内容类型：speech,text"`
+	ContextInfo map[string]interface{} `json:"context_info,optional" desc:"上下文信息对象"`
+	Category    string                `json:"category" desc:"项目类别"`
+	UserAge     int32                 `json:"user_age" desc:"用户年龄"`
 }
 
 type PolishNoteResp struct {

@@ -2,6 +2,7 @@ package expression
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"explorapal/app/api/internal/svc"
@@ -26,8 +27,23 @@ func NewPolishNoteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Polish
 }
 
 func (l *PolishNoteLogic) PolishNote(req *types.PolishNoteReq) (resp *types.PolishNoteResp, err error) {
+	// 将context_info转换为字符串
+	contextInfoStr := ""
+	if req.ContextInfo != nil {
+		contextBytes, err := json.Marshal(req.ContextInfo)
+		if err != nil {
+			l.Errorf("序列化context_info失败: %v", err)
+			contextInfoStr = fmt.Sprintf("observation_results: %v, previous_answers: %v, project_category: %v",
+				req.ContextInfo["observation_results"],
+				req.ContextInfo["previous_answers"],
+				req.ContextInfo["project_category"])
+		} else {
+			contextInfoStr = string(contextBytes)
+		}
+	}
+
 	// 调用AI服务润色笔记
-	aiResult, err := l.svcCtx.AIClient.PolishNote(l.ctx, req.RawContent, req.ContextInfo)
+	aiResult, err := l.svcCtx.AIClient.PolishNote(l.ctx, req.RawContent, contextInfoStr)
 	if err != nil {
 		l.Errorf("AI润色笔记失败: %v", err)
 		return nil, err
