@@ -22,6 +22,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 			TAL_MLOPS_APP_KEY: c.AIService.TAL_MLOPS_APP_KEY,
 			BaseURL:           c.AIService.BaseURL,
 			Timeout:           c.AIService.Timeout,
+			MaxTokens:         c.AIService.MaxTokens,
+			Temperature:       c.AIService.Temperature,
 		}),
 	}
 }

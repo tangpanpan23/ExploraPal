@@ -5,6 +5,7 @@ import (
 
 	videoprocessing "explorapal/app/video-processing/proto"
 	"explorapal/app/video-processing/rpc/internal/svc"
+	"explorapal/third/openai"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +25,9 @@ func NewAnalyzeVideoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Anal
 }
 
 func (l *AnalyzeVideoLogic) AnalyzeVideo(in *videoprocessing.AnalyzeVideoReq) (*videoprocessing.AnalyzeVideoResp, error) {
-	// TODO: 实现视频分析逻辑
+	// 记录API请求参数
+	l.Infof("视频分析请求: VideoData大小=%d bytes, Format=%s, AnalysisType=%s, Duration=%.2f",
+		len(in.VideoData), in.Format, in.AnalysisType, in.Duration)
 
 	// 1. 验证输入
 	if len(in.VideoData) == 0 {
@@ -34,13 +37,16 @@ func (l *AnalyzeVideoLogic) AnalyzeVideo(in *videoprocessing.AnalyzeVideoReq) (*
 		}, nil
 	}
 
-	// 2. 分析视频内容
-	result, err := l.processVideoAnalysis(in)
+	// 2. 调用AI服务进行视频分析
+	result, err := l.processVideoAnalysisWithAI(in)
 	if err != nil {
-		l.Logger.Errorf("视频分析失败: %v", err)
+		l.Logger.Errorf("AI视频分析失败: %v", err)
 		// 返回模拟结果
 		return l.getDefaultVideoAnalysisResult(in), nil
 	}
+
+	// 记录成功结果
+	l.Infof("视频分析成功: 场景数量=%d, 物体数量=%d, 文字数量=%d", len(result.Scenes), len(result.Objects), len(result.Texts))
 
 	return &videoprocessing.AnalyzeVideoResp{
 		Status: 200,
@@ -49,72 +55,118 @@ func (l *AnalyzeVideoLogic) AnalyzeVideo(in *videoprocessing.AnalyzeVideoReq) (*
 	}, nil
 }
 
-// processVideoAnalysis 处理视频分析
-func (l *AnalyzeVideoLogic) processVideoAnalysis(in *videoprocessing.AnalyzeVideoReq) (*videoprocessing.VideoAnalysisResult, error) {
-	// TODO: 实现实际的视频分析处理
-	// 这里可以调用AI服务进行视频分析
+// processVideoAnalysisWithAI 调用AI服务处理视频分析
+func (l *AnalyzeVideoLogic) processVideoAnalysisWithAI(in *videoprocessing.AnalyzeVideoReq) (*videoprocessing.VideoAnalysisResult, error) {
+	// 使用ServiceContext中的AI客户端
+	// 显式使用openai包以避免编译器误报
+	_ = openai.Client{}
+	analysisType := in.AnalysisType
+	if analysisType == "" {
+		analysisType = "content"
+	}
 
-	// 暂时返回模拟结果
-	return &videoprocessing.VideoAnalysisResult{
-		Scenes: []*videoprocessing.SceneAnalysis{
-			{
-				Timestamp:  0.0,
-				SceneType:  "educational",
-				Confidence: 0.95,
-				Description: sanitizeUTF8("这是一个教育视频场景，包含了学习内容"),
-			},
-		},
-		Objects: []*videoprocessing.ObjectDetection{
-			{
-				Timestamp:  5.0,
-				ObjectName: sanitizeUTF8("黑板"),
-				Confidence: 0.88,
+	aiResult, err := l.svcCtx.AIClient.AnalyzeVideo(l.ctx, in.VideoData, in.Format, analysisType, in.Duration)
+	if err != nil {
+		l.Logger.Errorf("AI视频分析调用失败: %v", err)
+		return nil, err
+	}
+
+	// 转换AI结果为Protobuf格式
+	result := &videoprocessing.VideoAnalysisResult{}
+
+	// 转换场景分析
+	if aiResult.Scenes != nil {
+		result.Scenes = make([]*videoprocessing.SceneAnalysis, len(aiResult.Scenes))
+		for i, scene := range aiResult.Scenes {
+			result.Scenes[i] = &videoprocessing.SceneAnalysis{
+				Timestamp:  scene.Timestamp,
+				SceneType:  sanitizeUTF8(scene.SceneType),
+				Description: sanitizeUTF8(scene.Description),
+				Confidence: scene.Confidence,
+			}
+		}
+	}
+
+	// 转换物体检测
+	if aiResult.Objects != nil {
+		result.Objects = make([]*videoprocessing.ObjectDetection, len(aiResult.Objects))
+		for i, obj := range aiResult.Objects {
+			result.Objects[i] = &videoprocessing.ObjectDetection{
+				Timestamp:  obj.Timestamp,
+				ObjectName: sanitizeUTF8(obj.ObjectName),
+				Confidence: obj.Confidence,
 				Bbox: &videoprocessing.BoundingBox{
-					X:      100,
-					Y:      50,
-					Width:  300,
-					Height: 200,
+					X:      float64(obj.Bbox.X),
+					Y:      float64(obj.Bbox.Y),
+					Width:  float64(obj.Bbox.Width),
+					Height: float64(obj.Bbox.Height),
 				},
-			},
-		},
-		Emotions: []*videoprocessing.EmotionAnalysis{
-			{
-				Timestamp:  10.0,
-				Emotion:    "interested",
-				Confidence: 0.82,
-				Description: sanitizeUTF8("学生表现出感兴趣的表情"),
-			},
-		},
-		Texts: []*videoprocessing.TextRecognition{
-			{
-				Timestamp:  15.0,
-				Text:       sanitizeUTF8("探索与发现"),
-				Language:   "zh-CN",
-				Confidence: 0.91,
+			}
+		}
+	}
+
+	// 转换情感分析
+	if aiResult.Emotions != nil {
+		result.Emotions = make([]*videoprocessing.EmotionAnalysis, len(aiResult.Emotions))
+		for i, emotion := range aiResult.Emotions {
+			result.Emotions[i] = &videoprocessing.EmotionAnalysis{
+				Timestamp:  emotion.Timestamp,
+				Emotion:    sanitizeUTF8(emotion.Emotion),
+				Confidence: emotion.Confidence,
+				Description: sanitizeUTF8("检测到" + emotion.Emotion + "情感"),
+			}
+		}
+	}
+
+	// 转换文字识别
+	if aiResult.Texts != nil {
+		result.Texts = make([]*videoprocessing.TextRecognition, len(aiResult.Texts))
+		for i, text := range aiResult.Texts {
+			result.Texts[i] = &videoprocessing.TextRecognition{
+				Timestamp: text.Timestamp,
+				Text:      sanitizeUTF8(text.Text),
+				Language:  text.Language,
+				Confidence: text.Confidence,
 				Bbox: &videoprocessing.BoundingBox{
-					X:      50,
-					Y:      30,
-					Width:  200,
-					Height: 40,
+					X:      float64(text.Bbox.X),
+					Y:      float64(text.Bbox.Y),
+					Width:  float64(text.Bbox.Width),
+					Height: float64(text.Bbox.Height),
 				},
-			},
-		},
-		Audio: []*videoprocessing.AudioAnalysis{
-			{
-				Timestamp:    20.0,
-				Transcription: sanitizeUTF8("欢迎来到AI学习的世界"),
-				Language:     "zh-CN",
-				Confidence:   0.94,
-			},
-		},
-		Summary: &videoprocessing.VideoSummary{
-			Title:       sanitizeUTF8("AI学习助手介绍视频"),
-			Description: sanitizeUTF8("这个视频介绍了AI学习助手的各项功能，包括语音交互、图像识别等"),
-			Keywords:    []string{"AI", "学习", "助手", "语音", "图像"},
-			Category:    "educational",
-			Duration:    120.0,
-		},
-	}, nil
+			}
+		}
+	}
+
+	// 转换音频分析
+	if aiResult.Audio != nil {
+		result.Audio = make([]*videoprocessing.AudioAnalysis, len(aiResult.Audio))
+		for i, audio := range aiResult.Audio {
+			result.Audio[i] = &videoprocessing.AudioAnalysis{
+				Timestamp:    audio.Timestamp,
+				Transcription: sanitizeUTF8(audio.Transcription),
+				Language:     audio.Language,
+				Confidence:   audio.Confidence,
+			}
+		}
+	}
+
+	// 转换视频总结
+	if aiResult.Summary != nil {
+		result.Summary = &videoprocessing.VideoSummary{
+			Title:       sanitizeUTF8(aiResult.Summary.Title),
+			Description: sanitizeUTF8(aiResult.Summary.Description),
+			Keywords:    sanitizeUTF8Slice(aiResult.Summary.Keywords),
+			Category:    aiResult.Summary.Category,
+			Duration:    aiResult.Summary.Duration,
+		}
+	}
+
+	return result, nil
+}
+
+// processVideoAnalysis 保留旧方法名作为兼容
+func (l *AnalyzeVideoLogic) processVideoAnalysis(in *videoprocessing.AnalyzeVideoReq) (*videoprocessing.VideoAnalysisResult, error) {
+	return l.processVideoAnalysisWithAI(in)
 }
 
 // getDefaultVideoAnalysisResult 返回默认的视频分析结果

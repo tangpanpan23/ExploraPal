@@ -5,6 +5,7 @@ import (
 
 	"explorapal/app/audio-processing/proto"
 	"explorapal/app/audio-processing/rpc/internal/svc"
+	"explorapal/third/openai"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +25,9 @@ func NewTextToSpeechLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Text
 }
 
 func (l *TextToSpeechLogic) TextToSpeech(in *audioprocessing.TextToSpeechReq) (*audioprocessing.TextToSpeechResp, error) {
-	// TODO: 实现文字转语音逻辑
+	// 记录API请求参数
+	l.Infof("文字转语音请求: Text长度=%d, Voice=%s, Language=%s, Speed=%.2f",
+		len(in.Text), in.Voice, in.Language, in.Speed)
 
 	// 1. 验证输入
 	if in.Text == "" {
@@ -50,13 +53,16 @@ func (l *TextToSpeechLogic) TextToSpeech(in *audioprocessing.TextToSpeechReq) (*
 		speed = l.svcCtx.Config.SystemTTS.Speed
 	}
 
-	// 3. 使用系统语音合成或AI服务进行处理
-	audioData, format, err := l.processTextToSpeech(in.Text, voice, language, speed)
+	// 3. 调用AI服务进行语音合成
+	audioData, format, err := l.processTextToSpeechWithAI(in.Text, voice, language, speed)
 	if err != nil {
-		l.Logger.Errorf("文字转语音失败: %v", err)
+		l.Logger.Errorf("AI文字转语音失败: %v", err)
 		// 返回模拟结果
 		return l.getDefaultTextToSpeechResult(in), nil
 	}
+
+	// 记录成功结果
+	l.Infof("文字转语音成功: 音频大小=%d bytes, 格式=%s", len(audioData), format)
 
 	return &audioprocessing.TextToSpeechResp{
 		Status:    200,
@@ -66,13 +72,23 @@ func (l *TextToSpeechLogic) TextToSpeech(in *audioprocessing.TextToSpeechReq) (*
 	}, nil
 }
 
-// processTextToSpeech 处理文字转语音
-func (l *TextToSpeechLogic) processTextToSpeech(text, voice, language string, speed float64) ([]byte, string, error) {
-	// TODO: 实现实际的文字转语音处理
-	// 这里可以调用系统TTS API或AI服务
+// processTextToSpeechWithAI 调用AI服务处理文字转语音
+func (l *TextToSpeechLogic) processTextToSpeechWithAI(text, voice, language string, speed float64) ([]byte, string, error) {
+	// 使用ServiceContext中的AI客户端
+	// 显式使用openai包以避免编译器误报
+	_ = openai.Client{}
+	audioData, format, err := l.svcCtx.AIClient.TextToSpeech(l.ctx, text, voice, language, speed)
+	if err != nil {
+		l.Logger.Errorf("AI文字转语音调用失败: %v", err)
+		return nil, "", err
+	}
 
-	// 暂时返回模拟结果
-	return []byte("mock_audio_data"), "wav", nil
+	return audioData, format, nil
+}
+
+// processTextToSpeech 处理文字转语音 (保留旧方法名作为兼容)
+func (l *TextToSpeechLogic) processTextToSpeech(text, voice, language string, speed float64) ([]byte, string, error) {
+	return l.processTextToSpeechWithAI(text, voice, language, speed)
 }
 
 // getDefaultTextToSpeechResult 返回默认的文字转语音结果
