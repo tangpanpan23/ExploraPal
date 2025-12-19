@@ -141,7 +141,31 @@ curl -X POST "http://localhost:9003/api/questioning/questions/generate" \
 }
 ```
 
-#### 步骤4：表达阶段 - AI润色笔记
+#### 步骤4：表达阶段 - 语音转文字
+
+```bash
+curl -X POST "http://localhost:9003/api/expression/speech/text" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "project_id": 1,
+    "user_id": 1,
+    "audio_data": "UklGRnoGAABXQVZFZm10IAAAAAEAAQARAAAAEAAAAAEACABkYXRhAgAAAAEA",
+    "audio_format": "wav",
+    "language": "zh-CN"
+  }'
+```
+
+**响应示例**:
+```json
+{
+  "text": "三角龙有三只角，脖子上有骨板，是草食性恐龙",
+  "confidence": 0.95,
+  "language": "zh-CN",
+  "duration": 3.2
+}
+```
+
+#### 步骤5：表达阶段 - AI润色笔记
 
 ```bash
 curl -X POST "http://localhost:9003/api/expression/note/polish" \
@@ -155,7 +179,9 @@ curl -X POST "http://localhost:9003/api/expression/note/polish" \
       "observation_results": "三角龙化石，三只角，骨板",
       "previous_answers": "防御，草食性",
       "project_category": "dinosaur"
-    }
+    },
+    "category": "dinosaur",
+    "user_age": 8
   }'
 ```
 
@@ -177,12 +203,14 @@ curl -X POST "http://localhost:9003/api/expression/note/polish" \
 }
 ```
 
-#### 步骤5：成果生成 - 创建研究报告
+#### 步骤6：成果生成 - 创建研究报告
 
 ```bash
 curl -X POST "http://localhost:9003/api/achievement/report/generate" \
   -H "Content-Type: application/json" \
   -d '{
+    "project_id": 1,
+    "user_id": 1,
     "project_data": "小明探索了三角龙，学习了恐龙的特征、生活习性和灭绝原因",
     "category": "dinosaur"
   }'

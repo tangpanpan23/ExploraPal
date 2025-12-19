@@ -2,6 +2,7 @@ package openai
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -284,13 +285,18 @@ func (c *Client) GenerateQuestions(ctx context.Context, contextInfo string, cate
 
 	content := resp.Choices[0].Message.Content
 
+	// 记录AI原始响应
+	fmt.Printf("[AI_DEBUG] GenerateQuestions原始响应:\n%s\n", content)
+
 	// 尝试解析JSON响应
 	questions := parseQuestionsFromJSON(content)
 	if len(questions) == 0 {
+		fmt.Printf("[AI_DEBUG] GenerateQuestions JSON解析失败，返回默认问题\n")
 		// 如果解析失败，返回默认问题
 		return c.getDefaultQuestions(category), nil
 	}
 
+	fmt.Printf("[AI_DEBUG] GenerateQuestions解析成功，返回%d个问题\n", len(questions))
 	return questions, nil
 }
 
@@ -319,6 +325,14 @@ func (c *Client) PolishNote(ctx context.Context, rawContent, contextInfo string)
 - connections: 相关知识连接数组
 - formatted_text: 格式化的文本内容`, rawContent, contextInfo)
 
+	// 记录AI请求参数
+	fmt.Printf("[AI_DEBUG] PolishNote请求参数:\n")
+	fmt.Printf("  Model: %s\n", ModelTextGeneration)
+	fmt.Printf("  MaxTokens: %d\n", c.config.MaxTokens)
+	fmt.Printf("  Temperature: %.2f\n", c.config.Temperature)
+	fmt.Printf("  Prompt长度: %d\n", len(prompt))
+	fmt.Printf("  Prompt内容:\n%s\n", prompt)
+
 	req := openai.ChatCompletionRequest{
 		Model: ModelTextGeneration,
 		Messages: []openai.ChatCompletionMessage{
@@ -333,23 +347,84 @@ func (c *Client) PolishNote(ctx context.Context, rawContent, contextInfo string)
 
 	resp, err := c.client.CreateChatCompletion(ctx, req)
 	if err != nil {
+		// 记录AI调用错误
+		fmt.Printf("[AI_DEBUG] AI服务调用失败: %v\n", err)
 		// AI服务不可用时，返回默认的润色结果
 		return c.getDefaultPolishedNote(rawContent, contextInfo), nil
 	}
 
 	if len(resp.Choices) == 0 {
+		fmt.Printf("[AI_DEBUG] AI响应Choices为空\n")
 		return c.getDefaultPolishedNote(rawContent, contextInfo), nil
 	}
 
 	content := resp.Choices[0].Message.Content
 
-	// 这里需要解析JSON响应并转换为PolishedNote结构体
-	// 为了简化，先返回基本结果
-	result := &PolishedNote{
-		FormattedText: content,
+	// 记录AI原始响应
+	fmt.Printf("[AI_DEBUG] AI原始响应:\n%s\n", content)
+
+	// 处理markdown格式的JSON代码块
+	jsonContent := content
+	if strings.HasPrefix(strings.TrimSpace(content), "```json") {
+		fmt.Printf("[AI_DEBUG] 检测到markdown格式的JSON代码块\n")
+		// 提取 ```json 和 ``` 之间的内容
+		startIndex := strings.Index(content, "```json")
+		if startIndex != -1 {
+			startIndex += 7 // 跳过 ```json
+			endIndex := strings.Index(content[startIndex:], "```")
+			if endIndex != -1 {
+				jsonContent = strings.TrimSpace(content[startIndex : startIndex+endIndex])
+				fmt.Printf("[AI_DEBUG] 提取的JSON内容:\n%s\n", jsonContent)
+			} else {
+				fmt.Printf("[AI_DEBUG] 未找到结束标记 ```\n")
+			}
+		}
 	}
 
-	return result, nil
+	// 尝试解析JSON响应
+	var jsonResult PolishedNote
+	if err := json.Unmarshal([]byte(jsonContent), &jsonResult); err != nil {
+		// 记录JSON解析错误
+		fmt.Printf("[AI_DEBUG] JSON解析失败: %v\n", err)
+		contentPreviewLen := 200
+		if len(jsonContent) < 200 {
+			contentPreviewLen = len(jsonContent)
+		}
+		fmt.Printf("[AI_DEBUG] JSON内容前%d字符: %s\n", contentPreviewLen, jsonContent[:contentPreviewLen])
+		// 如果JSON解析失败，返回默认结果
+		return c.getDefaultPolishedNote(rawContent, contextInfo), nil
+	}
+
+	// 记录解析成功的结构化数据
+	fmt.Printf("[AI_DEBUG] JSON解析成功:\n")
+	fmt.Printf("  Title: %s\n", jsonResult.Title)
+	fmt.Printf("  Summary: %s\n", jsonResult.Summary)
+	fmt.Printf("  KeyPoints数量: %d\n", len(jsonResult.KeyPoints))
+
+	// 确保所有必需字段都有值
+	if jsonResult.Title == "" {
+		fmt.Printf("[AI_DEBUG] Title字段为空，使用默认值\n")
+		jsonResult.Title = "探索笔记"
+	}
+	if jsonResult.Summary == "" {
+		fmt.Printf("[AI_DEBUG] Summary字段为空，使用默认值\n")
+		summaryLen := 20
+		if len(rawContent) < 20 {
+			summaryLen = len(rawContent)
+		}
+		jsonResult.Summary = fmt.Sprintf("这是关于%s的学习笔记", rawContent[:summaryLen])
+	}
+	if len(jsonResult.KeyPoints) == 0 {
+		fmt.Printf("[AI_DEBUG] KeyPoints字段为空，使用默认值\n")
+		jsonResult.KeyPoints = []string{"学习了新的知识", "发现了有趣的现象"}
+	}
+	if jsonResult.FormattedText == "" {
+		fmt.Printf("[AI_DEBUG] FormattedText字段为空，使用原始响应\n")
+		jsonResult.FormattedText = content
+	}
+
+	fmt.Printf("[AI_DEBUG] 返回最终结果: Title='%s'\n", jsonResult.Title)
+	return &jsonResult, nil
 }
 
 // GenerateReport 生成研究报告
@@ -402,13 +477,43 @@ func (c *Client) GenerateReport(ctx context.Context, projectData string) (*Resea
 
 	content := resp.Choices[0].Message.Content
 
-	// 这里需要解析JSON响应并转换为ResearchReport结构体
-	// 为了简化，先返回基本结果
-	result := &ResearchReport{
-		Content: content,
+	// 记录AI原始响应
+	fmt.Printf("[AI_DEBUG] GenerateReport原始响应:\n%s\n", content)
+
+	// 处理markdown格式的JSON代码块
+	jsonContent := content
+	if strings.HasPrefix(strings.TrimSpace(content), "```json") {
+		fmt.Printf("[AI_DEBUG] GenerateReport检测到markdown格式的JSON代码块\n")
+		// 提取 ```json 和 ``` 之间的内容
+		startIndex := strings.Index(content, "```json")
+		if startIndex != -1 {
+			startIndex += 7 // 跳过 ```json
+			endIndex := strings.Index(content[startIndex:], "```")
+			if endIndex != -1 {
+				jsonContent = strings.TrimSpace(content[startIndex : startIndex+endIndex])
+				fmt.Printf("[AI_DEBUG] GenerateReport提取的JSON内容:\n%s\n", jsonContent)
+			}
+		}
 	}
 
-	return result, nil
+	// 尝试解析JSON响应
+	var jsonResult ResearchReport
+	if err := json.Unmarshal([]byte(jsonContent), &jsonResult); err != nil {
+		fmt.Printf("[AI_DEBUG] GenerateReport JSON解析失败: %v\n", err)
+		// 如果JSON解析失败，返回默认结果
+		return c.getDefaultResearchReport(projectData), nil
+	}
+
+	// 确保所有必需字段都有值
+	if jsonResult.Title == "" {
+		jsonResult.Title = "探索研究报告"
+	}
+	if jsonResult.Content == "" {
+		jsonResult.Content = jsonContent
+	}
+
+	fmt.Printf("[AI_DEBUG] GenerateReport解析成功: Title='%s'\n", jsonResult.Title)
+	return &jsonResult, nil
 }
 
 // getDefaultQuestions 根据类别返回默认问题
@@ -461,9 +566,44 @@ func (c *Client) getDefaultQuestions(category string) []Question {
 
 // parseQuestionsFromJSON 解析AI返回的JSON格式问题
 func parseQuestionsFromJSON(content string) []Question {
-	// 这里应该实现JSON解析逻辑
-	// 为了简化，先返回空数组，让调用方使用默认问题
-	return []Question{}
+	fmt.Printf("[AI_DEBUG] parseQuestionsFromJSON输入内容:\n%s\n", content)
+
+	// 处理markdown格式的JSON代码块
+	jsonContent := content
+	if strings.HasPrefix(strings.TrimSpace(content), "```json") {
+		fmt.Printf("[AI_DEBUG] parseQuestionsFromJSON检测到markdown格式\n")
+		// 提取 ```json 和 ``` 之间的内容
+		startIndex := strings.Index(content, "```json")
+		if startIndex != -1 {
+			startIndex += 7 // 跳过 ```json
+			endIndex := strings.Index(content[startIndex:], "```")
+			if endIndex != -1 {
+				jsonContent = strings.TrimSpace(content[startIndex : startIndex+endIndex])
+				fmt.Printf("[AI_DEBUG] parseQuestionsFromJSON提取的JSON:\n%s\n", jsonContent)
+			}
+		}
+	}
+
+	// 尝试解析JSON
+	var result struct {
+		Questions []Question `json:"questions"`
+	}
+
+	if err := json.Unmarshal([]byte(jsonContent), &result); err != nil {
+		fmt.Printf("[AI_DEBUG] parseQuestionsFromJSON解析questions结构失败: %v\n", err)
+		// 如果解析失败，尝试直接解析为问题数组
+		var questions []Question
+		if err2 := json.Unmarshal([]byte(jsonContent), &questions); err2 != nil {
+			fmt.Printf("[AI_DEBUG] parseQuestionsFromJSON直接解析数组也失败: %v\n", err2)
+			// 如果都失败了，返回空数组
+			return []Question{}
+		}
+		fmt.Printf("[AI_DEBUG] parseQuestionsFromJSON直接解析数组成功，返回%d个问题\n", len(questions))
+		return questions
+	}
+
+	fmt.Printf("[AI_DEBUG] parseQuestionsFromJSON解析questions结构成功，返回%d个问题\n", len(result.Questions))
+	return result.Questions
 }
 
 // getDefaultImageAnalysis AI服务不可用时返回默认的图像分析结果
@@ -492,6 +632,7 @@ func (c *Client) getDefaultImageAnalysis(imageURL, prompt string) *ImageAnalysis
 
 // getDefaultPolishedNote AI服务不可用时返回默认的笔记润色结果
 func (c *Client) getDefaultPolishedNote(rawContent, contextInfo string) *PolishedNote {
+	fmt.Printf("[AI_DEBUG] 返回默认润色结果 (AI服务异常或解析失败)\n")
 	result := &PolishedNote{
 		FormattedText:      rawContent, // 保持原始内容
 		Title:              "探索笔记",

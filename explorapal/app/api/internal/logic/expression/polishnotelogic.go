@@ -42,6 +42,9 @@ func (l *PolishNoteLogic) PolishNote(req *types.PolishNoteReq) (resp *types.Poli
 		}
 	}
 
+	// 记录API层参数
+	l.Infof("调用AI润色笔记: RawContent长度=%d, ContextInfo='%s'", len(req.RawContent), contextInfoStr)
+
 	// 调用AI服务润色笔记
 	aiResult, err := l.svcCtx.AIClient.PolishNote(l.ctx, req.RawContent, contextInfoStr)
 	if err != nil {
