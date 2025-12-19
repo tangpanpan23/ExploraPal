@@ -3,7 +3,7 @@ Host: 0.0.0.0
 Port: 9003
 Mode: dev
 Timeout: 75000  # 75秒超时，与AI分析超时保持一致
-MaxBytes: 10485760  # 10MB，允许上传更大的文件（图片、音频、视频）
+MaxBytes: 52428800  # 50MB，允许上传更大的多媒体文件（图片、音频、视频）
 
 # JWT配置
 JwtAuth:

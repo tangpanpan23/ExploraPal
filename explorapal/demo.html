@@ -667,6 +667,34 @@
             margin: 10px;
         }
 
+        .video-container {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+            margin: 15px 0;
+        }
+
+        .media-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .video-info {
+            text-align: center;
+            color: #6c757d;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .video-info small {
+            background: rgba(108, 117, 125, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
         .download-btn:hover {
             background: #218838;
         }
@@ -746,6 +774,156 @@
                 padding: 20px;
             }
         }
+
+        /* 步骤控制样式 */
+        .step-controls {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .step-controls .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .step-controls .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .step-controls .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .step-controls .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-controls .btn-success:hover {
+            background: #1e7e34;
+            transform: translateY(-1px);
+        }
+
+        .step-controls .btn:active {
+            transform: translateY(0);
+        }
+
+        /* 演示说明样式 */
+        .demo-instructions {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 10px 0 20px 0;
+            font-size: 14px;
+            color: #1565c0;
+        }
+
+        .demo-instructions strong {
+            color: #0d47a1;
+        }
+
+        /* 数据选项面板样式 */
+        .data-options-panel {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border: 2px solid #dee2e6;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-options-panel h4 {
+            margin: 0 0 10px 0;
+            color: #495057;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .data-options-panel p {
+            margin: 0 0 15px 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .option-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .option-item:hover {
+            border-color: #007bff;
+            box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+        }
+
+        .option-btn {
+            align-self: flex-start;
+            padding: 6px 12px;
+            font-size: 13px;
+            border: 1px solid #007bff;
+            background: white;
+            color: #007bff;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-btn:hover {
+            background: #007bff;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .option-description {
+            font-size: 12px;
+            color: #6c757d;
+            margin: 0;
+            font-style: italic;
+        }
+
+        .option-note {
+            font-size: 12px;
+            color: #17a2b8;
+            margin: 10px 0 0 0;
+            font-style: italic;
+        }
+
+        .no-options {
+            color: #6c757d;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
     </style>
 </head>
 
@@ -754,6 +932,11 @@
         <div class="header">
             <h1>🦕 探索伙伴</h1>
             <p>AI驱动的儿童学习助手 - 让好奇心变成深度探索</p>
+            <div class="demo-instructions">
+                <p><strong>📋 演示说明：</strong> 每个步骤完成后会显示结果和数据选项，<strong
+                        style="color: #d32f2f;">必须等待您手动点击"继续下一步"按钮</strong>才能进入下一步。您可以选择使用AI返回的数据自动填充下一步输入，或手动编辑。音频和视频生成后可直接预览和下载。
+                </p>
+            </div>
         </div>
 
         <!-- 状态栏 -->
@@ -870,6 +1053,8 @@
                 </div>
 
                 <button class="btn" onclick="createProject()">创建项目</button>
+                <button class="btn btn-outline-secondary" onclick="switchStep(2)"
+                    style="margin-left: 10px;">直接跳到步骤2</button>
 
                 <div class="result" id="result-1">
                     <h3>创建结果</h3>
@@ -883,7 +1068,7 @@
                 <p style="color: #666; margin-bottom: 30px;">上传一张恐龙图片，让AI帮你分析和识别！</p>
 
                 <div class="form-group">
-                    <label>选择图片文件</label>
+                    <label>选择图片文件 <small style="color: #666;">(最大30MB)</small></label>
                     <div class="file-upload" id="image-upload">
                         <input type="file" id="image-file" accept="image/*" onchange="handleFileSelect(this)">
                         <div class="upload-text">📸 点击选择图片或拖拽到此处</div>
@@ -974,7 +1159,7 @@
                 <p style="color: #666; margin-bottom: 30px;">上传音频文件，让AI帮你转换为文字！</p>
 
                 <div class="form-group">
-                    <label>选择音频文件</label>
+                    <label>选择音频文件 <small style="color: #666;">(最大30MB)</small></label>
                     <div class="file-upload" id="audio-upload">
                         <input type="file" id="audio-file" accept="audio/*" onchange="handleAudioSelect(this)">
                         <div class="upload-text">🎵 点击选择音频或拖拽到此处</div>
@@ -1041,7 +1226,7 @@
                 <p style="color: #666; margin-bottom: 30px;">上传视频文件，让AI帮你分析其中的内容、场景和情感！</p>
 
                 <div class="form-group">
-                    <label>选择视频文件</label>
+                    <label>选择视频文件 <small style="color: #666;">(最大30MB)</small></label>
                     <div class="file-upload" id="video-upload">
                         <input type="file" id="video-file" accept="video/*" onchange="handleVideoSelect(this)">
                         <div class="upload-text">🎬 点击选择视频或拖拽到此处</div>
@@ -1114,9 +1299,21 @@
                     <h3>视频生成结果</h3>
                     <div class="json-data" id="result-content-8"></div>
                     <div class="media-player" id="video-player" style="display: none;">
-                        <h4>生成的视频</h4>
-                        <video id="result-video" controls></video>
-                        <button class="btn download-btn" onclick="downloadMedia('video')">下载视频</button>
+                        <h4>🎬 生成的视频预览</h4>
+                        <div class="video-container">
+                            <video id="result-video" controls preload="metadata">
+                                您的浏览器不支持视频播放。
+                            </video>
+                        </div>
+                        <div class="media-controls">
+                            <button class="btn btn-success download-btn"
+                                onclick="downloadVideo(generatedVideoData, 'mp4')">
+                                📥 下载视频
+                            </button>
+                            <div class="video-info">
+                                <small>提示：视频加载可能需要一些时间，请耐心等待</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1231,28 +1428,61 @@
 
         // 切换步骤
         function switchStep(stepNum) {
+            console.log(`🔄 switchStep 被调用，目标步骤: ${stepNum}`);
+
             // 检查步骤依赖关系
             if (!canAccessStep(stepNum)) {
+                console.log(`❌ 无法访问步骤 ${stepNum}，依赖检查失败`);
                 showError(`请先完成第${stepNum - 1}步，再进行第${stepNum}步`);
                 return;
             }
+
+            console.log(`✅ 可以访问步骤 ${stepNum}，开始切换...`);
 
             // 更新步骤状态
             document.querySelectorAll('.step').forEach(step => {
                 step.classList.remove('active');
             });
-            document.querySelector(`[data-step="${stepNum}"]`).classList.add('active');
+            const targetStep = document.querySelector(`[data-step="${stepNum}"]`);
+            if (targetStep) {
+                targetStep.classList.add('active');
+                console.log(`✅ 已激活步骤导航 ${stepNum}`);
+            }
 
             // 切换内容区域
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
-            document.getElementById(`section-${stepNum}`).classList.add('active');
+            const targetSection = document.getElementById(`section-${stepNum}`);
+            if (targetSection) {
+                targetSection.classList.add('active');
+                console.log(`✅ 已激活内容区域 section-${stepNum}`);
+                console.log(`📋 section-${stepNum} 现在是否有 active 类:`, targetSection.classList.contains('active'));
+            } else {
+                console.error(`❌ 找不到内容区域 section-${stepNum}`);
+            }
+
+            // 确保之前的section被隐藏
+            const prevSection = document.getElementById(`section-${stepNum - 1}`);
+            if (prevSection) {
+                console.log(`📋 section-${stepNum - 1} 是否还 active:`, prevSection.classList.contains('active'));
+            }
 
             currentStep = stepNum;
+            console.log(`✅ 当前步骤已更新为 ${currentStep}`);
 
             // 更新步骤可用性显示
             updateStepAvailability();
+            console.log(`✅ 步骤可用性已更新`);
+
+            // 验证切换结果
+            setTimeout(() => {
+                const activeSections = document.querySelectorAll('.section.active');
+                console.log(`📊 验证结果: 当前活跃的section数量 = ${activeSections.length}`);
+                activeSections.forEach(section => {
+                    console.log(`📊 活跃section: ${section.id}`);
+                });
+            }, 100);
         }
 
         // 检查是否可以访问某个步骤
@@ -1326,20 +1556,132 @@
         }
 
         // 标记步骤完成
-        function markStepCompleted(stepNum) {
-            console.log(`✅ 步骤 ${stepNum} 标记为完成`);
+        function markStepCompleted(stepNum, autoContinue = true) {
+            console.log(`✅ 步骤 ${stepNum} 标记为完成${autoContinue ? '，准备自动继续' : '，等待用户确认'}`);
             stepStatus[stepNum] = 'completed';
+            console.log(`📊 步骤状态更新: stepStatus[${stepNum}] = 'completed'`);
             updateStepAvailability();
 
             // 保存状态
             saveContextToStorage();
 
-            // 自动进入下一步（如果不是最后一步）
-            if (stepNum < 8) {
+            // 根据参数决定是否自动继续
+            if (autoContinue && stepNum < 8) {
                 console.log(`⏭️ 准备跳转到步骤 ${stepNum + 1}`);
                 setTimeout(() => {
                     switchStep(stepNum + 1);
                 }, 2000);
+            }
+        }
+
+        // 用户手动继续到下一步
+        function continueToNextStep(currentStep) {
+            console.log(`👆 用户点击继续下一步: 从步骤 ${currentStep} 到 ${currentStep + 1}`);
+
+            if (currentStep < 8) {
+                const nextStepNum = currentStep + 1;
+
+                // 简化逻辑：直接尝试切换，不做过多检查
+                console.log(`🔄 尝试切换到步骤 ${nextStepNum}...`);
+
+                // 隐藏当前步骤的结果
+                const currentResult = document.getElementById(`result-${currentStep}`);
+                if (currentResult) {
+                    currentResult.classList.remove('show');
+                }
+
+                // 切换到下一步
+                switchStep(nextStepNum);
+
+                // 确保页面滚动到顶部，让用户看到新的步骤
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                // 显示成功消息
+                showMessage(`已进入第 ${nextStepNum} 步`, 'success');
+
+                // 添加视觉反馈：短暂改变背景色
+                document.body.style.backgroundColor = '#e8f5e8';
+                setTimeout(() => {
+                    document.body.style.backgroundColor = '';
+                }, 500);
+            } else {
+                // 演示完成
+                console.log('🎉 演示完成！');
+                showMessage('🎉 演示完成！感谢您的体验！', 'success');
+
+                setTimeout(() => {
+                    if (confirm('演示已完成！是否要重新开始演示？')) {
+                        location.reload();
+                    }
+                }, 2000);
+            }
+        }
+
+        // 下载音频文件
+        function downloadAudio(base64Data, format) {
+            try {
+                console.log('📥 开始下载音频文件...');
+
+                // 将base64转换为blob
+                const binaryString = atob(base64Data);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+
+                const blob = new Blob([bytes], { type: `audio/${format}` });
+                const url = URL.createObjectURL(blob);
+
+                // 创建下载链接
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `generated_audio.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                // 释放URL对象
+                URL.revokeObjectURL(url);
+
+                console.log('✅ 音频文件下载完成');
+                showMessage('音频文件下载成功！', 'success');
+            } catch (error) {
+                console.error('❌ 音频下载失败:', error);
+                showError('音频下载失败: ' + error.message);
+            }
+        }
+
+        // 下载视频文件
+        function downloadVideo(base64Data, format) {
+            try {
+                console.log('📥 开始下载视频文件...');
+
+                // 将base64转换为blob
+                const binaryString = atob(base64Data);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+
+                const blob = new Blob([bytes], { type: `video/${format}` });
+                const url = URL.createObjectURL(blob);
+
+                // 创建下载链接
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `generated_video.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                // 释放URL对象
+                URL.revokeObjectURL(url);
+
+                console.log('✅ 视频文件下载完成');
+                showMessage('视频文件下载成功！', 'success');
+            } catch (error) {
+                console.error('❌ 视频下载失败:', error);
+                showError('视频下载失败: ' + error.message);
             }
         }
 
@@ -1582,14 +1924,16 @@
                 console.log('✅ 项目创建成功 - project_id:', projectId);
                 console.log('✅ 项目创建成功 - currentProjectId已设置为:', currentProjectId);
 
-                document.getElementById('result-content-1').innerHTML = formatJsonResponse(result, 1);
+                const buttonHtml = '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(1)">继续下一步 →</button></div>';
+                console.log('🔘 生成按钮HTML:', buttonHtml);
+                document.getElementById('result-content-1').innerHTML = formatJsonResponse(result, 1) + buttonHtml;
                 document.getElementById('result-1').classList.add('show');
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(1, result);
 
-                // 标记步骤完成
-                markStepCompleted(1);
+                // 标记步骤完成但不自动继续
+                markStepCompleted(1, false);
             } catch (error) {
                 showError('创建项目失败: ' + error.message);
             }
@@ -1604,7 +1948,14 @@
                 return;
             }
 
-            console.log('✅ 图片文件已选择:', selectedImageFile.name);
+            // 检查文件大小（30MB限制，因为base64编码会增加33%大小）
+            const maxSize = 30 * 1024 * 1024; // 30MB (编码后约40MB，仍小于50MB服务器限制)
+            if (selectedImageFile.size > maxSize) {
+                showError(`图片文件过大 (${(selectedImageFile.size / 1024 / 1024).toFixed(2)}MB)。请上传小于30MB的图片文件。`);
+                return;
+            }
+
+            console.log('✅ 图片文件已选择:', selectedImageFile.name, `大小: ${(selectedImageFile.size / 1024 / 1024).toFixed(2)}MB`);
 
             const prompt = document.getElementById('analysis-prompt').value;
             console.log('📝 分析提示:', prompt);
@@ -1683,14 +2034,15 @@
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
 
-                document.getElementById('result-content-2').innerHTML = formatJsonResponse(result, 2);
+                document.getElementById('result-content-2').innerHTML = formatJsonResponse(result, 2) +
+                    '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(2)">继续下一步 →</button></div>';
                 document.getElementById('result-2').classList.add('show');
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(2, result);
 
-                // 标记步骤完成
-                markStepCompleted(2);
+                // 标记步骤完成但不自动继续
+                markStepCompleted(2, false);
             } catch (error) {
                 document.getElementById('progress-2').classList.remove('show');
                 showError('图片分析失败: ' + error.message);
@@ -1737,14 +2089,15 @@
 
                 const result = await response.json();
 
-                document.getElementById('result-content-3').innerHTML = formatJsonResponse(result, 3);
+                document.getElementById('result-content-3').innerHTML = formatJsonResponse(result, 3) +
+                    '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(3)">继续下一步 →</button></div>';
                 document.getElementById('result-3').classList.add('show');
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(3, result);
 
                 // 标记步骤完成
-                markStepCompleted(3);
+                markStepCompleted(3, false);
             } catch (error) {
                 showError('生成问题失败: ' + error.message);
             }
@@ -1801,14 +2154,15 @@
 
                 const result = await response.json();
 
-                document.getElementById('result-content-4').innerHTML = formatJsonResponse(result, 4);
+                document.getElementById('result-content-4').innerHTML = formatJsonResponse(result, 4) +
+                    '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(4)">继续下一步 →</button></div>';
                 document.getElementById('result-4').classList.add('show');
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(4, result);
 
                 // 标记步骤完成
-                markStepCompleted(4);
+                markStepCompleted(4, false);
             } catch (error) {
                 showError('内容润色失败: ' + error.message);
             }
@@ -1819,6 +2173,15 @@
                 showError('请先选择音频文件');
                 return;
             }
+
+            // 检查文件大小（30MB限制，因为base64编码会增加33%大小）
+            const maxSize = 30 * 1024 * 1024; // 30MB (编码后约40MB，仍小于50MB服务器限制)
+            if (selectedAudioFile.size > maxSize) {
+                showError(`音频文件过大 (${(selectedAudioFile.size / 1024 / 1024).toFixed(2)}MB)。请上传小于30MB的音频文件。`);
+                return;
+            }
+
+            console.log(`🎵 音频文件信息: ${selectedAudioFile.name}, 大小: ${(selectedAudioFile.size / 1024 / 1024).toFixed(2)}MB`);
 
             // 语音转文字可以独立进行，但会记录到当前项目中（如果有的话）
             const language = document.getElementById('audio-language').value;
@@ -1870,14 +2233,21 @@
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
 
-                document.getElementById('result-content-5').innerHTML = formatJsonResponse(result, 5);
+                // 为语音转文字步骤添加音频下载功能
+                let downloadButton = '';
+                if (result && result.audio_data) {
+                    downloadButton = '<button class="btn btn-success" onclick="downloadAudio(\'' + result.audio_data + '\', \'' + (result.format || 'wav') + '\')">📥 下载音频</button>';
+                }
+
+                document.getElementById('result-content-5').innerHTML = formatJsonResponse(result, 5) +
+                    '<div class="step-controls">' + downloadButton + '<button class="btn btn-primary" onclick="continueToNextStep(5)">继续下一步 →</button></div>';
                 document.getElementById('result-5').classList.add('show');
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(5, result);
 
                 // 标记步骤完成
-                markStepCompleted(5);
+                markStepCompleted(5, false);
             } catch (error) {
                 document.getElementById('progress-5').classList.remove('show');
                 showError('语音转换失败: ' + error.message);
@@ -1902,12 +2272,8 @@
             const data = {
                 project_id: projectId,
                 user_id: currentUserId,
-                context_info: {
-                    content: context,
-                    learning_goals: goals,
-                    category: document.getElementById('project-category').value,
-                    observation_id: currentObservationId // 如果有观察记录，也包含在内
-                }
+                project_data: context, // 按照API文档，使用project_data字段
+                category: document.getElementById('project-category').value
             };
 
             console.log('📤 报告生成请求数据:', data);
@@ -1923,14 +2289,15 @@
 
                 const result = await response.json();
 
-                document.getElementById('result-content-6').innerHTML = formatJsonResponse(result, 6);
+                document.getElementById('result-content-6').innerHTML = formatJsonResponse(result, 6) +
+                    '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(6)">继续下一步 →</button></div>';
                 document.getElementById('result-6').classList.add('show');
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(6, result);
 
                 // 标记步骤完成
-                markStepCompleted(6);
+                markStepCompleted(6, false);
             } catch (error) {
                 showError('生成报告失败: ' + error.message);
             }
@@ -1941,6 +2308,15 @@
                 showError('请先选择视频文件');
                 return;
             }
+
+            // 检查文件大小（30MB限制，因为base64编码会增加33%大小）
+            const maxSize = 30 * 1024 * 1024; // 30MB (编码后约40MB，仍小于50MB服务器限制)
+            if (selectedVideoFile.size > maxSize) {
+                showError(`视频文件过大 (${(selectedVideoFile.size / 1024 / 1024).toFixed(2)}MB)。请上传小于30MB的视频文件。`);
+                return;
+            }
+
+            console.log(`🎬 视频文件信息: ${selectedVideoFile.name}, 大小: ${(selectedVideoFile.size / 1024 / 1024).toFixed(2)}MB`);
 
             // 视频分析可以独立进行，但结果会记录到当前项目中（如果有的话）
 
@@ -1961,13 +2337,15 @@
                     user_id: currentUserId,
                     video_data: base64Data,
                     video_format: selectedVideoFile.name.split('.').pop().toLowerCase(),
-                    analysis_type: 'content' // 默认分析类型
+                    analysis_type: 'content', // 默认分析类型
+                    duration: 0 // 0表示分析整个视频
                 };
 
                 console.log('📤 视频分析请求数据:', {
                     project_id: data.project_id,
                     video_format: data.video_format,
-                    analysis_type: data.analysis_type
+                    analysis_type: data.analysis_type,
+                    duration: data.duration
                 });
 
                 // 模拟进度
@@ -1991,14 +2369,15 @@
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
 
-                document.getElementById('result-content-7').innerHTML = formatJsonResponse(result, 7);
+                document.getElementById('result-content-7').innerHTML = formatJsonResponse(result, 7) +
+                    '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(7)">继续下一步 →</button></div>';
                 document.getElementById('result-7').classList.add('show');
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(7, result);
 
                 // 标记步骤完成
-                markStepCompleted(7);
+                markStepCompleted(7, false);
             } catch (error) {
                 document.getElementById('progress-7').classList.remove('show');
                 showError('视频分析失败: ' + error.message);
@@ -2060,19 +2439,29 @@
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
 
                 // 如果有视频数据，显示播放器
-                if (result.data && result.data.video_data) {
+                if (result && result.video_data) {
+                    generatedVideoData = result.video_data;
+                    displayGeneratedVideo(generatedVideoData, result.format || 'mp4');
+                } else if (result.data && result.data.video_data) {
                     generatedVideoData = result.data.video_data;
                     displayGeneratedVideo(generatedVideoData, result.data.format || 'mp4');
                 }
 
-                document.getElementById('result-content-8').innerHTML = formatJsonResponse(result, 8);
+                // 为视频生成步骤添加视频下载功能
+                let downloadButton = '';
+                if (result && result.video_data) {
+                    downloadButton = '<button class="btn btn-success" onclick="downloadVideo(\'' + result.video_data + '\', \'' + (result.format || 'mp4') + '\')">📥 下载视频</button>';
+                }
+
+                document.getElementById('result-content-8').innerHTML = formatJsonResponse(result, 8) +
+                    '<div class="step-controls">' + downloadButton + '<button class="btn btn-primary" onclick="continueToNextStep(8)">完成演示 🎉</button></div>';
                 document.getElementById('result-8').classList.add('show');
 
                 // 处理响应数据作为下一步输入
                 handleApiResponse(8, result);
 
                 // 标记步骤完成
-                markStepCompleted(8);
+                markStepCompleted(8, false);
 
             } catch (error) {
                 document.getElementById('progress-8').classList.remove('show');
@@ -2095,12 +2484,57 @@
         }
 
         function displayGeneratedVideo(videoData, format) {
-            const player = document.getElementById('video-player');
-            const video = document.getElementById('result-video');
+            try {
+                console.log('🎬 开始显示生成的视频...');
 
-            // 假设返回的是base64编码的视频数据
-            video.src = `data:video/${format};base64,${videoData}`;
-            player.style.display = 'block';
+                const player = document.getElementById('video-player');
+                const video = document.getElementById('result-video');
+
+                // 将base64转换为blob URL，这样可以更好地支持视频播放
+                const binaryString = atob(videoData);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+
+                // 根据格式确定正确的MIME类型
+                let mimeType = 'video/mp4'; // 默认
+                if (format.toLowerCase() === 'webm') {
+                    mimeType = 'video/webm';
+                } else if (format.toLowerCase() === 'ogg') {
+                    mimeType = 'video/ogg';
+                } else if (format.toLowerCase() === 'avi') {
+                    mimeType = 'video/avi';
+                } else if (format.toLowerCase() === 'mov') {
+                    mimeType = 'video/quicktime';
+                }
+
+                const blob = new Blob([bytes], { type: mimeType });
+                const videoUrl = URL.createObjectURL(blob);
+
+                // 设置视频源
+                video.src = videoUrl;
+                video.load(); // 重新加载视频
+
+                // 显示播放器
+                player.style.display = 'block';
+
+                // 添加视频加载完成的事件监听
+                video.addEventListener('loadeddata', function () {
+                    console.log('✅ 视频加载完成，可以播放');
+                });
+
+                video.addEventListener('error', function (e) {
+                    console.error('❌ 视频加载失败:', e);
+                    showError('视频加载失败，请尝试下载');
+                });
+
+                console.log('✅ 视频播放器已显示');
+
+            } catch (error) {
+                console.error('❌ 显示视频时出错:', error);
+                showError('显示视频时出错: ' + error.message);
+            }
         }
 
         function downloadMedia(type) {
@@ -2355,6 +2789,17 @@ API响应格式: { project_id: number, project_code: string, status: string }
             }
         }
 
+        // 测试步骤切换
+        function testStepSwitching() {
+            console.log('🧪 测试步骤切换功能');
+            console.log('📊 当前步骤状态:', stepStatus);
+            console.log('🎯 当前活跃步骤:', currentStep);
+
+            // 尝试切换到步骤2
+            console.log('🔄 测试切换到步骤2...');
+            switchStep(2);
+        }
+
         // 测试项目创建响应格式
         async function testProjectCreation() {
             console.log('🧪 测试项目创建响应格式...');
@@ -2430,44 +2875,56 @@ API响应格式: { project_id: number, project_code: string, status: string }
         function handleApiResponse(stepNumber, responseData) {
             console.log(`📥 处理步骤 ${stepNumber} 的响应:`, responseData);
 
-            // 根据步骤类型处理响应数据作为下一步的默认输入
+            // 根据步骤类型显示响应数据选项，供用户选择使用
             switch (stepNumber) {
                 case 1: // 项目创建成功
-                    // 项目创建后可以预填充一些默认的分析提示
-                    const promptInput = document.getElementById('analysis-prompt');
-                    if (promptInput && !promptInput.value.trim()) {
-                        const defaultPrompt = `请分析这张${document.getElementById('project-category').value === 'dinosaur' ? '恐龙' : '探索'}相关的图片，识别主要对象，描述特征和习性。`;
-                        promptInput.value = defaultPrompt;
-                        console.log('📝 已自动填充图片分析提示:', defaultPrompt);
-                    }
-                    break;
-
-                case 2: // 图片分析成功 - 填充问题生成的上下文
-                    if (responseData && responseData.object_name) {
-                        const contextInput = document.getElementById('context-info');
-                        if (contextInput && !contextInput.value.trim()) {
-                            // 从实际响应中提取内容
-                            const objectName = responseData.object_name;
-                            const description = responseData.description || '';
-                            const category = responseData.category || '';
-                            const scientificName = responseData.scientific_name || '';
-
-                            const contextText = `我刚刚分析了一张图片，发现了"${objectName}"。${description} 类别：${category}${scientificName ? `，学名：${scientificName}` : ''}。我想了解更多相关的信息和知识。`;
-                            contextInput.value = contextText;
-                            console.log('📝 已自动填充问题生成上下文（从API响应提取）:', contextText);
+                    // 显示项目创建结果，并提供预设的分析提示选项
+                    showResponseDataOptions(stepNumber, responseData, [
+                        {
+                            label: '使用默认分析提示',
+                            data: `请分析这张${document.getElementById('project-category').value === 'dinosaur' ? '恐龙' : '探索'}相关的图片，识别主要对象，描述特征和习性。`,
+                            targetInput: 'analysis-prompt',
+                            description: '系统推荐的分析提示词'
                         }
+                    ]);
+                    break;
+
+                case 2: // 图片分析成功 - 显示问题生成上下文选项
+                    if (responseData && responseData.object_name) {
+                        // 从实际响应中提取内容
+                        const objectName = responseData.object_name;
+                        const description = responseData.description || '';
+                        const category = responseData.category || '';
+                        const scientificName = responseData.scientific_name || '';
+
+                        const contextText = `我刚刚分析了一张图片，发现了"${objectName}"。${description} 类别：${category}${scientificName ? `，学名：${scientificName}` : ''}。我想了解更多相关的信息和知识。`;
+
+                        showResponseDataOptions(stepNumber, responseData, [
+                            {
+                                label: '使用AI分析结果',
+                                data: contextText,
+                                targetInput: 'context-info',
+                                description: '基于图片分析结果生成的上下文描述'
+                            },
+                            {
+                                label: '使用对象名称',
+                                data: `我发现了一个${objectName}，想了解更多关于它的信息。`,
+                                targetInput: 'context-info',
+                                description: '只使用识别出的对象名称'
+                            }
+                        ]);
+                    } else {
+                        showResponseDataOptions(stepNumber, responseData, []);
                     }
                     break;
 
-                case 3: // 问题生成成功 - 填充笔记润色的原始内容
+                case 3: // 问题生成成功 - 显示笔记润色内容选项
                     if (responseData && responseData.questions && responseData.questions.length > 0) {
-                        const rawContentInput = document.getElementById('raw-content');
-                        if (rawContentInput && !rawContentInput.value.trim()) {
-                            // 从实际响应中提取内容：使用第一个问题的内容
-                            const firstQuestion = responseData.questions[0];
-                            const questionContent = firstQuestion.content || '';
+                        const options = [];
 
-                            // 生成基于实际问题的思考内容
+                        // 为每个问题生成选项
+                        responseData.questions.forEach((question, index) => {
+                            const questionContent = question.content || '';
                             const contentText = `${questionContent}？这是一个很有趣的问题。
 
 我观察到的现象是：我刚才分析了一张图片，发现了一些很有趣的东西。
@@ -2475,22 +2932,30 @@ API响应格式: { project_id: number, project_code: string, status: string }
 我觉得可能的答案是：基于我看到的特征和了解的知识，我认为...
 
 但是我还想进一步了解和探索，所以我需要记录我的想法和发现。`;
-                            rawContentInput.value = contentText;
-                            console.log('📝 已自动填充笔记润色内容（基于实际问题）:', contentText);
-                        }
+
+                            options.push({
+                                label: `使用问题 ${index + 1}: ${questionContent.substring(0, 20)}...`,
+                                data: contentText,
+                                targetInput: 'raw-content',
+                                description: `基于"${questionContent}"生成的学习笔记内容`
+                            });
+                        });
+
+                        showResponseDataOptions(stepNumber, responseData, options);
+                    } else {
+                        showResponseDataOptions(stepNumber, responseData, []);
                     }
                     break;
 
-                case 4: // 笔记润色成功 - 填充报告生成的上下文
+                case 4: // 笔记润色成功 - 显示报告生成上下文选项
                     if (responseData && (responseData.title || responseData.summary)) {
-                        const reportContextInput = document.getElementById('report-context');
-                        if (reportContextInput && !reportContextInput.value.trim()) {
-                            // 从实际响应中提取内容
-                            const title = responseData.title || '我的探索之旅';
-                            const summary = responseData.summary || '';
-                            const keyPoints = responseData.key_points || [];
+                        // 从实际响应中提取内容
+                        const title = responseData.title || '我的探索之旅';
+                        const summary = responseData.summary || '';
+                        const keyPoints = responseData.key_points || [];
+                        const formattedText = responseData.formatted_text || '';
 
-                            const reportText = `通过这次AI学习的探索之旅，我获得了很多新的知识和发现。
+                        const reportText = `通过这次AI学习的探索之旅，我获得了很多新的知识和发现。
 
 探索主题：${title}
 
@@ -2500,58 +2965,144 @@ API响应格式: { project_id: number, project_code: string, status: string }
 ${keyPoints.map(point => `• ${point}`).join('\n')}
 
 在这个学习过程中，我学会了如何观察事物、提出问题、记录想法，并且通过AI的帮助获得了更深入的理解。未来我还想探索更多相关的主题和知识。`;
-                            reportContextInput.value = reportText;
-                            console.log('📝 已自动填充报告生成上下文（从润色结果提取）:', reportText);
-                        }
-                    }
-                    break;
 
-                case 5: // 语音转文字成功 - 补充到笔记润色或作为独立内容
-                    if (responseData && responseData.transcription) {
-                        // 优先填充到笔记润色，如果已经有内容则补充
-                        const rawContentInput = document.getElementById('raw-content');
-                        if (rawContentInput) {
-                            const currentContent = rawContentInput.value.trim();
-                            const transcription = responseData.transcription;
-
-                            if (currentContent) {
-                                // 如果已有内容，补充语音内容
-                                rawContentInput.value = `${currentContent}\n\n语音记录：${transcription}`;
-                            } else {
-                                // 如果没有内容，直接使用语音内容
-                                rawContentInput.value = `语音记录：${transcription}\n\n基于这段语音，我想进一步整理和润色这些想法。`;
+                        showResponseDataOptions(stepNumber, responseData, [
+                            {
+                                label: '使用润色结果生成报告',
+                                data: reportText,
+                                targetInput: 'report-context',
+                                description: '基于AI润色后的笔记内容生成学习报告'
+                            },
+                            {
+                                label: '直接使用润色后的文本',
+                                data: formattedText,
+                                targetInput: 'report-context',
+                                description: '直接使用AI润色后的完整文本'
+                            },
+                            {
+                                label: '只使用标题和要点',
+                                data: `探索主题：${title}\n\n关键发现：\n${keyPoints.map(point => `• ${point}`).join('\n')}`,
+                                targetInput: 'report-context',
+                                description: '精简版的学习报告内容'
                             }
-                            console.log('📝 已自动填充语音转文字结果:', transcription);
-                        }
+                        ]);
+                    } else {
+                        showResponseDataOptions(stepNumber, responseData, []);
                     }
                     break;
 
-                case 6: // 报告生成成功 - 填充视频脚本
-                    if (responseData && (responseData.title || responseData.content)) {
-                        const videoScriptInput = document.getElementById('video-script');
-                        if (videoScriptInput && !videoScriptInput.value.trim()) {
-                            // 从实际响应中提取内容
-                            const title = responseData.title || '我的探索之旅';
-                            const content = responseData.content || '';
+                case 5: // 语音转文字成功 - 显示转写内容选项
+                    if (responseData && responseData.transcription) {
+                        const transcription = responseData.transcription;
 
-                            const scriptText = `大家好！欢迎来到我的AI学习探索之旅。
+                        showResponseDataOptions(stepNumber, responseData, [
+                            {
+                                label: '补充到现有笔记',
+                                data: (document.getElementById('raw-content').value.trim() ?
+                                    `${document.getElementById('raw-content').value.trim()}\n\n语音记录：${transcription}` :
+                                    `语音记录：${transcription}\n\n基于这段语音，我想进一步整理和润色这些想法。`),
+                                targetInput: 'raw-content',
+                                description: '将语音转写内容添加到笔记润色输入框'
+                            },
+                            {
+                                label: '作为新笔记内容',
+                                data: `语音记录：${transcription}\n\n基于这段语音，我想进一步整理和润色这些想法。`,
+                                targetInput: 'raw-content',
+                                description: '直接使用语音转写内容作为新的笔记'
+                            },
+                            {
+                                label: '复制到剪贴板',
+                                data: transcription,
+                                targetInput: null,
+                                description: '复制纯文本到剪贴板供手动使用'
+                            }
+                        ]);
+                    } else {
+                        showResponseDataOptions(stepNumber, responseData, []);
+                    }
+                    break;
+
+                case 6: // 报告生成成功 - 显示视频脚本选项
+                    if (responseData && (responseData.title || responseData.content)) {
+                        // 从实际响应中提取内容
+                        const title = responseData.title || '我的探索之旅';
+                        const content = responseData.content || '';
+                        const abstract = responseData.abstract || '';
+                        const conclusion = responseData.conclusion || '';
+
+                        const fullScriptText = `大家好！欢迎来到我的AI学习探索之旅。
 
 今天我来分享关于"${title}"的探索经历。
 
-${content.substring(0, 300)}${content.length > 300 ? '...' : ''}
+${abstract}
+
+${content.substring(0, 400)}${content.length > 400 ? '...' : ''}
+
+${conclusion}
 
 在这个学习过程中，我学到了很多有趣的知识，希望大家也能喜欢这个主题！
 
 谢谢观看！`;
-                            videoScriptInput.value = scriptText;
-                            console.log('📝 已自动填充视频脚本（从报告内容提取）:', scriptText);
-                        }
+
+                        const shortScriptText = `大家好！欢迎来到我的AI学习探索之旅。
+
+今天我来分享关于"${title}"的探索经历。
+
+${abstract}
+
+${conclusion}
+
+谢谢观看！`;
+
+                        showResponseDataOptions(stepNumber, responseData, [
+                            {
+                                label: '使用完整报告内容',
+                                data: fullScriptText,
+                                targetInput: 'video-script',
+                                description: '基于完整学习报告生成详细的视频脚本'
+                            },
+                            {
+                                label: '使用精简版内容',
+                                data: shortScriptText,
+                                targetInput: 'video-script',
+                                description: '基于报告摘要生成简洁的视频脚本'
+                            },
+                            {
+                                label: '只使用标题和结论',
+                                data: `"${title}" - ${conclusion}`,
+                                targetInput: 'video-script',
+                                description: '极简版视频脚本'
+                            }
+                        ]);
+                    } else {
+                        showResponseDataOptions(stepNumber, responseData, []);
                     }
                     break;
 
-                case 7: // 视频分析成功 - 可以提供一些分析洞察
-                    // 视频分析通常是独立的，不需要填充后续内容
-                    console.log('📊 视频分析完成，可以用于理解视频内容');
+                case 7: // 视频分析成功 - 显示分析结果选项
+                    if (responseData && responseData.video_analysis) {
+                        const analysis = responseData.video_analysis;
+                        const summary = analysis.summary || {};
+
+                        // 基于视频分析结果生成描述
+                        const analysisDescription = `视频分析完成：
+- 标题：${summary.title || '未知'}
+- 描述：${summary.description || '无描述'}
+- 类别：${summary.category || '未知'}
+- 时长：${summary.duration || 0}秒
+- 主要内容：${summary.keywords ? summary.keywords.join('、') : '无关键词'}`;
+
+                        showResponseDataOptions(stepNumber, responseData, [
+                            {
+                                label: '复制分析结果',
+                                data: analysisDescription,
+                                targetInput: null,
+                                description: '将视频分析结果复制到剪贴板'
+                            }
+                        ]);
+                    } else {
+                        showResponseDataOptions(stepNumber, responseData, []);
+                    }
                     break;
 
                 case 8: // 视频生成成功 - 完成整个流程
@@ -2560,6 +3111,94 @@ ${content.substring(0, 300)}${content.length > 300 ? '...' : ''}
 
                 default:
                     console.log(`ℹ️ 步骤 ${stepNumber} 无特殊的后续输入填充逻辑`);
+            }
+        }
+
+        // 显示响应数据选项供用户选择
+        function showResponseDataOptions(stepNumber, responseData, options) {
+            console.log(`📋 为步骤 ${stepNumber} 显示 ${options.length} 个数据选项`);
+
+            // 在结果显示区域添加数据选项面板
+            const resultContent = document.getElementById(`result-content-${stepNumber}`);
+            if (!resultContent) {
+                console.error(`❌ 找不到结果内容区域: result-content-${stepNumber}`);
+                return;
+            }
+
+            if (options.length > 0) {
+                let optionsHtml = '<div class="data-options-panel"><h4>📋 可用的数据选项</h4><p>选择以下选项之一作为下一步的输入数据：</p><div class="options-list">';
+
+                options.forEach((option, index) => {
+                    optionsHtml += `
+                        <div class="option-item">
+                            <button class="btn btn-outline-primary option-btn"
+                                    onclick="useResponseData('${option.targetInput}', '${btoa(JSON.stringify(option.data))}', ${stepNumber})">
+                                ${option.label}
+                            </button>
+                            <div class="option-description">${option.description}</div>
+                        </div>`;
+                });
+
+                optionsHtml += '</div><p class="option-note">💡 提示：点击选项按钮将自动填充到下一步的输入框中</p></div>';
+
+                // 在JSON数据显示之后添加选项面板
+                const jsonData = resultContent.querySelector('.json-data');
+                if (jsonData) {
+                    jsonData.insertAdjacentHTML('afterend', optionsHtml);
+                } else {
+                    resultContent.insertAdjacentHTML('beforeend', optionsHtml);
+                }
+            } else {
+                // 如果没有选项，至少显示一个提示
+                const noOptionsHtml = '<div class="data-options-panel"><p class="no-options">ℹ️ 此步骤的结果不包含可用于下一步的数据选项</p></div>';
+                resultContent.insertAdjacentHTML('beforeend', noOptionsHtml);
+            }
+        }
+
+        // 使用响应数据填充输入框
+        function useResponseData(targetInputId, encodedData, stepNumber) {
+            try {
+                const data = JSON.parse(atob(encodedData));
+
+                if (targetInputId) {
+                    const targetInput = document.getElementById(targetInputId);
+                    if (targetInput) {
+                        targetInput.value = data;
+                        targetInput.focus();
+                        targetInput.scrollIntoView({ behavior: 'smooth' });
+
+                        // 添加视觉反馈
+                        targetInput.style.backgroundColor = '#e8f5e8';
+                        setTimeout(() => {
+                            targetInput.style.backgroundColor = '';
+                        }, 1000);
+
+                        showMessage(`✅ 已将数据填充到${targetInputId}输入框`, 'success');
+                        console.log(`📝 已填充数据到 ${targetInputId}:`, data.substring(0, 100) + '...');
+                    } else {
+                        console.error(`❌ 找不到目标输入框: ${targetInputId}`);
+                        showError(`找不到目标输入框: ${targetInputId}`);
+                    }
+                } else {
+                    // 如果没有目标输入框，复制到剪贴板
+                    navigator.clipboard.writeText(data).then(() => {
+                        showMessage('✅ 数据已复制到剪贴板', 'success');
+                        console.log('📋 数据已复制到剪贴板:', data);
+                    }).catch(err => {
+                        console.error('❌ 复制到剪贴板失败:', err);
+                        showError('复制到剪贴板失败，请手动复制');
+                    });
+                }
+
+                // 隐藏选项面板
+                const optionsPanel = document.querySelector('.data-options-panel');
+                if (optionsPanel) {
+                    optionsPanel.style.display = 'none';
+                }
+
+            } catch (error) {
+                console.error('❌ 处理响应数据时出错:', error);
+                showError('处理数据时出错: ' + error.message);
             }
         }
 
