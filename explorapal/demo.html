@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>探索伙伴 - AI学习助手演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 0;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .demo-flow {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .step {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            flex: 1;
+            min-width: 280px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .step.active {
+            border: 3px solid #667eea;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .step h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .step p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .demo-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            margin-top: 30px;
+        }
+
+        .section {
+            display: none;
+            margin-bottom: 40px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .file-upload {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: #f8f9fa;
+        }
+
+        .file-upload:hover {
+            background: #e3f2fd;
+            border-color: #1976d2;
+        }
+
+        .file-upload.dragover {
+            background: #e8f5e8;
+            border-color: #4caf50;
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload .upload-text {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .file-upload .upload-hint {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .result pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .result .json-data {
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 15px;
+            color: #333;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .media-player {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .media-player audio,
+        .media-player video {
+            width: 100%;
+            max-width: 600px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+
+        .download-btn {
+            background: #28a745;
+            margin: 10px;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .progress-bar.show {
+            display: block;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .demo-flow {
+                flex-direction: column;
+            }
+
+            .step {
+                margin: 10px 0;
+            }
+
+            .demo-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦕 探索伙伴</h1>
+            <p>AI驱动的儿童学习助手 - 让好奇心变成深度探索</p>
+        </div>
+
+        <div class="demo-flow">
+            <div class="step" data-step="1">
+                <div class="step-number">1</div>
+                <h3>创建项目</h3>
+                <p>开启你的探索之旅</p>
+            </div>
+            <div class="step" data-step="2">
+                <div class="step-number">2</div>
+                <h3>观察分析</h3>
+                <p>上传图片，AI智能识别</p>
+            </div>
+            <div class="step" data-step="3">
+                <div class="step-number">3</div>
+                <h3>提问引导</h3>
+                <p>AI生成个性化问题</p>
+            </div>
+            <div class="step" data-step="4">
+                <div class="step-number">4</div>
+                <h3>内容润色</h3>
+                <p>优化表达和笔记</p>
+            </div>
+            <div class="step" data-step="5">
+                <div class="step-number">5</div>
+                <h3>语音交互</h3>
+                <p>语音转文字处理</p>
+            </div>
+            <div class="step" data-step="6">
+                <div class="step-number">6</div>
+                <h3>生成报告</h3>
+                <p>创建研究报告</p>
+            </div>
+            <div class="step" data-step="7">
+                <div class="step-number">7</div>
+                <h3>视频分析</h3>
+                <p>AI分析视频内容</p>
+            </div>
+            <div class="step" data-step="8">
+                <div class="step-number">8</div>
+                <h3>视频创作</h3>
+                <p>生成AI教学视频</p>
+            </div>
+        </div>
+
+        <div class="demo-content">
+            <!-- 创建项目 -->
+            <div class="section active" id="section-1">
+                <h2>🎯 第一步：创建探索项目</h2>
+                <p style="color: #666; margin-bottom: 30px;">让我们为小明的恐龙探索之旅创建一个项目吧！</p>
+
+                <div class="form-group">
+                    <label for="project-title">项目标题</label>
+                    <input type="text" id="project-title" value="小明的恐龙探索之旅" placeholder="输入项目标题">
+                </div>
+
+                <div class="form-group">
+                    <label for="project-desc">项目描述</label>
+                    <textarea id="project-desc" placeholder="描述这个探索项目的目标和内容">跟随小明一起探索古老的恐龙世界，发现恐龙的奥秘，学习古生物知识。</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="project-category">项目分类</label>
+                    <select id="project-category">
+                        <option value="dinosaur">恐龙探索</option>
+                        <option value="space">太空探索</option>
+                        <option value="ocean">海洋探险</option>
+                        <option value="nature">自然观察</option>
+                        <option value="science">科学实验</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="project-tags">项目标签（用逗号分隔）</label>
+                    <input type="text" id="project-tags" value="恐龙,古生物,探索" placeholder="输入标签，如：恐龙,探索,学习">
+                </div>
+
+                <button class="btn" onclick="createProject()">创建项目</button>
+
+                <div class="result" id="result-1">
+                    <h3>创建结果</h3>
+                    <div class="json-data" id="result-content-1"></div>
+                </div>
+            </div>
+
+            <!-- 图片分析 -->
+            <div class="section" id="section-2">
+                <h2>🔍 第二步：观察分析 - 上传图片</h2>
+                <p style="color: #666; margin-bottom: 30px;">上传一张恐龙图片，让AI帮你分析和识别！</p>
+
+                <div class="form-group">
+                    <label>选择图片文件</label>
+                    <div class="file-upload" id="image-upload">
+                        <input type="file" id="image-file" accept="image/*" onchange="handleFileSelect(this)">
+                        <div class="upload-text">📸 点击选择图片或拖拽到此处</div>
+                        <div class="upload-hint">支持 JPG、PNG、GIF 格式</div>
+                    </div>
+                    <div id="image-preview" style="margin-top: 20px; display: none;">
+                        <img id="preview-img" style="max-width: 300px; max-height: 300px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="analysis-prompt">分析提示（可选）</label>
+                    <textarea id="analysis-prompt" placeholder="描述你想让AI分析什么，比如：请分析这张图片中的恐龙种类、特征和习性">请分析这张恐龙图片，识别恐龙种类，描述其特征、习性和生存环境。</textarea>
+                </div>
+
+                <button class="btn" onclick="analyzeImage()" id="analyze-btn">开始分析</button>
+
+                <div class="progress-bar" id="progress-2">
+                    <div class="progress-fill"></div>
+                </div>
+
+                <div class="result" id="result-2">
+                    <h3>分析结果</h3>
+                    <div class="json-data" id="result-content-2"></div>
+                </div>
+            </div>
+
+            <!-- 问题生成 -->
+            <div class="section" id="section-3">
+                <h2>❓ 第三步：提问引导 - 生成探索问题</h2>
+                <p style="color: #666; margin-bottom: 30px;">基于图片分析结果，AI会为你生成有趣的问题！</p>
+
+                <div class="form-group">
+                    <label for="user-age">用户年龄</label>
+                    <select id="user-age">
+                        <option value="6">6岁</option>
+                        <option value="7">7岁</option>
+                        <option value="8" selected>8岁</option>
+                        <option value="9">9岁</option>
+                        <option value="10">10岁</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="context-info">观察信息</label>
+                    <textarea id="context-info" placeholder="描述你观察到的内容">小明观察到了一块保存完好的三角龙化石，上面有三只角和颈部骨板，看起来非常威武。</textarea>
+                </div>
+
+                <button class="btn" onclick="generateQuestions()">生成问题</button>
+
+                <div class="result" id="result-3">
+                    <h3>生成的问题</h3>
+                    <div class="json-data" id="result-content-3"></div>
+                </div>
+            </div>
+
+            <!-- 笔记润色 -->
+            <div class="section" id="section-4">
+                <h2>✨ 第四步：内容润色 - 优化表达</h2>
+                <p style="color: #666; margin-bottom: 30px;">让AI帮你优化笔记和表达，让内容更有趣更易懂！</p>
+
+                <div class="form-group">
+                    <label for="raw-content">原始内容</label>
+                    <textarea id="raw-content" placeholder="输入你想润色的内容">我看到了一个三角龙的化石，它有三只角和很大的脖子骨板。看起来很厉害的样子，我想知道它是怎么生活的，吃什么东西，有什么朋友。</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="polish-context">上下文信息（JSON格式，可选）</label>
+                    <textarea id="polish-context" placeholder='{"age": 8, "interest": "恐龙", "learning_goal": "了解古生物"}'>{"age": 8, "interest": "恐龙", "learning_goal": "了解古生物知识"}</textarea>
+                </div>
+
+                <button class="btn" onclick="polishNote()">润色内容</button>
+
+                <div class="result" id="result-4">
+                    <h3>润色结果</h3>
+                    <div class="json-data" id="result-content-4"></div>
+                </div>
+            </div>
+
+            <!-- 语音转文字 -->
+            <div class="section" id="section-5">
+                <h2>🎤 第五步：语音交互 - 语音转文字</h2>
+                <p style="color: #666; margin-bottom: 30px;">上传音频文件，让AI帮你转换为文字！</p>
+
+                <div class="form-group">
+                    <label>选择音频文件</label>
+                    <div class="file-upload" id="audio-upload">
+                        <input type="file" id="audio-file" accept="audio/*" onchange="handleAudioSelect(this)">
+                        <div class="upload-text">🎵 点击选择音频或拖拽到此处</div>
+                        <div class="upload-hint">支持 MP3、WAV、M4A 等格式</div>
+                    </div>
+                    <div id="audio-preview" style="margin-top: 20px; display: none;">
+                        <audio id="preview-audio" controls style="width: 100%; max-width: 400px;"></audio>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="audio-language">音频语言</label>
+                    <select id="audio-language">
+                        <option value="zh-CN" selected>中文</option>
+                        <option value="en-US">英文</option>
+                        <option value="ja-JP">日文</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="speechToText()">转换文字</button>
+
+                <div class="progress-bar" id="progress-5">
+                    <div class="progress-fill"></div>
+                </div>
+
+                <div class="result" id="result-5">
+                    <h3>转换结果</h3>
+                    <div class="json-data" id="result-content-5"></div>
+                    <div class="media-player" id="audio-player" style="display: none;">
+                        <h4>原始音频</h4>
+                        <audio id="result-audio" controls></audio>
+                        <button class="btn download-btn" onclick="downloadMedia('audio')">下载音频</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 生成报告 -->
+            <div class="section" id="section-6">
+                <h2>📋 第六步：生成报告 - 创建研究成果</h2>
+                <p style="color: #666; margin-bottom: 30px;">基于所有探索内容，生成一份完整的学习报告！</p>
+
+                <div class="form-group">
+                    <label for="report-context">报告内容总结</label>
+                    <textarea id="report-context" placeholder="总结你的探索发现和学习心得">通过这次恐龙探索之旅，我学习到了很多关于三角龙的知识。它们生活在白垩纪晚期，是草食性恐龙，有三只角和颈部骨板来保护自己。我还学会了如何观察化石和提出问题。</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="learning-goals">学习目标</label>
+                    <textarea id="learning-goals" placeholder="描述你的学习目标">了解恐龙的基本特征，学习观察和提问的方法，培养科学探索精神。</textarea>
+                </div>
+
+                <button class="btn" onclick="generateReport()">生成报告</button>
+
+                <div class="result" id="result-6">
+                    <h3>研究报告</h3>
+                    <div class="json-data" id="result-content-6"></div>
+                </div>
+            </div>
+
+            <!-- 视频分析 -->
+            <div class="section" id="section-7">
+                <h2>🎥 第七步：视频分析 - AI分析视频内容</h2>
+                <p style="color: #666; margin-bottom: 30px;">上传视频文件，让AI帮你分析其中的内容、场景和情感！</p>
+
+                <div class="form-group">
+                    <label>选择视频文件</label>
+                    <div class="file-upload" id="video-upload">
+                        <input type="file" id="video-file" accept="video/*" onchange="handleVideoSelect(this)">
+                        <div class="upload-text">🎬 点击选择视频或拖拽到此处</div>
+                        <div class="upload-hint">支持 MP4、AVI、MOV 等格式</div>
+                    </div>
+                    <div id="video-preview" style="margin-top: 20px; display: none;">
+                        <video id="preview-video" controls style="max-width: 400px; max-height: 300px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);"></video>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="analyzeVideo()">开始分析</button>
+
+                <div class="progress-bar" id="progress-7">
+                    <div class="progress-fill"></div>
+                </div>
+
+                <div class="result" id="result-7">
+                    <h3>视频分析结果</h3>
+                    <div class="json-data" id="result-content-7"></div>
+                </div>
+            </div>
+
+            <!-- 视频生成 -->
+            <div class="section" id="section-8">
+                <h2>🎬 第八步：视频创作 - 生成AI教学视频</h2>
+                <p style="color: #666; margin-bottom: 30px;">让AI基于你的探索内容，生成一段教学视频！</p>
+
+                <div class="form-group">
+                    <label for="video-script">视频脚本</label>
+                    <textarea id="video-script" placeholder="输入视频脚本内容">欢迎来到恐龙世界！今天我们来学习三角龙。三角龙是生活在白垩纪晚期的草食性恐龙，它们有三只角和颈部大骨板。让我们一起探索三角龙的奥秘吧！</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="video-style">视频风格</label>
+                    <select id="video-style">
+                        <option value="educational" selected>教育风格</option>
+                        <option value="cartoon">卡通风格</option>
+                        <option value="documentary">纪录片风格</option>
+                        <option value="adventure">冒险风格</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="video-duration">视频时长（秒）</label>
+                    <input type="number" id="video-duration" value="60" min="30" max="300">
+                </div>
+
+                <div class="form-group">
+                    <label for="video-scenes">场景描述（每行一个场景）</label>
+                    <textarea id="video-scenes" placeholder="输入场景描述">三角龙外形介绍&#10;生活习性展示&#10;生存环境再现</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="video-voice">语音类型</label>
+                    <select id="video-voice">
+                        <option value="female" selected>女声</option>
+                        <option value="male">男声</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="generateVideo()">生成视频</button>
+
+                <div class="progress-bar" id="progress-8">
+                    <div class="progress-fill"></div>
+                </div>
+
+                <div class="result" id="result-8">
+                    <h3>视频生成结果</h3>
+                    <div class="json-data" id="result-content-8"></div>
+                    <div class="media-player" id="video-player" style="display: none;">
+                        <h4>生成的视频</h4>
+                        <video id="result-video" controls></video>
+                        <button class="btn download-btn" onclick="downloadMedia('video')">下载视频</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentStep = 1;
+        let projectData = null;
+        let observationData = null;
+        let selectedImageFile = null;
+        let selectedAudioFile = null;
+        let selectedVideoFile = null;
+        let generatedAudioData = null;
+        let generatedVideoData = null;
+
+        // API基础URL
+        const API_BASE = 'http://localhost:9003';
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initSteps();
+            initDragAndDrop();
+        });
+
+        // 初始化步骤
+        function initSteps() {
+            const steps = document.querySelectorAll('.step');
+            steps.forEach(step => {
+                step.addEventListener('click', function() {
+                    const stepNum = parseInt(this.dataset.step);
+                    switchStep(stepNum);
+                });
+            });
+        }
+
+        // 初始化拖拽上传
+        function initDragAndDrop() {
+            // 图片上传
+            const imageUpload = document.getElementById('image-upload');
+            imageUpload.addEventListener('dragover', handleDragOver);
+            imageUpload.addEventListener('dragleave', handleDragLeave);
+            imageUpload.addEventListener('drop', (e) => handleImageDrop(e));
+
+            // 音频上传
+            const audioUpload = document.getElementById('audio-upload');
+            audioUpload.addEventListener('dragover', handleDragOver);
+            audioUpload.addEventListener('dragleave', handleDragLeave);
+            audioUpload.addEventListener('drop', (e) => handleAudioDrop(e));
+
+            // 视频上传
+            const videoUpload = document.getElementById('video-upload');
+            videoUpload.addEventListener('dragover', handleDragOver);
+            videoUpload.addEventListener('dragleave', handleDragLeave);
+            videoUpload.addEventListener('drop', (e) => handleVideoDrop(e));
+        }
+
+        // 切换步骤
+        function switchStep(stepNum) {
+            // 更新步骤状态
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.querySelector(`[data-step="${stepNum}"]`).classList.add('active');
+
+            // 切换内容区域
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`section-${stepNum}`).classList.add('active');
+
+            currentStep = stepNum;
+        }
+
+        // 拖拽事件处理
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('dragover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+        }
+
+        // 文件选择处理
+        function handleFileSelect(input) {
+            selectedImageFile = input.files[0];
+            if (selectedImageFile) {
+                displayImagePreview(selectedImageFile);
+            }
+        }
+
+        function handleAudioSelect(input) {
+            selectedAudioFile = input.files[0];
+            if (selectedAudioFile) {
+                displayAudioPreview(selectedAudioFile);
+            }
+        }
+
+        function handleVideoSelect(input) {
+            selectedVideoFile = input.files[0];
+            if (selectedVideoFile) {
+                displayVideoPreview(selectedVideoFile);
+            }
+        }
+
+        // 拖拽文件处理
+        function handleImageDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                selectedImageFile = files[0];
+                document.getElementById('image-file').files = files;
+                displayImagePreview(selectedImageFile);
+            }
+        }
+
+        function handleAudioDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                selectedAudioFile = files[0];
+                document.getElementById('audio-file').files = files;
+                displayAudioPreview(selectedAudioFile);
+            }
+        }
+
+        function handleVideoDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                selectedVideoFile = files[0];
+                document.getElementById('video-file').files = files;
+                displayVideoPreview(selectedVideoFile);
+            }
+        }
+
+        // 显示图片预览
+        function displayImagePreview(file) {
+            const preview = document.getElementById('image-preview');
+            const img = document.getElementById('preview-img');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                img.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 显示音频预览
+        function displayAudioPreview(file) {
+            const preview = document.getElementById('audio-preview');
+            const audio = document.getElementById('preview-audio');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                audio.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 显示视频预览
+        function displayVideoPreview(file) {
+            const preview = document.getElementById('video-preview');
+            const video = document.getElementById('preview-video');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                video.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // API调用函数
+        async function createProject() {
+            const title = document.getElementById('project-title').value;
+            const description = document.getElementById('project-desc').value;
+            const category = document.getElementById('project-category').value;
+            const tags = document.getElementById('project-tags').value.split(',').map(tag => tag.trim());
+
+            const data = {
+                user_id: 1,
+                title: title,
+                description: description,
+                category: category,
+                tags: tags
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/project/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                projectData = result.data;
+
+                document.getElementById('result-content-1').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-1').classList.add('show');
+
+                // 自动切换到下一步
+                setTimeout(() => switchStep(2), 2000);
+            } catch (error) {
+                showError('创建项目失败: ' + error.message);
+            }
+        }
+
+        async function analyzeImage() {
+            if (!selectedImageFile) {
+                showError('请先选择图片文件');
+                return;
+            }
+
+            const prompt = document.getElementById('analysis-prompt').value;
+
+            // 显示进度条
+            const progressBar = document.getElementById('progress-2');
+            const progressFill = progressBar.querySelector('.progress-fill');
+            progressBar.classList.add('show');
+
+            try {
+                // 将文件转换为base64
+                const base64Data = await fileToBase64(selectedImageFile);
+                const imageUrl = `data:${selectedImageFile.type};base64,${base64Data}`;
+
+                const data = {
+                    project_id: projectData?.project_id || 1,
+                    user_id: 1,
+                    image_url: imageUrl,
+                    prompt: prompt,
+                    category: document.getElementById('project-category').value
+                };
+
+                // 模拟进度
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 10;
+                    progressFill.style.width = progress + '%';
+                    if (progress >= 90) clearInterval(progressInterval);
+                }, 200);
+
+                const response = await fetch(`${API_BASE}/api/observation/image/recognize`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                observationData = result;
+
+                progressFill.style.width = '100%';
+                setTimeout(() => progressBar.classList.remove('show'), 1000);
+
+                document.getElementById('result-content-2').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-2').classList.add('show');
+
+                // 自动切换到下一步
+                setTimeout(() => switchStep(3), 3000);
+            } catch (error) {
+                document.getElementById('progress-2').classList.remove('show');
+                showError('图片分析失败: ' + error.message);
+            }
+        }
+
+        async function generateQuestions() {
+            const userAge = parseInt(document.getElementById('user-age').value);
+            const contextInfo = document.getElementById('context-info').value;
+
+            const data = {
+                project_id: projectData?.project_id || 1,
+                user_id: 1,
+                observation_id: observationData?.observation_id || 1,
+                context_info: contextInfo,
+                category: document.getElementById('project-category').value,
+                user_age: userAge
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/questioning/questions/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                document.getElementById('result-content-3').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-3').classList.add('show');
+
+                // 自动切换到下一步
+                setTimeout(() => switchStep(4), 2000);
+            } catch (error) {
+                showError('生成问题失败: ' + error.message);
+            }
+        }
+
+        async function polishNote() {
+            const rawContent = document.getElementById('raw-content').value;
+            const contextInfoStr = document.getElementById('polish-context').value;
+
+            let contextInfo = {};
+            try {
+                contextInfo = JSON.parse(contextInfoStr);
+            } catch (e) {
+                contextInfo = { raw_context: contextInfoStr };
+            }
+
+            const data = {
+                raw_content: rawContent,
+                context_info: contextInfo,
+                category: document.getElementById('project-category').value,
+                user_age: parseInt(document.getElementById('user-age').value)
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/expression/note/polish`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                document.getElementById('result-content-4').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-4').classList.add('show');
+
+                // 自动切换到下一步
+                setTimeout(() => switchStep(5), 2000);
+            } catch (error) {
+                showError('内容润色失败: ' + error.message);
+            }
+        }
+
+        async function speechToText() {
+            if (!selectedAudioFile) {
+                showError('请先选择音频文件');
+                return;
+            }
+
+            const language = document.getElementById('audio-language').value;
+
+            // 显示进度条
+            const progressBar = document.getElementById('progress-5');
+            const progressFill = progressBar.querySelector('.progress-fill');
+            progressBar.classList.add('show');
+
+            try {
+                // 将文件转换为base64
+                const base64Data = await fileToBase64(selectedAudioFile);
+
+                const data = {
+                    audio_data: base64Data,
+                    format: selectedAudioFile.name.split('.').pop().toLowerCase(),
+                    language: language
+                };
+
+                // 模拟进度
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 8;
+                    progressFill.style.width = progress + '%';
+                    if (progress >= 90) clearInterval(progressInterval);
+                }, 300);
+
+                const response = await fetch(`${API_BASE}/api/expression/speech-to-text`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                progressFill.style.width = '100%';
+                setTimeout(() => progressBar.classList.remove('show'), 1000);
+
+                document.getElementById('result-content-5').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-5').classList.add('show');
+
+                // 自动切换到下一步
+                setTimeout(() => switchStep(6), 2000);
+            } catch (error) {
+                document.getElementById('progress-5').classList.remove('show');
+                showError('语音转换失败: ' + error.message);
+            }
+        }
+
+        async function generateReport() {
+            const context = document.getElementById('report-context').value;
+            const goals = document.getElementById('learning-goals').value;
+
+            const data = {
+                project_id: projectData?.project_id || 1,
+                user_id: 1,
+                context_info: {
+                    content: context,
+                    learning_goals: goals,
+                    category: document.getElementById('project-category').value
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/achievement/report/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                document.getElementById('result-content-6').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-6').classList.add('show');
+
+                // 自动切换到下一步
+                setTimeout(() => switchStep(7), 2000);
+            } catch (error) {
+                showError('生成报告失败: ' + error.message);
+            }
+        }
+
+        async function analyzeVideo() {
+            if (!selectedVideoFile) {
+                showError('请先选择视频文件');
+                return;
+            }
+
+            // 显示进度条
+            const progressBar = document.getElementById('progress-7');
+            const progressFill = progressBar.querySelector('.progress-fill');
+            progressBar.classList.add('show');
+
+            try {
+                // 将文件转换为base64
+                const base64Data = await fileToBase64(selectedVideoFile);
+
+                const data = {
+                    video_data: base64Data,
+                    format: selectedVideoFile.name.split('.').pop().toLowerCase()
+                };
+
+                // 模拟进度
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 5;
+                    progressFill.style.width = progress + '%';
+                    if (progress >= 90) clearInterval(progressInterval);
+                }, 500);
+
+                const response = await fetch(`${API_BASE}/api/achievement/video/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                progressFill.style.width = '100%';
+                setTimeout(() => progressBar.classList.remove('show'), 1000);
+
+                document.getElementById('result-content-7').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-7').classList.add('show');
+
+                // 自动切换到下一步
+                setTimeout(() => switchStep(8), 3000);
+            } catch (error) {
+                document.getElementById('progress-7').classList.remove('show');
+                showError('视频分析失败: ' + error.message);
+            }
+        }
+
+        async function generateVideo() {
+            const script = document.getElementById('video-script').value;
+            const style = document.getElementById('video-style').value;
+            const duration = parseFloat(document.getElementById('video-duration').value);
+            const scenes = document.getElementById('video-scenes').value.split('\n').filter(s => s.trim());
+            const voice = document.getElementById('video-voice').value;
+            const language = 'zh-CN';
+
+            const data = {
+                script: script,
+                style: style,
+                duration: duration,
+                scenes: scenes,
+                voice: voice,
+                language: language
+            };
+
+            // 显示进度条
+            const progressBar = document.getElementById('progress-8');
+            const progressFill = progressBar.querySelector('.progress-fill');
+            progressBar.classList.add('show');
+
+            try {
+                // 模拟进度（视频生成需要时间）
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 2;
+                    progressFill.style.width = progress + '%';
+                    if (progress >= 95) clearInterval(progressInterval);
+                }, 1000);
+
+                const response = await fetch(`${API_BASE}/api/achievement/video/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                progressFill.style.width = '100%';
+                setTimeout(() => progressBar.classList.remove('show'), 1000);
+
+                document.getElementById('result-content-8').textContent = JSON.stringify(result, null, 2);
+                document.getElementById('result-8').classList.add('show');
+
+                // 如果有视频数据，显示播放器
+                if (result.data && result.data.video_data) {
+                    generatedVideoData = result.data.video_data;
+                    displayGeneratedVideo(generatedVideoData, result.data.format || 'mp4');
+                }
+
+            } catch (error) {
+                document.getElementById('progress-8').classList.remove('show');
+                showError('视频生成失败: ' + error.message);
+            }
+        }
+
+        // 工具函数
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    // 移除data:xxx;base64,前缀
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function displayGeneratedVideo(videoData, format) {
+            const player = document.getElementById('video-player');
+            const video = document.getElementById('result-video');
+
+            // 假设返回的是base64编码的视频数据
+            video.src = `data:video/${format};base64,${videoData}`;
+            player.style.display = 'block';
+        }
+
+        function downloadMedia(type) {
+            let data, filename, mimeType;
+
+            if (type === 'audio' && generatedAudioData) {
+                data = generatedAudioData;
+                filename = 'generated_audio.mp3';
+                mimeType = 'audio/mp3';
+            } else if (type === 'video' && generatedVideoData) {
+                data = generatedVideoData;
+                filename = 'generated_video.mp4';
+                mimeType = 'video/mp4';
+            } else {
+                showError('没有可下载的媒体文件');
+                return;
+            }
+
+            // 创建下载链接
+            const blob = new Blob([Uint8Array.from(atob(data), c => c.charCodeAt(0))], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function showError(message) {
+            // 移除现有的错误信息
+            const existingErrors = document.querySelectorAll('.error');
+            existingErrors.forEach(error => error.remove());
+
+            // 创建新的错误信息
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error show';
+            errorDiv.innerHTML = `<strong>错误：</strong>${message}`;
+
+            // 添加到当前活动步骤中
+            const activeSection = document.querySelector('.section.active');
+            activeSection.appendChild(errorDiv);
+
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+                setTimeout(() => errorDiv.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

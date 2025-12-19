@@ -81,6 +81,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/ping",
 				Handler: common.PingHandler(serverCtx),
 			},
+			{
+				// 前端演示页面
+				Method:  http.MethodGet,
+				Path:    "/demo",
+				Handler: common.DemoHandler(serverCtx),
+			},
 		},
 		rest.WithPrefix("/api/common"),
 	)
