@@ -20,12 +20,16 @@ else
     echo "查找可能的服务进程..."
     PROJECT_PID=$(pgrep -f "projectmanagementservice" | head -1)
     AI_PID=$(pgrep -f "aidialogueservice" | head -1)
+    AUDIO_PID=$(pgrep -f "audioprocessingservice" | head -1)
+    VIDEO_PID=$(pgrep -f "videoprocessingservice" | head -1)
     API_PID=$(pgrep -f "api.go" | head -1)
 
-    if [ ! -z "$PROJECT_PID" ] || [ ! -z "$AI_PID" ] || [ ! -z "$API_PID" ]; then
+    if [ ! -z "$PROJECT_PID" ] || [ ! -z "$AI_PID" ] || [ ! -z "$AUDIO_PID" ] || [ ! -z "$VIDEO_PID" ] || [ ! -z "$API_PID" ]; then
         echo "发现运行中的服务，正在停止..."
         [ ! -z "$PROJECT_PID" ] && kill $PROJECT_PID && echo "停止项目管理RPC服务 (PID: $PROJECT_PID)"
         [ ! -z "$AI_PID" ] && kill $AI_PID && echo "停止AI对话RPC服务 (PID: $AI_PID)"
+        [ ! -z "$AUDIO_PID" ] && kill $AUDIO_PID && echo "停止语音处理RPC服务 (PID: $AUDIO_PID)"
+        [ ! -z "$VIDEO_PID" ] && kill $VIDEO_PID && echo "停止视频处理RPC服务 (PID: $VIDEO_PID)"
         [ ! -z "$API_PID" ] && kill $API_PID && echo "停止API服务 (PID: $API_PID)"
         echo "✅ 所有服务已停止"
     else

@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net/http"
 
 	"explorapal/app/api/internal/config"
 	"explorapal/app/api/internal/handler"
@@ -27,13 +26,6 @@ func main() {
 
 	// 注册路由处理器
 	handler.RegisterHandlers(server, ctx)
-
-	// 健康检查路由
-	server.AddRoute(rest.Route{
-		Method:  http.MethodGet,
-		Path:    "/api/common/ping",
-		Handler: handler.PingHandler(ctx),
-	})
 
 	fmt.Printf("🚀 Starting API server at %s:%d...\n", c.Host, c.Port)
 	fmt.Printf("📋 API文档: http://%s:%d/api/common/ping\n", c.Host, c.Port)

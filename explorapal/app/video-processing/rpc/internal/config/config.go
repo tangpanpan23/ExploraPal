@@ -25,6 +25,8 @@ type Config struct {
 		TAL_MLOPS_APP_KEY string
 		BaseURL           string
 		Timeout           int
+		MaxTokens         int
+		Temperature       float32
 	}
 
 	// 缓存配置

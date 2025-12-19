@@ -47,6 +47,7 @@ explorapal/
 │   ├── project-management/rpc/ # 项目管理RPC服务
 │   ├── image-recognition/rpc/  # 图像识别RPC服务
 │   ├── audio-processing/rpc/   # 语音处理RPC服务
+│   ├── video-processing/rpc/   # 视频处理RPC服务
 │   └── ai-dialogue/rpc/        # AI对话RPC服务
 ├── common/                     # 通用工具
 ├── constant/                   # 常量定义
@@ -87,6 +88,13 @@ explorapal/
 - `POST /api/expression/speech/text` - 语音转文字
 - `POST /api/expression/note/polish` - AI润色笔记
 
+### 语音处理
+- `POST /api/audio/text-to-speech` - 文字转语音
+
+### 视频处理
+- `POST /api/achievement/video/analyze` - 视频内容分析
+- `POST /api/achievement/video/generate` - AI视频生成
+
 ### 成果生成
 - `POST /api/achievement/report/generate` - 生成研究报告
 - `POST /api/achievement/documentary/generate` - 生成纪录片
@@ -94,12 +102,63 @@ explorapal/
 
 ## AI能力集成
 
-### 阿里云Qwen集成
+### TAL MLOps平台AI模型集成
 - **qwen3-vl-plus** (256K): 视觉理解，支持思考模式，图像分析最优
 - **qwen-flash** (1048.576K): 思考+非思考模式融合，问题生成和笔记润色
 - **qwen3-max** (256K): 智能体编程优化，复杂推理和报告生成
 - **qwen3-omni-flash** (48K): 多模态大模型，支持语音转文字和文字转语音
+- **qwen-vl-plus** (256K): 视频理解和分析，支持视频内容解析
 
+
+## 🎪 快速体验
+
+### 多模态AI演示
+体验完整的AI学习流程，包括图像分析、语音处理、视频生成等功能：
+
+```bash
+# 查看详细演示指南
+cat MULTIMODAL_DEMO.md
+
+# 运行完整演示流程脚本
+./demo_flow.sh
+```
+
+**演示内容**:
+- 🔍 **AI图像识别**: 识别恐龙化石并分析特征
+- ❓ **智能问题生成**: 基于观察结果生成个性化问题
+- 🎤 **语音交互**: 语音转文字和文字转语音
+- 🎬 **视频创作**: AI生成教学视频和内容分析
+- 📊 **自动报告**: 生成研究报告和学习总结
+
+### 技术架构图
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    🎨 多模态AI学习平台                           │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
+│  │  API网关    │  │  项目管理   │  │   AI对话    │              │
+│  │  (Port 9003)│  │  (Port 9001)│  │  (Port 9002)│              │
+│  └─────────────┘  └─────────────┘  └─────────────┘              │
+│           │              │              │                        │
+│  ┌─────────────┐  ┌─────────────┐                               │
+│  │ 语音处理    │  │ 视频处理    │                               │
+│  │ (Port 9004) │  │ (Port 9005) │                               │
+│  └─────────────┘  └─────────────┘                               │
+│           │              │              │                        │
+├─────────────────────────────────────────────────────────────────┤
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │               🤖 多模态AI模型集群                       │    │
+│  │                                                         │    │
+│  │  • qwen3-vl-plus    (视觉理解)                          │    │
+│  │  • qwen-flash       (文本处理)                          │    │
+│  │  • qwen3-omni-flash (语音处理)                          │    │
+│  │  • qwen-vl-plus     (视频理解)                          │    │
+│  │  • qwen3-max        (复杂推理)                          │    │
+│  └─────────────────────────────────────────────────────────┘    │
+├─────────────────────────────────────────────────────────────────┤
+│  🎯 TAL MLOps平台 • MySQL • Redis • 微服务架构                 │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ## 部署和运行
 
@@ -116,14 +175,15 @@ explorapal/
 
 ### 启动服务
 ```bash
-# 启动项目管理服务
-go run app/project-management/rpc/projectmanagementservice.go
+# 方式1: 使用演示脚本（推荐）
+./start_demo.sh
 
-# 启动API服务
-go run app/api/api.go
-
-# 启动其他RPC服务
-go run app/ai-dialogue/rpc/aidialogueservice.go
+# 方式2: 手动启动各服务
+go run app/project-management/rpc/projectmanagementservice.go    # 9001
+go run app/ai-dialogue/rpc/aidialogueservice.go                 # 9002
+go run app/api/api.go                                           # 9003
+go run app/audio-processing/rpc/service.go                      # 9004
+go run app/video-processing/rpc/service.go                      # 9005
 ```
 
 ### 数据库初始化
