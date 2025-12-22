@@ -459,6 +459,152 @@
             margin: 20px 0;
         }
 
+        /* 语音转写文本样式 */
+        .transcription-section {
+            margin-bottom: 20px;
+        }
+
+        .transcription-section h5 {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 15px 0 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .transcription-section h5::before {
+            content: "🎤";
+            margin-right: 8px;
+        }
+
+        .transcription-text {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            color: #333;
+            line-height: 1.6;
+            font-size: 1rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .transcription-text::before {
+            content: '"';
+            font-size: 2rem;
+            color: #6c757d;
+            position: absolute;
+            top: -5px;
+            left: 10px;
+            font-family: serif;
+        }
+
+        .transcription-text::after {
+            content: '"';
+            font-size: 2rem;
+            color: #6c757d;
+            position: absolute;
+            bottom: -15px;
+            right: 10px;
+            font-family: serif;
+        }
+
+        /* 研究报告样式 */
+        .report-header {
+            margin-bottom: 20px;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .report-header h3 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .report-content-section {
+            margin-top: 20px;
+        }
+
+        .report-content-section h5 {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .report-content-section h5::before {
+            content: "📄";
+            margin-right: 8px;
+        }
+
+        /* 报告内容区域的markdown样式增强 */
+        .report-content-section .markdown-content {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            line-height: 1.7;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .report-content-section .markdown-content h1,
+        .report-content-section .markdown-content h2,
+        .report-content-section .markdown-content h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .report-content-section .markdown-content h1 {
+            font-size: 1.8rem;
+            border-bottom-color: #e74c3c;
+        }
+
+        .report-content-section .markdown-content h2 {
+            font-size: 1.5rem;
+            border-bottom-color: #27ae60;
+        }
+
+        .report-content-section .markdown-content h3 {
+            font-size: 1.3rem;
+            border-bottom-color: #f39c12;
+        }
+
+        .report-content-section .markdown-content ul,
+        .report-content-section .markdown-content ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        .report-content-section .markdown-content li {
+            margin-bottom: 8px;
+        }
+
+        .report-content-section .markdown-content blockquote {
+            border-left: 4px solid #3498db;
+            margin: 20px 0;
+            padding: 15px 20px;
+            background: #ecf0f1;
+            font-style: italic;
+        }
+
+        .report-content-section .markdown-content strong {
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
         .response-details {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -998,7 +1144,8 @@
             <h1>🦕 探索伙伴</h1>
             <p>AI驱动的儿童学习助手 - 让好奇心变成深度探索</p>
             <div class="demo-instructions">
-                <p><strong>📋 演示说明：</strong> 每个步骤完成后会显示结果和数据选项，<strong
+                <p><strong>📋 演示说明：</strong> 新的智能流程：<strong style="color: #1976d2;">第一步拍照 → AI自动分析并创建项目 →
+                        确认项目后继续探索</strong>。后续步骤完成后会显示结果和数据选项，<strong
                         style="color: #d32f2f;">必须等待您手动点击"继续下一步"按钮</strong>才能进入下一步。您可以选择使用AI返回的数据自动填充下一步输入，或手动编辑。音频和视频生成后可直接预览和下载。
                 </p>
             </div>
@@ -1045,13 +1192,13 @@
         <div class="demo-flow">
             <div class="step" data-step="1">
                 <div class="step-number">1</div>
-                <h3>创建项目</h3>
-                <p>开启你的探索之旅</p>
+                <h3>智能拍照</h3>
+                <p>上传照片，AI自动识别主题</p>
             </div>
             <div class="step" data-step="2">
                 <div class="step-number">2</div>
-                <h3>观察分析</h3>
-                <p>上传图片，AI智能识别</p>
+                <h3>项目匹配</h3>
+                <p>基于识别结果自动创建项目</p>
             </div>
             <div class="step" data-step="3">
                 <div class="step-number">3</div>
@@ -1086,44 +1233,34 @@
         </div>
 
         <div class="demo-content">
-            <!-- 创建项目 -->
+            <!-- 智能拍照 -->
             <div class="section active" id="section-1">
-                <h2>🎯 第一步：创建探索项目</h2>
-                <p style="color: #666; margin-bottom: 30px;">让我们为小明的恐龙探索之旅创建一个项目吧！</p>
+                <h2>📸 第一步：智能拍照分析</h2>
+                <p style="color: #666; margin-bottom: 30px;">上传一张照片，让AI智能识别主题并自动创建对应的探索项目！</p>
 
                 <div class="form-group">
-                    <label for="project-title">项目标题</label>
-                    <input type="text" id="project-title" value="小明的恐龙探索之旅" placeholder="输入项目标题">
+                    <label>选择图片文件 <small style="color: #666;">(最大30MB，支持智能主题识别)</small></label>
+                    <div class="file-upload" id="image-upload-step1">
+                        <input type="file" id="image-file-step1" accept="image/*"
+                            onchange="handleImageSelectStep1(this)">
+                        <div class="upload-text">📸 点击选择图片或拖拽到此处</div>
+                        <div class="upload-hint">支持 JPG、PNG、GIF 格式，AI将自动识别主题并创建相应项目</div>
+                    </div>
+                    <div id="image-preview-step1" style="margin-top: 20px; display: none;">
+                        <img id="preview-img-step1"
+                            style="max-width: 300px; max-height: 300px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="project-desc">项目描述</label>
-                    <textarea id="project-desc" placeholder="描述这个探索项目的目标和内容">跟随小明一起探索古老的恐龙世界，发现恐龙的奥秘，学习古生物知识。</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="project-category">项目分类</label>
-                    <select id="project-category">
-                        <option value="dinosaur">恐龙探索</option>
-                        <option value="space">太空探索</option>
-                        <option value="ocean">海洋探险</option>
-                        <option value="nature">自然观察</option>
-                        <option value="science">科学实验</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="project-tags">项目标签（用逗号分隔）</label>
-                    <input type="text" id="project-tags" value="恐龙,古生物,探索" placeholder="输入标签，如：恐龙,探索,学习">
-                </div>
-
-                <button class="btn" onclick="createProject()">创建项目</button>
-                <button class="btn btn-outline-secondary" onclick="switchStep(2)"
-                    style="margin-left: 10px;">直接跳到步骤2</button>
+                <button class="btn" onclick="analyzeImageAndCreateProject()">智能分析并创建项目</button>
                 <button class="btn btn-outline-info" onclick="testAllStepResponses()"
                     style="margin-left: 10px;">测试所有响应</button>
                 <button class="btn btn-outline-success" onclick="testMarkdownRendering()"
                     style="margin-left: 10px;">测试Markdown</button>
+
+                <div class="progress-bar" id="progress-1">
+                    <div class="progress-fill"></div>
+                </div>
 
                 <div class="result" id="result-1">
                     <h3>创建结果</h3>
@@ -1131,40 +1268,40 @@
                 </div>
             </div>
 
-            <!-- 图片分析 -->
+            <!-- 项目匹配确认 -->
             <div class="section" id="section-2">
-                <h2>🔍 第二步：观察分析 - 上传图片</h2>
-                <p style="color: #666; margin-bottom: 30px;">上传一张恐龙图片，让AI帮你分析和识别！</p>
+                <h2>✅ 第二步：项目匹配确认</h2>
+                <p style="color: #666; margin-bottom: 30px;">AI已基于图片分析自动创建了探索项目，请确认项目信息后继续下一步。</p>
 
-                <div class="form-group">
-                    <label>选择图片文件 <small style="color: #666;">(最大30MB)</small></label>
-                    <div class="file-upload" id="image-upload">
-                        <input type="file" id="image-file" accept="image/*" onchange="handleFileSelect(this)">
-                        <div class="upload-text">📸 点击选择图片或拖拽到此处</div>
-                        <div class="upload-hint">支持 JPG、PNG、GIF 格式，文件大小 ≤ 5MB（大图将自动压缩）</div>
+                <div class="project-confirmation"
+                    style="background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%); border-radius: 12px; padding: 30px; margin-bottom: 30px; border: 2px solid #4caf50; box-shadow: 0 4px 15px rgba(76, 175, 80, 0.1);">
+                    <h3 style="color: #2e7d32; margin-bottom: 20px; display: flex; align-items: center;">
+                        🎉 项目已自动创建！
+                    </h3>
+                    <div id="project-summary" style="margin-bottom: 20px;">
+                        <!-- 项目信息将在这里动态显示 -->
+                        <div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 15px;">
+                            <h4 style="color: #333; margin-bottom: 15px;">📋 项目详情</h4>
+                            <div id="project-details" style="color: #555; line-height: 1.6;">
+                                <!-- 项目详细信息 -->
+                            </div>
+                        </div>
+                        <div style="background: white; border-radius: 8px; padding: 20px;">
+                            <h4 style="color: #333; margin-bottom: 15px;">🔍 识别结果</h4>
+                            <div id="recognition-details" style="color: #555; line-height: 1.6;">
+                                <!-- 图片识别结果 -->
+                            </div>
+                        </div>
                     </div>
-                    <div id="image-preview" style="margin-top: 20px; display: none;">
-                        <img id="preview-img"
-                            style="max-width: 300px; max-height: 300px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    <div style="display: flex; gap: 15px; align-items: center; justify-content: center;">
+                        <button class="btn btn-success" onclick="confirmProjectAndContinue()">确认项目，开始探索 →</button>
+                        <button class="btn btn-outline-warning" onclick="switchStep(1)"
+                            style="margin-left: 10px;">重新拍照</button>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="analysis-prompt">分析提示（可选）</label>
-                    <textarea id="analysis-prompt"
-                        placeholder="描述你想让AI分析什么，比如：请分析这张图片中的恐龙种类、特征和习性">请分析这张恐龙图片，识别恐龙种类，描述其特征、习性和生存环境。</textarea>
-                </div>
-
-                <button class="btn" onclick="console.log('按钮被点击'); analyzeImage()" id="analyze-btn">开始分析</button>
-                <button class="btn btn-outline-info" onclick="testStep2ResponseDisplay()"
-                    style="margin-left: 10px;">测试步骤2响应</button>
-
-                <div class="progress-bar" id="progress-2">
-                    <div class="progress-fill"></div>
-                </div>
-
-                <div class="result" id="result-2">
-                    <h3>分析结果</h3>
+                <div class="result" id="result-2" style="display: none;">
+                    <h3>项目确认结果</h3>
                     <div class="json-data" id="result-content-2"></div>
                 </div>
             </div>
@@ -1177,9 +1314,11 @@
                 <div class="form-group">
                     <label for="user-age">用户年龄</label>
                     <select id="user-age">
+                        <option value="4" selected>4岁</option>
+                        <option value="5">5岁</option>
                         <option value="6">6岁</option>
                         <option value="7">7岁</option>
-                        <option value="8" selected>8岁</option>
+                        <option value="8">8岁</option>
                         <option value="9">9岁</option>
                         <option value="10">10岁</option>
                     </select>
@@ -1188,7 +1327,7 @@
                 <div class="form-group">
                     <label for="context-info">观察信息</label>
                     <textarea id="context-info"
-                        placeholder="描述你观察到的内容">小明观察到了一块保存完好的三角龙化石，上面有三只角和颈部骨板，看起来非常威武。</textarea>
+                        placeholder="描述你观察到的内容">小葫芦观察到了一块保存完好的三角龙化石，上面有三只角和颈部骨板，看起来非常威武。</textarea>
                 </div>
 
                 <button class="btn" onclick="generateQuestions()">生成问题</button>
@@ -1215,7 +1354,7 @@
                 <div class="form-group">
                     <label for="polish-context">上下文信息（JSON格式，可选）</label>
                     <textarea id="polish-context"
-                        placeholder='{"age": 8, "interest": "恐龙", "learning_goal": "了解古生物"}'>{"age": 8, "interest": "恐龙", "learning_goal": "了解古生物知识"}</textarea>
+                        placeholder='{"age": 4, "interest": "恐龙", "learning_goal": "了解古生物"}'>{"age": 4, "interest": "恐龙", "learning_goal": "了解古生物知识"}</textarea>
                 </div>
 
                 <button class="btn" onclick="polishNote()">润色内容</button>
@@ -1577,23 +1716,37 @@
 
         // 初始化拖拽上传
         function initDragAndDrop() {
-            // 图片上传
+            // 第一步图片上传（智能分析）
+            const imageUploadStep1 = document.getElementById('image-upload-step1');
+            if (imageUploadStep1) {
+                imageUploadStep1.addEventListener('dragover', handleDragOver);
+                imageUploadStep1.addEventListener('dragleave', handleDragLeave);
+                imageUploadStep1.addEventListener('drop', (e) => handleImageDropStep1(e));
+            }
+
+            // 图片上传（步骤2）
             const imageUpload = document.getElementById('image-upload');
-            imageUpload.addEventListener('dragover', handleDragOver);
-            imageUpload.addEventListener('dragleave', handleDragLeave);
-            imageUpload.addEventListener('drop', (e) => handleImageDrop(e));
+            if (imageUpload) {
+                imageUpload.addEventListener('dragover', handleDragOver);
+                imageUpload.addEventListener('dragleave', handleDragLeave);
+                imageUpload.addEventListener('drop', (e) => handleImageDrop(e));
+            }
 
             // 音频上传
             const audioUpload = document.getElementById('audio-upload');
-            audioUpload.addEventListener('dragover', handleDragOver);
-            audioUpload.addEventListener('dragleave', handleDragLeave);
-            audioUpload.addEventListener('drop', (e) => handleAudioDrop(e));
+            if (audioUpload) {
+                audioUpload.addEventListener('dragover', handleDragOver);
+                audioUpload.addEventListener('dragleave', handleDragLeave);
+                audioUpload.addEventListener('drop', (e) => handleAudioDrop(e));
+            }
 
             // 视频上传
             const videoUpload = document.getElementById('video-upload');
-            videoUpload.addEventListener('dragover', handleDragOver);
-            videoUpload.addEventListener('dragleave', handleDragLeave);
-            videoUpload.addEventListener('drop', (e) => handleVideoDrop(e));
+            if (videoUpload) {
+                videoUpload.addEventListener('dragover', handleDragOver);
+                videoUpload.addEventListener('dragleave', handleDragLeave);
+                videoUpload.addEventListener('drop', (e) => handleVideoDrop(e));
+            }
         }
 
         // 切换步骤
@@ -1658,6 +1811,7 @@
         // 检查是否可以访问某个步骤
         function canAccessStep(stepNum) {
             if (stepNum === 1) return true; // 第一步总是可以访问
+            if (stepNum === 2) return stepStatus[1] === 'completed'; // 第二步需要第一步完成
 
             // 检查前一个步骤是否已完成
             return stepStatus[stepNum - 1] === 'completed';
@@ -1742,6 +1896,16 @@
                     switchStep(stepNum + 1);
                 }, 2000);
             }
+        }
+
+        // 确认项目并继续到下一步
+        function confirmProjectAndContinue() {
+            console.log('✅ 用户确认项目，继续到下一步');
+
+            // 标记步骤2完成并自动继续到步骤3
+            markStepCompleted(2, true);
+
+            showMessage('项目确认完成，开始生成探索问题！', 'success');
         }
 
         // 用户手动继续到下一步
@@ -1884,7 +2048,24 @@
             e.currentTarget.classList.remove('dragover');
         }
 
-        // 文件选择处理
+        // 第一步的文件选择处理
+        function handleImageSelectStep1(input) {
+            const file = input.files[0];
+            if (file) {
+                // 检查文件大小 (30MB限制，因为base64编码会增加33%大小)
+                const maxSize = 30 * 1024 * 1024; // 30MB (编码后约40MB，仍小于50MB服务器限制)
+                if (file.size > maxSize) {
+                    showError(`图片文件过大 (${(file.size / 1024 / 1024).toFixed(2)}MB)。请上传小于30MB的图片文件。`);
+                    input.value = ''; // 清空选择
+                    return;
+                }
+
+                selectedImageFile = file;
+                displayImagePreviewStep1(file);
+            }
+        }
+
+        // 原始的文件选择处理
         function handleFileSelect(input) {
             const file = input.files[0];
             if (file) {
@@ -1933,6 +2114,19 @@
             }
         }
 
+        // 第一步的拖拽文件处理
+        function handleImageDropStep1(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                selectedImageFile = files[0];
+                document.getElementById('image-file-step1').files = files;
+                displayImagePreviewStep1(selectedImageFile);
+            }
+        }
+
         // 拖拽文件处理
         function handleImageDrop(e) {
             e.preventDefault();
@@ -1968,6 +2162,19 @@
                 document.getElementById('video-file').files = files;
                 displayVideoPreview(selectedVideoFile);
             }
+        }
+
+        // 显示第一步的图片预览
+        function displayImagePreviewStep1(file) {
+            const preview = document.getElementById('image-preview-step1');
+            const img = document.getElementById('preview-img-step1');
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                img.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
         }
 
         // 显示图片预览（带压缩）
@@ -2063,6 +2270,308 @@
                 preview.style.display = 'block';
             };
             reader.readAsDataURL(file);
+        }
+
+        // 第一步：智能分析图片并创建项目
+        async function analyzeImageAndCreateProject() {
+            console.log('🧠 analyzeImageAndCreateProject函数被调用');
+
+            if (!selectedImageFile) {
+                console.log('❌ 没有选择图片文件');
+                showError('请先选择图片文件');
+                return;
+            }
+
+            // 检查文件大小（30MB限制，因为base64编码会增加33%大小）
+            const maxSize = 30 * 1024 * 1024; // 30MB (编码后约40MB，仍小于50MB服务器限制)
+            if (selectedImageFile.size > maxSize) {
+                showError(`图片文件过大 (${(selectedImageFile.size / 1024 / 1024).toFixed(2)}MB)。请上传小于30MB的图片文件。`);
+                return;
+            }
+
+            console.log('✅ 图片文件已选择:', selectedImageFile.name, `大小: ${(selectedImageFile.size / 1024 / 1024).toFixed(2)}MB`);
+
+            // 显示进度条
+            const progressBar = document.getElementById('progress-1');
+            const progressFill = progressBar.querySelector('.progress-fill');
+            progressBar.classList.add('show');
+            console.log('📊 进度条已显示');
+
+            try {
+                // 将文件转换为base64
+                const base64Data = await fileToBase64(selectedImageFile);
+                const imageUrl = `data:${selectedImageFile.type};base64,${base64Data}`;
+
+                // 首先创建一个临时项目用于图片分析
+                console.log('📝 创建临时项目用于图片分析...');
+                const tempProjectData = {
+                    user_id: currentUserId,
+                    title: '临时智能分析项目',
+                    description: '用于AI分析图片并自动创建合适项目的临时项目',
+                    category: 'auto_analysis',
+                    tags: ['临时', '智能分析']
+                };
+
+                const tempProjectResponse = await fetchWithTimeout(`${API_BASE}/api/project/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(tempProjectData)
+                }, API_TIMEOUTS.simple);
+
+                if (!tempProjectResponse.ok) {
+                    const errorText = await tempProjectResponse.text();
+                    console.error('❌ 临时项目创建失败:', tempProjectResponse.status, errorText);
+                    throw new Error(`临时项目创建失败: ${tempProjectResponse.status} ${tempProjectResponse.statusText}`);
+                }
+
+                const tempProjectResult = await safeJsonParse(tempProjectResponse);
+                console.log('✅ 临时项目创建成功:', tempProjectResult);
+
+                // 设置临时项目ID
+                const tempProjectId = tempProjectResult.project_id;
+                if (!setCurrentProjectId(tempProjectId)) {
+                    throw new Error('设置临时项目ID失败');
+                }
+
+                // 现在用临时项目ID分析图片
+                console.log('🔍 开始图片分析...');
+                showMessage('正在分析图片内容，请稍候...', 'info');
+
+                const analysisData = {
+                    project_id: tempProjectId,
+                    user_id: currentUserId,
+                    image_url: imageUrl,
+                    prompt: '请分析这张图片，识别主要对象，确定其类别，并为这个对象创建一个合适的探索项目名称和描述。',
+                    category: 'auto' // 自动识别类别
+                };
+
+                const analysisResponse = await fetchWithTimeout(`${API_BASE}/api/observation/image/recognize`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(analysisData)
+                }, API_TIMEOUTS.ai_heavy);
+
+                if (!analysisResponse.ok) {
+                    const errorText = await analysisResponse.text();
+                    console.error('❌ 图片分析失败:', analysisResponse.status, errorText);
+                    throw new Error(`图片分析失败: ${analysisResponse.status} ${analysisResponse.statusText}`);
+                }
+
+                const analysisResult = await safeJsonParse(analysisResponse);
+                console.log('✅ 图片分析成功:', analysisResult);
+
+                // 基于分析结果生成项目信息
+                const projectInfo = generateProjectFromAnalysis(analysisResult);
+                console.log('🏗️ 基于分析结果生成的项目信息:', projectInfo);
+
+                // 更新临时项目为正式项目
+                console.log('📝 更新临时项目为正式项目...');
+                const projectData = {
+                    project_id: tempProjectId,
+                    user_id: currentUserId,
+                    title: projectInfo.title,
+                    description: projectInfo.description,
+                    category: projectInfo.category,
+                    tags: projectInfo.tags
+                };
+
+                // 注意：这里假设API支持通过project_id更新项目信息
+                // 如果不支持，我们可能需要删除临时项目并创建新项目
+                const projectResponse = await fetchWithTimeout(`${API_BASE}/api/project/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(projectData)
+                }, API_TIMEOUTS.simple);
+
+                let projectResult;
+                if (projectResponse.ok) {
+                    projectResult = await safeJsonParse(projectResponse);
+                    console.log('✅ 项目更新成功:', projectResult);
+                } else {
+                    // 如果更新API不存在，则删除临时项目并创建新项目
+                    console.log('⚠️ 项目更新API不可用，删除临时项目并创建新项目...');
+
+                    // 删除临时项目（如果API支持的话）
+                    try {
+                        await fetchWithTimeout(`${API_BASE}/api/project/delete`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ project_id: tempProjectId, user_id: currentUserId })
+                        }, API_TIMEOUTS.simple);
+                    } catch (e) {
+                        console.warn('删除临时项目失败:', e);
+                    }
+
+                    // 创建正式项目
+                    const newProjectData = {
+                        user_id: currentUserId,
+                        title: projectInfo.title,
+                        description: projectInfo.description,
+                        category: projectInfo.category,
+                        tags: projectInfo.tags
+                    };
+
+                    const newProjectResponse = await fetchWithTimeout(`${API_BASE}/api/project/create`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(newProjectData)
+                    }, API_TIMEOUTS.simple);
+
+                    if (!newProjectResponse.ok) {
+                        const errorText = await newProjectResponse.text();
+                        console.error('❌ 正式项目创建失败:', newProjectResponse.status, errorText);
+                        throw new Error(`正式项目创建失败: ${newProjectResponse.status} ${newProjectResponse.statusText}`);
+                    }
+
+                    projectResult = await safeJsonParse(newProjectResponse);
+                    console.log('✅ 正式项目创建成功:', projectResult);
+                }
+
+                // 设置项目信息
+                projectData.data = projectResult;
+                const projectId = projectResult.project_id || tempProjectId;
+                if (!setCurrentProjectId(projectId)) {
+                    throw new Error('设置项目ID失败');
+                }
+
+                // 保存分析结果到observationData
+                observationData = analysisResult;
+                currentObservationId = analysisResult.observation_id;
+
+                progressFill.style.width = '100%';
+                setTimeout(() => progressBar.classList.remove('show'), 1000);
+
+                // 标记步骤完成并自动继续
+                console.log('📝 准备标记步骤1为完成...');
+                markStepCompleted(1, true); // 自动继续到下一步
+                console.log('✅ 步骤1已标记为完成，当前stepStatus:', JSON.stringify(stepStatus, null, 2));
+
+                // 显示结果
+                displayStepResponse(1, {
+                    project: projectResult,
+                    analysis: analysisResult,
+                    generatedProjectInfo: projectInfo
+                });
+
+                // 处理响应数据
+                handleApiResponse(1, {
+                    project: projectResult,
+                    analysis: analysisResult,
+                    generatedProjectInfo: projectInfo
+                });
+
+                showMessage('✅ 智能分析完成！已自动创建探索项目', 'success');
+
+            } catch (error) {
+                document.getElementById('progress-1').classList.remove('show');
+                console.error('❌ 智能分析失败:', error);
+                showError('智能分析失败: ' + error.message);
+            }
+        }
+
+        // 在步骤2显示项目信息
+        function displayProjectInfoInStep2(step1Result) {
+            console.log('📊 在步骤2显示项目信息:', step1Result);
+
+            const projectInfo = step1Result.generatedProjectInfo;
+            const analysis = step1Result.analysis;
+            const project = step1Result.project;
+
+            // 更新项目状态栏
+            updateStatusBar();
+
+            // 显示项目详细信息
+            const projectDetails = document.getElementById('project-details');
+            const recognitionDetails = document.getElementById('recognition-details');
+
+            if (projectDetails) {
+                projectDetails.innerHTML = `
+                    <div style="margin-bottom: 15px;"><strong>项目ID:</strong> ${project.project_id || 'N/A'}</div>
+                    <div style="margin-bottom: 15px;"><strong>项目标题:</strong> ${projectInfo.title}</div>
+                    <div style="margin-bottom: 15px;"><strong>项目描述:</strong> ${projectInfo.description}</div>
+                    <div style="margin-bottom: 15px;"><strong>项目分类:</strong> ${getCategoryName(projectInfo.category)}</div>
+                    <div style="margin-bottom: 15px;"><strong>项目标签:</strong> ${projectInfo.tags.map(tag => `<span style="background: #e3f2fd; color: #1976d2; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-right: 5px;">${tag}</span>`).join('')}</div>
+                `;
+            }
+
+            if (recognitionDetails) {
+                recognitionDetails.innerHTML = `
+                    <div style="margin-bottom: 15px;"><strong>识别对象:</strong> ${analysis.object_name || 'N/A'}</div>
+                    <div style="margin-bottom: 15px;"><strong>对象类别:</strong> ${getCategoryName(analysis.category)}</div>
+                    <div style="margin-bottom: 15px;"><strong>置信度:</strong> ${analysis.confidence ? (analysis.confidence * 100).toFixed(1) + '%' : 'N/A'}</div>
+                    ${analysis.scientific_name ? `<div style="margin-bottom: 15px;"><strong>学名:</strong> ${analysis.scientific_name}</div>` : ''}
+                    <div style="margin-bottom: 15px;"><strong>AI分析:</strong> ${analysis.description ? analysis.description.substring(0, 100) + '...' : '暂无详细分析'}</div>
+                `;
+            }
+
+            // 显示项目确认区域
+            const projectSummary = document.getElementById('project-summary');
+            if (projectSummary) {
+                projectSummary.style.display = 'block';
+            }
+
+            console.log('✅ 项目信息已在步骤2显示');
+        }
+
+        // 获取分类的中文名称
+        function getCategoryName(category) {
+            const categoryNames = {
+                'dinosaur': '恐龙探索',
+                'space': '太空探索',
+                'ocean': '海洋探险',
+                'nature': '自然观察',
+                'science': '科学实验'
+            };
+            return categoryNames[category] || category || '未分类';
+        }
+
+        // 基于图片分析结果生成项目信息
+        function generateProjectFromAnalysis(analysisResult) {
+            const objectName = analysisResult.object_name || '未知对象';
+            const category = analysisResult.category || 'nature';
+            const description = analysisResult.description || '';
+
+            // 根据识别结果生成项目标题和描述
+            let title, projectDesc, tags;
+
+            if (category === 'dinosaur' || objectName.includes('龙') || objectName.includes('dinosaur')) {
+                title = `小葫芦的恐龙探索之旅 - ${objectName}`;
+                projectDesc = `跟随小葫芦一起探索古老的恐龙世界，特别是${objectName}。通过观察化石和学习知识，发现恐龙的奥秘，培养科学探索精神。`;
+                tags = ['恐龙', '古生物', objectName, '探索', '科学'];
+            } else if (category === 'space' || objectName.includes('星') || objectName.includes('太空')) {
+                title = `小葫芦的太空探索之旅 - ${objectName}`;
+                projectDesc = `跟随小葫芦一起探索浩瀚的太空世界，特别是${objectName}。通过观察天体和学习知识，激发对宇宙的兴趣和好奇心。`;
+                tags = ['太空', '宇宙', objectName, '探索', '天文'];
+            } else if (category === 'ocean' || objectName.includes('海') || objectName.includes('鱼')) {
+                title = `小葫芦的海洋探险之旅 - ${objectName}`;
+                projectDesc = `跟随小葫芦一起探索神奇的海洋世界，特别是${objectName}。通过观察海洋生物和学习知识，了解海洋生态系统的奥秘。`;
+                tags = ['海洋', '生物', objectName, '探险', '生态'];
+            } else if (category === 'nature' || objectName.includes('花') || objectName.includes('树') || objectName.includes('动物')) {
+                title = `小葫芦的自然观察之旅 - ${objectName}`;
+                projectDesc = `跟随小葫芦一起观察大自然的美妙，特别是${objectName}。通过细心观察和记录，培养对自然的热爱和科学观察能力。`;
+                tags = ['自然', '观察', objectName, '生态', '科学'];
+            } else {
+                title = `小葫芦的探索之旅 - ${objectName}`;
+                projectDesc = `跟随小葫芦一起探索有趣的${objectName}世界。通过观察、学习和思考，培养好奇心和探索精神。`;
+                tags = ['探索', objectName, '学习', '观察'];
+            }
+
+            return {
+                title: title,
+                description: projectDesc,
+                category: category,
+                tags: tags
+            };
         }
 
         // API调用函数
@@ -2475,6 +2984,8 @@
 
                 const result = await safeJsonParse(response);
 
+                console.log('🎤 语音识别API响应数据:', JSON.stringify(result, null, 2));
+
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
 
@@ -2572,24 +3083,34 @@
             try {
                 // 将文件转换为base64
                 const base64Data = await fileToBase64(selectedVideoFile);
+                const videoUrl = `data:${selectedVideoFile.type};base64,${base64Data}`;
 
-                // 视频分析可以独立进行，但如果有项目上下文，也会关联到项目中
+                // 验证API上下文
+                if (!validateApiContext('视频分析', true, false)) {
+                    return;
+                }
+
+                // 获取项目ID
                 const projectId = getCurrentProjectId();
+                if (!projectId) {
+                    showError('无法获取项目ID，请重新创建项目');
+                    return;
+                }
 
                 const data = {
-                    project_id: projectId || 1, // 默认值，避免API报错
+                    project_id: projectId,
                     user_id: currentUserId,
-                    video_data: base64Data,
-                    video_format: selectedVideoFile.name.split('.').pop().toLowerCase(),
-                    analysis_type: 'content', // 默认分析类型
-                    duration: 0 // 0表示分析整个视频
+                    video_data: base64Data, // API期望video_data字段
+                    video_format: selectedVideoFile.type || selectedVideoFile.name.split('.').pop().toLowerCase(),
+                    analysis_type: 'content',
+                    duration: null // 不指定duration，让API自行检测
                 };
 
                 console.log('📤 视频分析请求数据:', {
                     project_id: data.project_id,
                     video_format: data.video_format,
                     analysis_type: data.analysis_type,
-                    duration: data.duration
+                    has_video_url: !!data.video_url
                 });
 
                 // 模拟进度
@@ -2618,6 +3139,8 @@
                 }
 
                 const result = await safeJsonParse(response);
+
+                console.log('🎬 视频分析API响应数据:', JSON.stringify(result, null, 2));
 
                 progressFill.style.width = '100%';
                 setTimeout(() => progressBar.classList.remove('show'), 1000);
@@ -2842,8 +3365,8 @@
             localStorage.removeItem('explorapal_demo_context');
 
             // 重置表单
-            document.getElementById('project-title').value = '小明的恐龙探索之旅';
-            document.getElementById('project-desc').value = '跟随小明一起探索古老的恐龙世界，发现恐龙的奥秘，学习古生物知识。';
+            document.getElementById('project-title').value = '小葫芦的恐龙探索之旅';
+            document.getElementById('project-desc').value = '跟随小葫芦一起探索古老的恐龙世界，发现恐龙的奥秘，学习古生物知识。';
             document.getElementById('project-category').value = 'dinosaur';
             document.getElementById('project-tags').value = '恐龙,古生物,探索';
 
@@ -3099,7 +3622,7 @@ API响应格式: { project_id: number, project_code: string, status: string }
                 },
                 4: {
                     title: "三角龙探秘笔记",
-                    summary: "小明学习了三角龙的基本特征",
+                    summary: "小葫芦学习了三角龙的基本特征",
                     key_points: ["三角龙有三只角", "是草食性恐龙"],
                     formatted_text: "今天我学习了三角龙..."
                 },
@@ -3110,7 +3633,7 @@ API响应格式: { project_id: number, project_code: string, status: string }
                     audio_data: "test_audio_data"
                 },
                 6: {
-                    title: "小明的三角龙探索报告",
+                    title: "小葫芦的三角龙探索报告",
                     abstract: "通过观察化石图片学习恐龙知识",
                     content: "详细的研究报告内容...",
                     conclusion: "三角龙是白垩纪最有趣的恐龙之一"
@@ -3258,7 +3781,7 @@ API响应格式: { project_id: number, project_code: string, status: string }
             // 测试笔记润色响应
             const testPolishResponse = {
                 title: "三角龙探秘笔记",
-                summary: "小明学习了三角龙的基本特征和生活习性",
+                summary: "小葫芦学习了三角龙的基本特征和生活习性",
                 key_points: [
                     "三角龙有三只角和颈部骨板",
                     "是草食性恐龙",
@@ -3311,8 +3834,8 @@ API响应格式: { project_id: number, project_code: string, status: string }
 
             // 测试报告生成响应
             const testReportResponse = {
-                title: "小明的三角龙探索报告",
-                abstract: "通过观察化石图片和AI引导提问，小明深入了解了三角龙的生活习性",
+                title: "小葫芦的三角龙探索报告",
+                abstract: "通过观察化石图片和AI引导提问，小葫芦深入了解了三角龙的生活习性",
                 content: "详细的研究报告内容...",
                 conclusion: "三角龙是白垩纪最有趣的恐龙之一",
                 next_steps: "探索其他种类的恐龙，学习恐龙灭绝的原因"
@@ -3375,6 +3898,58 @@ API响应格式: { project_id: number, project_code: string, status: string }
             console.log('✅ 步骤7测试响应已显示');
         }
 
+        // 测试步骤5响应显示
+        function testStep5ResponseDisplay() {
+            console.log('🧪 测试步骤5响应显示功能');
+
+            // 测试语音转文字响应
+            const testSpeechResponse = {
+                text: "三角龙有三只角，脖子上有骨板，是草食性恐龙",
+                transcription: "三角龙有三只角，脖子上有骨板，是草食性恐龙。三角龙是白垩纪晚期的恐龙，以头部三只角和颈部骨板为特征。这种恐龙主要以植物为食，生活在大约6800万年前。",
+                confidence: 0.95,
+                language: "zh-CN",
+                duration: 3.2,
+                audio_data: "test_audio_data_base64"
+            };
+
+            console.log('📊 测试数据:', JSON.stringify(testSpeechResponse, null, 2));
+
+            const formatted = formatJsonResponse(testSpeechResponse, 5);
+            console.log('📄 步骤5格式化结果长度:', formatted.length);
+
+            const downloadButton = '<button class="btn btn-success" onclick="downloadAudio(\'test_audio_data\', \'wav\')">📥 下载音频</button>';
+            document.getElementById('result-content-5').innerHTML = formatted +
+                '<div class="step-controls">' + downloadButton + '<button class="btn btn-warning" onclick="document.getElementById(\'result-5\').classList.remove(\'show\')">隐藏测试结果</button></div>';
+            document.getElementById('result-5').classList.add('show');
+
+            console.log('✅ 步骤5测试响应已显示');
+
+            // 模拟自动显示数据选项（延迟1秒）
+            setTimeout(() => {
+                console.log('🎤 模拟步骤5数据选项显示');
+                showResponseDataOptions(5, testSpeechResponse, [
+                    {
+                        label: '补充到现有笔记',
+                        data: `语音记录：${testSpeechResponse.transcription}\n\n基于这段语音，我想进一步整理和润色这些想法。`,
+                        targetInput: 'raw-content',
+                        description: '将语音转写内容添加到笔记润色输入框'
+                    },
+                    {
+                        label: '作为新笔记内容',
+                        data: `语音记录：${testSpeechResponse.transcription}\n\n基于这段语音，我想进一步整理和润色这些想法。`,
+                        targetInput: 'raw-content',
+                        description: '直接使用语音转写内容作为新的笔记'
+                    },
+                    {
+                        label: '复制到剪贴板',
+                        data: testSpeechResponse.transcription,
+                        targetInput: null,
+                        description: '复制纯文本到剪贴板供手动使用'
+                    }
+                ]);
+            }, 1000);
+        }
+
         // 测试步骤8响应显示
         function testStep8ResponseDisplay() {
             console.log('🧪 测试步骤8响应显示功能');
@@ -3408,6 +3983,102 @@ API响应格式: { project_id: number, project_code: string, status: string }
             document.getElementById('result-8').classList.add('show');
 
             console.log('✅ 步骤8测试响应已显示');
+        }
+
+        // 测试步骤6响应显示（研究报告）
+        function testStep6ResponseDisplay() {
+            console.log('🧪 测试步骤6响应显示功能 - 研究报告');
+
+            // 测试研究报告响应
+            const testReportResponse = {
+                "title": "小小古生物学家：三角龙探索研究报告",
+                "摘要": "本报告记录了一位小朋友在'恐龙探索之旅'活动中对三角龙的学习成果。通过观察化石、阅读资料和提出问题，孩子了解了三角龙的生活时期、食性、身体特征及其防御机制。研究过程培养了孩子的科学观察能力与好奇心，为未来的科学探索打下基础。",
+                "引言": "恐龙是孩子们非常感兴趣的主题，尤其是像三角龙这样外形独特、易于辨认的恐龙。本次'恐龙探索之旅'旨在通过趣味活动引导孩子主动学习古生物学知识，激发他们对自然历史的兴趣，并鼓励他们像科学家一样思考和提问。",
+                "方法论": "在本次探索活动中，孩子通过以下方式开展学习：\n1. 参观恐龙主题展览或互动体验区；\n2. 观察三角龙化石模型和复原图；\n3. 阅读适合儿童的科普书籍和图文资料；\n4. 在家长或老师引导下提出关于三角龙的问题并尝试寻找答案；\n5. 用绘画或口头表达方式总结所学内容。",
+                "发现与结果": "孩子在探索过程中获得了以下关键知识：\n- 三角龙生活在距今约6800万至6600万年前的白垩纪晚期；\n- 它是一种草食性恐龙，主要以低矮植物为食；\n- 三角龙最显著的特征是面部有三只角（两只长在眼睛上方，一只在鼻子上）以及颈部后方的大骨板（称为颈盾）；\n- 这些结构不仅用于防御掠食者（如暴龙），也可能用于同类之间的交流或展示；\n- 化石是了解恐龙的重要线索，通过观察化石可以推测恐龙的体型、行为和生活环境。",
+                "讨论": "本次探索活动成功地将复杂的古生物学知识转化为适合儿童理解的内容。孩子不仅能记住三角龙的基本特征，还能主动思考'为什么三角龙要有角？''它们怎么吃东西？'等问题，体现了初步的科学思维能力。此外，通过动手观察和提问，孩子增强了信息获取能力和表达能力。这种以兴趣为导向的学习方式，有助于培养终身学习的习惯。",
+                "结论": "通过'恐龙探索之旅'，孩子不仅学到了关于三角龙的具体知识，更重要的是掌握了科学探究的基本方法——观察、提问、寻找答案。这是一次富有成效的跨学科学习体验，融合了自然科学、历史和批判性思维，为孩子未来的科学素养发展奠定了良好基础。",
+                "参考资料": [
+                    "《儿童恐龙百科全书》，国家地理少儿版",
+                    "史密森尼国家自然历史博物馆儿童恐龙展区资料",
+                    "BBC Earth Kids: Triceratops Facts for Children",
+                    "中国古动物馆儿童科普手册"
+                ],
+                "孩子独特见解": "我觉得三角龙的颈盾就像超级英雄的披风，不仅能保护自己，还能在朋友面前显得很酷！我还觉得，如果三角龙还活着，它们可能会喜欢吃我花园里的青菜。",
+                "下一步探索建议": [
+                    "尝试制作三角龙的黏土模型，进一步了解其身体结构；",
+                    "参观本地自然博物馆，亲自观察真实的恐龙化石；",
+                    "比较三角龙与其他角龙类恐龙（如开角龙）的异同；",
+                    "开展一个小型'化石挖掘'模拟实验，体验古生物学家的工作；",
+                    "阅读更多关于白垩纪生态系统的绘本，了解三角龙生活的世界。"
+                ]
+            };
+
+            console.log('📊 测试数据:', JSON.stringify(testReportResponse, null, 2));
+
+            const formatted = formatJsonResponse(testReportResponse, 6);
+            console.log('📄 步骤6格式化结果长度:', formatted.length);
+
+            document.getElementById('result-content-6').innerHTML = formatted +
+                '<div class="step-controls"><button class="btn btn-warning" onclick="document.getElementById(\'result-6\').classList.remove(\'show\')">隐藏测试结果</button></div>';
+            document.getElementById('result-6').classList.add('show');
+
+            console.log('✅ 步骤6测试响应已显示');
+        }
+
+        // 测试步骤7响应显示（视频分析）
+        function testStep7ResponseDisplay() {
+            console.log('🧪 测试步骤7响应显示功能 - 视频分析');
+
+            // 测试视频分析响应（与API实际返回格式匹配）
+            const testVideoAnalysisResponse = {
+                "video_analysis": {
+                    "scenes": [
+                        {
+                            "timestamp": "00:00-00:05",
+                            "scene_type": "自然场景",
+                            "description": "视频开头显示三角龙在森林中漫步",
+                            "key_objects": ["三角龙", "树木", "岩石"]
+                        }
+                    ],
+                    "objects": ["三角龙", "树木", "岩石", "天空"],
+                    "emotions": ["好奇", "平静"],
+                    "texts": [],
+                    "audio": ["背景音乐", "自然声"],
+                    "summary": {
+                        "title": "三角龙探索之旅",
+                        "description": "这段视频展示了三角龙在白垩纪时期的日常生活，包括觅食、休息和与环境的互动。",
+                        "keywords": ["三角龙", "白垩纪", "恐龙生活", "古生物"],
+                        "category": "教育",
+                        "duration": 45.5
+                    }
+                },
+                "achievement_id": 123
+            };
+
+            console.log('📊 测试数据:', JSON.stringify(testVideoAnalysisResponse, null, 2));
+
+            const formatted = formatJsonResponse(testVideoAnalysisResponse, 7);
+            console.log('📄 步骤7格式化结果长度:', formatted.length);
+
+            document.getElementById('result-content-7').innerHTML = formatted +
+                '<div class="step-controls"><button class="btn btn-warning" onclick="document.getElementById(\'result-7\').classList.remove(\'show\')">隐藏测试结果</button></div>';
+            document.getElementById('result-7').classList.add('show');
+
+            console.log('✅ 步骤7测试响应已显示');
+
+            // 模拟自动显示数据选项（延迟1秒）
+            setTimeout(() => {
+                console.log('🎬 模拟步骤7数据选项显示');
+                showResponseDataOptions(7, testVideoAnalysisResponse, [
+                    {
+                        label: '复制分析结果',
+                        data: `视频分析完成：\n- 标题：三角龙探索之旅\n- 描述：这段视频展示了三角龙在白垩纪时期的日常生活，包括觅食、休息和与环境的互动。\n- 类别：教育\n- 时长：45.5秒\n- 主要内容：三角龙、白垩纪、恐龙生活、古生物`,
+                        targetInput: null,
+                        description: '将视频分析结果复制到剪贴板'
+                    }
+                ]);
+            }, 1000);
         }
 
         // 测试项目创建响应格式
@@ -3487,12 +4158,13 @@ API响应格式: { project_id: number, project_code: string, status: string }
 
             // 根据步骤类型显示响应数据选项，供用户选择使用
             switch (stepNumber) {
-                case 1: // 项目创建成功
-                    // 显示项目创建结果，并提供预设的分析提示选项
+                case 1: // 智能分析成功
+                    // 显示智能分析结果，并提供预设的分析提示选项
+                    // 注意：第一步没有project-category元素，所以使用通用提示
                     showResponseDataOptions(stepNumber, responseData, [
                         {
                             label: '使用默认分析提示',
-                            data: `请分析这张${document.getElementById('project-category').value === 'dinosaur' ? '恐龙' : '探索'}相关的图片，识别主要对象，描述特征和习性。`,
+                            data: `请分析这张图片，识别主要对象，描述特征和习性。`,
                             targetInput: 'analysis-prompt',
                             description: '系统推荐的分析提示词'
                         }
@@ -3602,34 +4274,9 @@ ${keyPoints.map(point => `• ${point}`).join('\n')}
                     break;
 
                 case 5: // 语音转文字成功 - 显示转写内容选项
-                    if (responseData && responseData.transcription) {
-                        const transcription = responseData.transcription;
-
-                        showResponseDataOptions(stepNumber, responseData, [
-                            {
-                                label: '补充到现有笔记',
-                                data: (document.getElementById('raw-content').value.trim() ?
-                                    `${document.getElementById('raw-content').value.trim()}\n\n语音记录：${transcription}` :
-                                    `语音记录：${transcription}\n\n基于这段语音，我想进一步整理和润色这些想法。`),
-                                targetInput: 'raw-content',
-                                description: '将语音转写内容添加到笔记润色输入框'
-                            },
-                            {
-                                label: '作为新笔记内容',
-                                data: `语音记录：${transcription}\n\n基于这段语音，我想进一步整理和润色这些想法。`,
-                                targetInput: 'raw-content',
-                                description: '直接使用语音转写内容作为新的笔记'
-                            },
-                            {
-                                label: '复制到剪贴板',
-                                data: transcription,
-                                targetInput: null,
-                                description: '复制纯文本到剪贴板供手动使用'
-                            }
-                        ]);
-                    } else {
-                        showResponseDataOptions(stepNumber, responseData, []);
-                    }
+                    // 语音转文字不需要在handleApiResponse中额外处理数据选项
+                    // 因为响应内容已经在displayStepResponse中显示
+                    console.log('🎤 步骤5语音转文字响应处理完成');
                     break;
 
                 case 6: // 报告生成成功 - 显示视频脚本选项
@@ -3736,8 +4383,12 @@ ${conclusion}
                 // 生成按钮HTML
                 let buttonHtml = '<div class="step-controls"><button class="btn btn-primary" onclick="continueToNextStep(' + stepNumber + ')">继续下一步 →</button></div>';
 
+                // 特殊处理步骤1（自动跳转到步骤2）
+                if (stepNumber === 1) {
+                    buttonHtml = '<div class="step-controls"><div style="text-align: center; color: #4caf50; font-weight: 600;">✅ 分析完成，正在自动跳转到项目确认...</div></div>';
+                }
                 // 特殊处理步骤5和步骤8（有下载功能）
-                if (stepNumber === 5 && result && result.audio_data) {
+                else if (stepNumber === 5 && result && result.audio_data) {
                     const downloadButton = '<button class="btn btn-success" onclick="downloadAudio(\'' + result.audio_data + '\', \'' + (result.format || 'wav') + '\')">📥 下载音频</button>';
                     buttonHtml = '<div class="step-controls">' + downloadButton + '<button class="btn btn-primary" onclick="continueToNextStep(' + stepNumber + ')">继续下一步 →</button></div>';
                 } else if (stepNumber === 8) {
@@ -3776,6 +4427,46 @@ ${conclusion}
                 resultElement.classList.add('show');
 
                 console.log(`✅ 步骤${stepNumber}响应显示成功`);
+
+                // 步骤1特殊处理：显示项目信息到步骤2
+                if (stepNumber === 1 && result && result.generatedProjectInfo) {
+                    console.log('🏗️ 步骤1特殊处理：准备显示项目信息到步骤2');
+                    setTimeout(() => {
+                        displayProjectInfoInStep2(result);
+                    }, 1000); // 延迟1秒，确保步骤切换完成
+                }
+
+                // 步骤5特殊处理：自动显示语音转文字的数据选项
+                if (stepNumber === 5 && result && (result.transcription || result.text)) {
+                    console.log('🎤 步骤5特殊处理：显示语音转文字数据选项');
+                    const transcription = result.transcription || result.text;
+
+                    setTimeout(() => {
+                        showResponseDataOptions(stepNumber, result, [
+                            {
+                                label: '补充到现有笔记',
+                                data: (document.getElementById('raw-content').value.trim() ?
+                                    `${document.getElementById('raw-content').value.trim()}\n\n语音记录：${transcription}` :
+                                    `语音记录：${transcription}\n\n基于这段语音，我想进一步整理和润色这些想法。`),
+                                targetInput: 'raw-content',
+                                description: '将语音转写内容添加到笔记润色输入框'
+                            },
+                            {
+                                label: '作为新笔记内容',
+                                data: `语音记录：${transcription}\n\n基于这段语音，我想进一步整理和润色这些想法。`,
+                                targetInput: 'raw-content',
+                                description: '直接使用语音转写内容作为新的笔记'
+                            },
+                            {
+                                label: '复制到剪贴板',
+                                data: transcription,
+                                targetInput: null,
+                                description: '复制纯文本到剪贴板供手动使用'
+                            }
+                        ]);
+                    }, 500); // 延迟500ms，确保响应内容先显示
+                }
+
                 return true;
 
             } catch (error) {
@@ -3893,9 +4584,9 @@ ${conclusion}
 
             // 针对不同步骤的特殊处理
             if (stepNumber === 1) {
-                // 项目创建响应 - go-zero直接返回响应对象
-                console.log('✅ 使用项目创建响应格式化');
-                return formatProjectResponse(data);
+                // 第一步：智能分析响应 - 包含项目创建和图片分析结果
+                console.log('✅ 使用智能分析响应格式化');
+                return formatSmartAnalysisResponse(data);
             } else if (stepNumber === 2) {
                 // 图片分析响应
                 console.log('✅ 使用图片分析响应格式化');
@@ -3929,6 +4620,59 @@ ${conclusion}
             // 默认的JSON格式化
             console.log('⚠️ 使用默认JSON格式化');
             return formatJsonValue(data, 0, false);
+        }
+
+        // 格式化智能分析响应（第一步）
+        function formatSmartAnalysisResponse(data) {
+            const project = data.project;
+            const analysis = data.analysis;
+            const projectInfo = data.generatedProjectInfo;
+
+            return `
+                <div class="api-response-card">
+                    <h4>🤖 智能分析结果</h4>
+                    <div class="response-details">
+                        <div class="detail-item">
+                            <span class="label">识别对象:</span>
+                            <span class="value object-name">${analysis.object_name || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">识别类别:</span>
+                            <span class="value">${analysis.category || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">自动生成项目:</span>
+                            <span class="value status-active">${projectInfo.title}</span>
+                        </div>
+                        ${analysis.description ? `
+                            <div class="description-section">
+                                <h5>📝 分析描述</h5>
+                                <div class="markdown-content">${renderMarkdown(analysis.description)}</div>
+                            </div>
+                        ` : ''}
+                        <div class="summary-section">
+                            <h5>📋 项目信息</h5>
+                            <p><strong>项目ID:</strong> ${project.project_id || 'N/A'}</p>
+                            <p><strong>项目标题:</strong> ${projectInfo.title}</p>
+                            <p><strong>项目描述:</strong> ${projectInfo.description}</p>
+                            <p><strong>项目标签:</strong> ${projectInfo.tags.join('、')}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="raw-json">
+                    <details>
+                        <summary>查看完整响应数据</summary>
+                        <div class="json-data">
+                            <strong>项目创建结果:</strong><br>
+                            ${formatJsonValue(project, 0, false)}<br><br>
+                            <strong>图片分析结果:</strong><br>
+                            ${formatJsonValue(analysis, 0, false)}<br><br>
+                            <strong>生成的项目信息:</strong><br>
+                            ${formatJsonValue(projectInfo, 0, false)}
+                        </div>
+                    </details>
+                </div>
+            `;
         }
 
         // 格式化项目创建响应
@@ -4135,10 +4879,10 @@ ${conclusion}
                 <div class="api-response-card">
                     <h4>🎤 语音转文字结果</h4>
                     <div class="response-details">
-                        ${data.transcription ? `
+                        ${(data.transcription || data.text) ? `
                             <div class="transcription-section">
                                 <h5>📝 识别文本</h5>
-                                <div class="transcription-text">${data.transcription}</div>
+                                <div class="transcription-text">${data.transcription || data.text}</div>
                             </div>
                         ` : ''}
                         <div class="detail-item">
@@ -4162,24 +4906,85 @@ ${conclusion}
 
         // 格式化报告生成响应
         function formatReportResponse(data) {
+            // 将结构化报告数据转换为Markdown格式
+            let markdownContent = '';
+
+            // 标题
+            if (data.title) {
+                markdownContent += `# ${data.title}\n\n`;
+            }
+
+            // 摘要
+            if (data.摘要) {
+                markdownContent += `## 📋 摘要\n\n${data.摘要}\n\n`;
+            }
+
+            // 引言
+            if (data.引言) {
+                markdownContent += `## 🎯 引言\n\n${data.引言}\n\n`;
+            }
+
+            // 方法论
+            if (data.方法论) {
+                markdownContent += `## 🔬 方法论\n\n${data.方法论}\n\n`;
+            }
+
+            // 发现与结果
+            if (data.发现与结果) {
+                markdownContent += `## 🔍 发现与结果\n\n${data.发现与结果}\n\n`;
+            }
+
+            // 讨论
+            if (data.讨论) {
+                markdownContent += `## 💭 讨论\n\n${data.讨论}\n\n`;
+            }
+
+            // 结论
+            if (data.结论) {
+                markdownContent += `## 🎯 结论\n\n${data.结论}\n\n`;
+            }
+
+            // 参考资料
+            if (data.参考资料 && Array.isArray(data.参考资料)) {
+                markdownContent += `## 📚 参考资料\n\n`;
+                data.参考资料.forEach((ref, index) => {
+                    markdownContent += `${index + 1}. ${ref}\n`;
+                });
+                markdownContent += '\n';
+            }
+
+            // 孩子独特见解
+            if (data.孩子独特见解) {
+                markdownContent += `## 🌟 孩子独特见解\n\n${data.孩子独特见解}\n\n`;
+            }
+
+            // 下一步探索建议
+            if (data.下一步探索建议 && Array.isArray(data.下一步探索建议)) {
+                markdownContent += `## 🚀 下一步探索建议\n\n`;
+                data.下一步探索建议.forEach((suggestion, index) => {
+                    markdownContent += `${index + 1}. ${suggestion}\n`;
+                });
+                markdownContent += '\n';
+            }
+
+            // 如果没有结构化数据，尝试直接使用content字段
+            if (!markdownContent && data.content) {
+                markdownContent = data.content;
+            }
+
             return `
                 <div class="api-response-card">
                     <h4>📋 研究报告</h4>
                     <div class="response-details">
-                        <div class="detail-item">
-                            <span class="label">报告标题:</span>
-                            <span class="value">${data.title || 'N/A'}</span>
-                        </div>
-                        ${data.description ? `
-                            <div class="description-section">
-                                <h5>📝 报告描述</h5>
-                                <p>${data.description}</p>
+                        ${data.title ? `
+                            <div class="report-header">
+                                <h3>📖 ${data.title}</h3>
                             </div>
                         ` : ''}
-                        ${data.content ? `
-                            <div class="content-section">
+                        ${markdownContent ? `
+                            <div class="report-content-section">
                                 <h5>📄 报告内容</h5>
-                                <div class="report-content">${data.content.replace(/\n/g, '<br>')}</div>
+                                <div class="markdown-content">${renderMarkdown(markdownContent)}</div>
                             </div>
                         ` : ''}
                     </div>
