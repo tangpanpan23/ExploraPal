@@ -2691,7 +2691,7 @@
                     user_id: currentUserId,
                     image_url: imageUrl,
                     prompt: prompt,
-                    category: document.getElementById('project-category').value
+                    category: getProjectCategory()
                 };
 
                 console.log('📤 图片分析请求数据:', data);
@@ -2805,7 +2805,7 @@
                 user_id: currentUserId,
                 observation_id: observationId,
                 context_info: contextInfo,
-                category: document.getElementById('project-category').value,
+                category: getProjectCategory(),
                 user_age: userAge
             };
 
@@ -2872,7 +2872,7 @@
                 raw_content: rawContent,
                 content_type: 'text',
                 context_info: contextInfo, // 不需要JSON.stringify，后端会处理
-                category: document.getElementById('project-category').value,
+                category: getProjectCategory(),
                 user_age: parseInt(document.getElementById('user-age').value)
             };
 
@@ -3022,7 +3022,7 @@
                 project_id: projectId,
                 user_id: currentUserId,
                 project_data: context, // 按照API文档，使用project_data字段
-                category: document.getElementById('project-category').value
+                category: getProjectCategory()
             };
 
             console.log('📤 报告生成请求数据:', data);
@@ -3400,6 +3400,23 @@
                 return null;
             }
             return currentProjectId;
+        }
+
+        // 获取项目分类（安全版本，支持多种来源）
+        function getProjectCategory() {
+            // 优先从DOM元素获取
+            const projectCategoryElement = document.getElementById('project-category');
+            if (projectCategoryElement && projectCategoryElement.value) {
+                return projectCategoryElement.value;
+            }
+
+            // 从项目数据中获取
+            if (projectData && projectData.category) {
+                return projectData.category;
+            }
+
+            // 默认值
+            return 'nature';
         }
 
         // 设置项目ID（带验证）
