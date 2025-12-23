@@ -214,7 +214,27 @@ chmod +x start_demo.sh stop_demo.sh
 
 #### 🎬 视频演示生成
 
-项目提供了专门的脚本用于生成AI视频演示，支持基于用户图片和描述的异步视频生成：
+项目提供了专门的脚本用于生成AI视频演示，支持基于用户图片和描述的异步视频生成。
+
+**配置说明：**
+1. **复制配置文件**：
+   ```bash
+   cp video_generation_config.yaml.example video_generation_config.yaml
+   ```
+
+2. **编辑配置文件**：
+   ```yaml
+   AstraAI:
+     AppID: "your_real_app_id"      # 从星图AI平台获取
+     AppKey: "your_real_app_key"    # 从星图AI平台获取
+   ```
+
+3. **测试配置**：
+   ```bash
+   ./test_config.sh  # 验证配置是否正确
+   ```
+
+4. **脚本会自动从配置文件读取API配置，无需在代码中硬编码**
 
 ```bash
 # 生成演示视频（异步）

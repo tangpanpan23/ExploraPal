@@ -204,9 +204,18 @@ echo "=================="
 # 执行异步API调用
 echo "🚀 提交异步视频生成任务..."
 
-# 使用豆包异步API端点 (测试环境)
-ASYNC_API_URL="http://apx-api-gray.tal.com/v1/async/chat"
-API_KEY="2000080004:xxxxx"  # 请替换为真实的API密钥 (格式: appId:appKey)
+# 从配置文件读取API配置
+echo "📖 读取配置文件..."
+ASYNC_API_URL="$(./read_config.sh base_url)/v1/async/chat"
+API_KEY="$(./read_config.sh api_key)"
+
+if [ -z "$API_KEY" ] || [[ "$API_KEY" == *":" ]]; then
+    echo "❌ 无法从配置文件读取API密钥"
+    echo "请检查 video_generation_config.yaml 文件"
+    exit 1
+fi
+
+echo "✅ 配置加载成功"
 
 # 先执行curl获取响应头信息
 CURL_HEADERS=$(curl -I -s "$ASYNC_API_URL" 2>/dev/null | head -1)

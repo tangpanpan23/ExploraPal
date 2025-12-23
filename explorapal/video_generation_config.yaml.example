@@ -1,0 +1,43 @@
+# 视频生成配置示例 - 星图AI平台
+# 复制此文件为 video_generation_config.yaml 并填入真实的配置信息
+
+# 星图AI平台配置
+AstraAI:
+  # 应用ID (从星图AI平台申请获得)
+  AppID: "your_app_id_here"
+
+  # 应用密钥 (从星图AI平台申请获得)
+  AppKey: "your_app_key_here"
+
+  # 服务环境
+  # 生产环境: http://apx-api.tal.com
+  # 测试环境: http://apx-api-gray.tal.com
+  Environment: "production"
+
+  # API端点配置 (根据环境自动设置)
+  BaseURL: "http://apx-api.tal.com"
+
+# 视频生成参数配置
+VideoGeneration:
+  # 默认视频时长(秒)
+  DefaultDuration: 60
+
+  # 默认视频风格
+  DefaultStyle: "educational"
+
+  # 模型配置
+  Model: "doubao-seedance-1.0-lite-t2v"
+
+  # 图片质量设置 (1-100)
+  ImageQuality: 80
+
+  # 最大图片尺寸 (用于压缩，单位：像素)
+  MaxImageSize: 1024
+
+# 调试配置
+Debug:
+  # 是否启用详细日志
+  Verbose: true
+
+  # 是否启用模拟模式 (当API密钥为占位符时自动启用)
+  EnableMockMode: true

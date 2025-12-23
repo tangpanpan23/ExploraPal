@@ -20,8 +20,20 @@ if [ $# -eq 0 ]; then
 fi
 
 TASK_ID="$1"
-ASYNC_API_URL="http://apx-api.tal.com/v1/async/results/$TASK_ID"
-API_KEY="300000712:9ffb0776d5409f4131f0a314fd5cb80e"  # 请替换为真实的API密钥 (格式: appId:appKey)
+
+# 从配置文件读取API配置
+echo "📖 读取配置文件..."
+BASE_URL="$(./read_config.sh base_url)"
+API_KEY="$(./read_config.sh api_key)"
+
+if [ -z "$API_KEY" ] || [[ "$API_KEY" == *":" ]]; then
+    echo "❌ 无法从配置文件读取API密钥"
+    echo "请检查 video_generation_config.yaml 文件"
+    exit 1
+fi
+
+ASYNC_API_URL="${BASE_URL}/v1/async/results/$TASK_ID"
+echo "✅ 配置加载成功"
 
 echo "📋 任务ID: $TASK_ID"
 echo "🔗 查询URL: $ASYNC_API_URL"
