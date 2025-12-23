@@ -27,29 +27,44 @@ func NewGenerateVideoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Gen
 }
 
 func (l *GenerateVideoLogic) GenerateVideo(req *types.GenerateVideoReq) (resp *types.GenerateVideoResp, err error) {
-	// TODO: 实现视频生成逻辑
+	l.Logger.Infof("开始生成视频 - 项目ID: %d, 用户ID: %d", req.ProjectId, req.UserId)
 
 	// 1. 创建视频处理RPC客户端
 	videoRpcClient, err := zrpc.NewClient(zrpc.RpcClientConf{
 		Endpoints: []string{"127.0.0.1:9005"}, // 视频处理RPC服务地址
-		Timeout:   120000,                     // 120秒超时
+		Timeout:   300000,                     // 300秒超时 (5分钟)
 	})
 	if err != nil {
 		l.Logger.Errorf("创建视频处理RPC客户端失败: %v", err)
 		return l.getDefaultGenerateVideoResponse(req), nil
 	}
 
-	// 2. 调用视频处理RPC服务
-	videoProcessingClient := videoprocessing.NewVideoProcessingServiceClient(videoRpcClient.Conn())
+	// 2. 构建RPC请求
 	rpcReq := &videoprocessing.GenerateVideoReq{
-		Script:  req.Script,
-		Style:   req.Style,
+		Style:    req.Style,
 		Duration: req.Duration,
-		Scenes:  req.Scenes,
-		Voice:   req.Voice,
+		Scenes:   req.Scenes,
+		Voice:    req.Voice,
 		Language: req.Language,
 	}
 
+	// 根据输入模式设置不同的参数
+	if req.ImageData != "" && req.Prompt != "" {
+		// 图像到视频模式 - 使用豆包Doubao-Seedance-1.0-lite-i2v
+		l.Logger.Infof("使用图像到视频模式 - 豆包Doubao-Seedance-1.0-lite-i2v")
+		rpcReq.ImageData = req.ImageData
+		rpcReq.Prompt = req.Prompt
+		rpcReq.Script = "" // 图像模式下不需要脚本
+	} else {
+		// 文本到视频模式 - 使用原有逻辑
+		l.Logger.Infof("使用文本到视频模式")
+		rpcReq.Script = req.Script
+		rpcReq.ImageData = ""
+		rpcReq.Prompt = ""
+	}
+
+	// 3. 调用视频处理RPC服务
+	videoProcessingClient := videoprocessing.NewVideoProcessingServiceClient(videoRpcClient.Conn())
 	rpcResp, err := videoProcessingClient.GenerateVideo(l.ctx, rpcReq)
 	if err != nil {
 		l.Logger.Errorf("调用视频处理RPC服务失败: %v", err)
@@ -57,9 +72,12 @@ func (l *GenerateVideoLogic) GenerateVideo(req *types.GenerateVideoReq) (resp *t
 		return l.getDefaultGenerateVideoResponse(req), nil
 	}
 
-	// 2. 转换响应格式
+	// 4. 转换响应格式
 	videoDataBase64 := base64.StdEncoding.EncodeToString(rpcResp.VideoData)
 	metadata := l.convertVideoMetadata(rpcResp.Metadata)
+
+	l.Logger.Infof("视频生成成功 - 格式: %s, 大小: %d bytes, 时长: %.2f秒",
+		rpcResp.Format, len(rpcResp.VideoData), rpcResp.Duration)
 
 	return &types.GenerateVideoResp{
 		VideoData:     videoDataBase64,

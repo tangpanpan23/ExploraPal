@@ -88,12 +88,14 @@ message VideoSummary {
 
 // 视频生成请求
 message GenerateVideoReq {
-  string script = 1;         // 视频脚本
-  string style = 2;          // 风格: "educational", "story", "animation"
-  double duration = 3;       // 期望时长(秒)
-  repeated string scenes = 4;     // 场景描述
-  string voice = 5;          // 语音类型
-  string language = 6;       // 语言
+  string script = 1;         // 视频脚本 (文本到视频模式)
+  string image_data = 2;     // base64编码的图片数据 (图像到视频模式)
+  string prompt = 3;         // 文字描述 (图像到视频模式)
+  string style = 4;          // 风格: "educational", "story", "animation"
+  double duration = 5;       // 期望时长(秒)
+  repeated string scenes = 6;     // 场景描述
+  string voice = 7;          // 语音类型
+  string language = 8;       // 语言
 }
 
 // 视频生成响应

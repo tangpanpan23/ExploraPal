@@ -237,12 +237,14 @@ curl -X POST "http://localhost:9003/api/expression/note/polish" \
 #### 步骤4.1: AI视频生成
 
 ```bash
+# 使用豆包Doubao-Seedance-1.0-lite-i2v模型进行图像到视频生成
 curl -X POST "http://localhost:9003/api/achievement/video/generate" \
   -H "Content-Type: application/json" \
   -d '{
     "project_id": 1,
     "user_id": 1,
-    "script": "欢迎来到恐龙世界！今天我们来学习三角龙。三角龙是一种古老的爬行动物，有三只角和坚硬的骨板...",
+    "image_data": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQ...",
+    "prompt": "小葫芦观察到了一只三角龙化石，上面有三只角和坚硬的骨板，看起来非常威武。这是白垩纪时期的古老生物。",
     "style": "educational",
     "duration": 60,
     "scenes": [

@@ -102,13 +102,26 @@ cd explorapal
 # http://localhost:8080/demo.html
 ```
 
-### 🎬 AI演示视频生成
+### 🎬 AI演示视频生成 (豆包Doubao-Seedance-1.0-lite-i2v)
 基于完整的演示流程，自动生成专业的MP4演示视频：
 
 ```bash
 # 生成完整演示视频（3分钟，涵盖8个步骤）
 cd explorapal
-./生成演示视频.sh
+./生成演示视频.sh <图片文件路径> <润色后的描述文本>
+```
+
+**视频生成技术**:
+- **AI模型**: 豆包Doubao-Seedance-1.0-lite-i2v (图像到视频生成)
+- **输入图片**: 用户原始上传的照片 (base64编码)
+- **文字描述**: 用户总结内容经过AI润色后的描述
+- **输出格式**: 高质量MP4视频文件
+- **API端点**: `/api/achievement/video/generate`
+
+**使用示例**:
+```bash
+# 示例：基于恐龙图片生成学习视频
+./生成演示视频.sh /path/to/dinosaur.jpg "小葫芦观察到了一只三角龙化石，上面有三只角和骨板，看起来非常威武。"
 ```
 
 ### 📚 详细演示指南

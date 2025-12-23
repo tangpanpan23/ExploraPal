@@ -51,8 +51,8 @@ const (
 	ModelVoiceInteraction = "qwen3-omni-flash" // 多模态语音处理
 
 	// 视频处理模型
-	ModelVideoAnalysis   = "qwen3-vl-plus"    // 视频内容分析
-	ModelVideoGeneration = "qwen3-vl-plus"    // 视频内容生成
+	ModelVideoAnalysis   = "qwen3-vl-plus"                   // 视频内容分析
+	ModelVideoGeneration = "Doubao-Seedance-1.0-lite-i2v"    // 图像到视频生成
 
 	// 备用模型
 	ModelImageAnalysisBackup     = "qwen3-vl-235b-a22b-instruct" // 备用的视觉模型
@@ -788,8 +788,9 @@ func (c *Client) generateMockVideoAnalysis() *VideoAnalysis {
 	}
 }
 
-// GenerateVideo AI视频生成
+// GenerateVideo AI视频生成 (使用豆包Doubao-Seedance-1.0-lite-i2v模型)
 func (c *Client) GenerateVideo(ctx context.Context, script, style string, duration float64, scenes []string, voice, language string) ([]byte, string, float64, *VideoMetadata, error) {
+	fmt.Printf("[AI_DEBUG] GenerateVideo使用豆包Doubao-Seedance-1.0-lite-i2v模型\n")
 	fmt.Printf("[AI_DEBUG] GenerateVideo请求参数:\n")
 	fmt.Printf("  Script长度: %d\n", len(script))
 	fmt.Printf("  Style: %s\n", style)
@@ -798,9 +799,53 @@ func (c *Client) GenerateVideo(ctx context.Context, script, style string, durati
 	fmt.Printf("  Voice: %s\n", voice)
 	fmt.Printf("  Language: %s\n", language)
 
+	// 构建豆包视频生成API请求
+	// Doubao-Seedance-1.0-lite-i2v是图像到视频模型，需要将脚本转换为图像生成提示
+	imagePrompt := c.buildVideoPrompt(script, style, duration, scenes, voice, language)
+
+	fmt.Printf("[AI_DEBUG] GenerateVideo构建的图像提示: %s\n", imagePrompt[:min(200, len(imagePrompt))])
+
+	// 调用豆包视频生成API
+	videoData, format, actualDuration, metadata, err := c.callDoubaoVideoGeneration(ctx, imagePrompt)
+	if err != nil {
+		fmt.Printf("[AI_DEBUG] GenerateVideo豆包API调用失败，转为模拟生成: %v\n", err)
+		// 失败时返回模拟视频
+		return c.generateMockVideo(script, style, duration, scenes, voice, language)
+	}
+
+	fmt.Printf("[AI_DEBUG] GenerateVideo豆包API调用成功，视频大小: %d bytes\n", len(videoData))
+	return videoData, format, actualDuration, metadata, nil
+}
+
+// GenerateVideoWithImage AI视频生成 (使用豆包Doubao-Seedance-1.0-lite-i2v模型 + 图片输入)
+func (c *Client) GenerateVideoWithImage(ctx context.Context, imageData, prompt, style string, duration float64, scenes []string, voice, language string) ([]byte, string, float64, *VideoMetadata, error) {
+	fmt.Printf("[AI_DEBUG] GenerateVideoWithImage使用豆包Doubao-Seedance-1.0-lite-i2v模型\n")
+	fmt.Printf("[AI_DEBUG] GenerateVideoWithImage请求参数:\n")
+	fmt.Printf("  ImageData长度: %d\n", len(imageData))
+	fmt.Printf("  Prompt长度: %d\n", len(prompt))
+	fmt.Printf("  Style: %s\n", style)
+	fmt.Printf("  Duration: %.2f\n", duration)
+	fmt.Printf("  Scenes数量: %d\n", len(scenes))
+	fmt.Printf("  Voice: %s\n", voice)
+	fmt.Printf("  Language: %s\n", language)
+
+	// 调用豆包图像到视频生成API
+	videoData, format, actualDuration, metadata, err := c.callDoubaoImageToVideo(ctx, imageData, prompt, style, duration, scenes, voice, language)
+	if err != nil {
+		fmt.Printf("[AI_DEBUG] GenerateVideoWithImage豆包API调用失败，转为模拟生成: %v\n", err)
+		// 失败时返回模拟视频
+		return c.generateMockVideo(prompt, style, duration, scenes, voice, language)
+	}
+
+	fmt.Printf("[AI_DEBUG] GenerateVideoWithImage豆包API调用成功，视频大小: %d bytes\n", len(videoData))
+	return videoData, format, actualDuration, metadata, nil
+}
+
+// buildVideoPrompt 构建豆包视频生成提示词
+func (c *Client) buildVideoPrompt(script, style string, duration float64, scenes []string, voice, language string) string {
 	scenesStr := strings.Join(scenes, ", ")
 
-	prompt := fmt.Sprintf(`请基于以下要求生成视频内容：
+	prompt := fmt.Sprintf(`根据以下视频脚本和要求，生成一个生动的图像描述，用于创建视频：
 
 视频脚本：%s
 风格类型：%s
@@ -809,142 +854,233 @@ func (c *Client) GenerateVideo(ctx context.Context, script, style string, durati
 语音类型：%s
 语言：%s
 
-请生成完整的视频内容，包括：
-1. 视频数据（base64编码）
-2. 视频格式
-3. 实际时长
-4. 元数据信息（标题、描述、场景等）
+请生成详细的图像描述，包括：
+- 主要场景和背景
+- 人物动作和表情
+- 色彩和光线效果
+- 构图和视角
+- 动态元素和运动感
 
-请严格按照以下JSON格式返回结果，不要包含任何其他文字：
+图像描述应该生动、具体，便于AI生成高质量的视频内容。`, script, style, duration, scenesStr, voice, language)
 
-{
-  "video_data": "",
-  "format": "mp4",
-  "duration": 60.0,
-  "metadata": {
-    "title": "视频标题",
-    "description": "视频描述",
-    "scenes": ["场景1", "场景2"],
-    "audio_language": "zh-CN",
-    "resolution": "1920x1080"
-  }
+	return prompt
 }
 
-注意：video_data字段请留空（因为当前AI模型不支持直接生成视频文件），系统会基于返回的元数据自动生成模拟视频。`, script, style, duration, scenesStr, voice, language)
-
-	fmt.Printf("[AI_DEBUG] GenerateVideo使用模型: %s\n", ModelVideoGeneration)
-
-	req := openai.ChatCompletionRequest{
-		Model: ModelVideoGeneration,
-		Messages: []openai.ChatCompletionMessage{
-			{
-				Role:    openai.ChatMessageRoleUser,
-				Content: prompt,
-			},
-		},
-		MaxTokens:   c.config.MaxTokens,
-		Temperature: c.config.Temperature,
+// callDoubaoVideoGeneration 调用豆包Doubao-Seedance-1.0-lite-i2v API (文本到视频)
+func (c *Client) callDoubaoVideoGeneration(ctx context.Context, prompt string) ([]byte, string, float64, *VideoMetadata, error) {
+	// 构建API请求体
+	reqBody := map[string]interface{}{
+		"model":          ModelVideoGeneration,
+		"prompt":         prompt,
+		"quality":        "standard",
+		"response_format": "url",
+		"prompt_extend":   true,
 	}
 
-	resp, err := c.client.CreateChatCompletion(ctx, req)
+	// 序列化请求体
+	reqData, err := json.Marshal(reqBody)
 	if err != nil {
-		fmt.Printf("[AI_DEBUG] GenerateVideo AI服务调用失败: %v\n", err)
-		return c.getDefaultVideoData(script, duration)
+		return nil, "", 0, nil, fmt.Errorf("序列化请求失败: %v", err)
 	}
 
-	if len(resp.Choices) == 0 {
-		fmt.Printf("[AI_DEBUG] GenerateVideo AI响应Choices为空\n")
-		return c.getDefaultVideoData(script, duration)
-	}
-
-	content := resp.Choices[0].Message.Content
-	fmt.Printf("[AI_DEBUG] GenerateVideo AI原始响应:\n%s\n", content)
-
-	// 处理markdown格式的响应
-	jsonContent := content
-	if strings.HasPrefix(strings.TrimSpace(content), "```json") {
-		fmt.Printf("[AI_DEBUG] GenerateVideo检测到markdown格式\n")
-		startIndex := strings.Index(content, "```json")
-		if startIndex != -1 {
-			startIndex += 7
-			endIndex := strings.Index(content[startIndex:], "```")
-			if endIndex != -1 {
-				jsonContent = strings.TrimSpace(content[startIndex : startIndex+endIndex])
-				fmt.Printf("[AI_DEBUG] GenerateVideo提取的JSON:\n%s\n", jsonContent)
-			}
-		}
-	}
-
-	// 解析JSON响应
-	var result struct {
-		VideoData string        `json:"video_data"`
-		Format    string        `json:"format"`
-		Duration  float64       `json:"duration"`
-		Metadata  VideoMetadata `json:"metadata"`
-	}
-
-	if err := json.Unmarshal([]byte(jsonContent), &result); err != nil {
-		fmt.Printf("[AI_DEBUG] GenerateVideo JSON解析失败: %v\n", err)
-		contentPreviewLen := 200
-		if len(jsonContent) < 200 {
-			contentPreviewLen = len(jsonContent)
-		}
-		fmt.Printf("[AI_DEBUG] GenerateVideo响应内容前%d字符: %s\n", contentPreviewLen, jsonContent[:contentPreviewLen])
-		fmt.Printf("[AI_DEBUG] GenerateVideo返回默认视频数据\n")
-		return c.getDefaultVideoData(script, duration)
-	}
-
-	if result.VideoData == "" {
-		fmt.Printf("[AI_DEBUG] GenerateVideo AI返回的视频数据为空，生成模拟视频数据\n")
-		fmt.Printf("[AI_DEBUG] GenerateVideo 注意：当前AI模型不支持直接生成视频文件，这是正常的限制\n")
-		// 当AI无法生成视频时，创建基于文本的模拟视频数据
-		mockVideoData, mockFormat, mockDuration, mockMetadata := c.generateMockVideoFromText(script, result.Metadata)
-		return mockVideoData, mockFormat, mockDuration, mockMetadata, nil
-	}
-
-	fmt.Printf("[AI_DEBUG] GenerateVideo解析到视频数据，长度: %d，格式: %s\n", len(result.VideoData), result.Format)
-
-	// 解码base64视频数据
-	fmt.Printf("[AI_DEBUG] GenerateVideo开始解码base64数据，长度: %d\n", len(result.VideoData))
-	if len(result.VideoData) > 0 {
-		fmt.Printf("[AI_DEBUG] GenerateVideo base64数据前50字符: %s\n", result.VideoData[:min(50, len(result.VideoData))])
-	}
-
-	// 清理base64数据，移除可能的空白字符和引号
-	cleanVideoData := strings.TrimSpace(result.VideoData)
-	cleanVideoData = strings.Trim(cleanVideoData, "\"`") // 移除可能的引号和反引号
-
-	videoBytes, err := base64.StdEncoding.DecodeString(cleanVideoData)
+	// 构建HTTP请求
+	apiURL := fmt.Sprintf("%s/images/generations", c.config.BaseURL)
+	req, err := http.NewRequestWithContext(ctx, "POST", apiURL, strings.NewReader(string(reqData)))
 	if err != nil {
-		fmt.Printf("[AI_DEBUG] GenerateVideo base64解码失败: %v\n", err)
-		fmt.Printf("[AI_DEBUG] GenerateVideo清理后的数据长度: %d\n", len(cleanVideoData))
-		if len(cleanVideoData) > 0 {
-			fmt.Printf("[AI_DEBUG] GenerateVideo清理后的数据前50字符: %s\n", cleanVideoData[:min(50, len(cleanVideoData))])
-		}
-
-		// 尝试URL安全的base64解码
-		fmt.Printf("[AI_DEBUG] GenerateVideo尝试URL安全base64解码\n")
-		videoBytes, err = base64.URLEncoding.DecodeString(cleanVideoData)
-		if err != nil {
-			fmt.Printf("[AI_DEBUG] GenerateVideo URL安全base64解码也失败: %v\n", err)
-			fmt.Printf("[AI_DEBUG] GenerateVideo返回默认视频数据\n")
-			return c.getDefaultVideoData(script, duration)
-		}
-		fmt.Printf("[AI_DEBUG] GenerateVideo URL安全base64解码成功\n")
+		return nil, "", 0, nil, fmt.Errorf("创建请求失败: %v", err)
 	}
 
-	format := result.Format
-	if format == "" {
-		format = "mp4"
+	// 设置请求头
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s:%s", c.config.TAL_MLOPS_APP_ID, c.config.TAL_MLOPS_APP_KEY))
+
+	// 发送请求
+	client := &http.Client{Timeout: time.Duration(c.config.Timeout) * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, "", 0, nil, fmt.Errorf("API请求失败: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// 读取响应
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, "", 0, nil, fmt.Errorf("读取响应失败: %v", err)
 	}
 
-	actualDuration := result.Duration
-	if actualDuration <= 0 {
-		actualDuration = duration
+	if resp.StatusCode != http.StatusOK {
+		return nil, "", 0, nil, fmt.Errorf("API返回错误状态码: %d, 响应: %s", resp.StatusCode, string(respBody))
 	}
 
-	fmt.Printf("[AI_DEBUG] GenerateVideo成功生成视频，格式: %s，大小: %d bytes，时长: %.2f秒\n", format, len(videoBytes), actualDuration)
-	return videoBytes, format, actualDuration, &result.Metadata, nil
+	// 解析响应
+	var apiResp struct {
+		Data []struct {
+			URL           string `json:"url"`
+			RevisedPrompt string `json:"revised_prompt"`
+		} `json:"data"`
+	}
+
+	if err := json.Unmarshal(respBody, &apiResp); err != nil {
+		return nil, "", 0, nil, fmt.Errorf("解析响应失败: %v", err)
+	}
+
+	if len(apiResp.Data) == 0 {
+		return nil, "", 0, nil, fmt.Errorf("API未返回视频数据")
+	}
+
+	// 获取视频URL并下载视频文件
+	videoURL := apiResp.Data[0].URL
+	fmt.Printf("[AI_DEBUG] 豆包API返回视频URL: %s\n", videoURL)
+
+	// 下载视频文件
+	videoData, err := c.downloadVideoFromURL(ctx, videoURL)
+	if err != nil {
+		return nil, "", 0, nil, fmt.Errorf("下载视频失败: %v", err)
+	}
+
+	// 构建元数据
+	metadata := &VideoMetadata{
+		Title:         "AI生成的演示视频",
+		Description:   prompt,
+		Scenes:        []string{"场景1", "场景2"},
+		AudioLanguage: "zh-CN",
+		Resolution:    "1920x1080",
+	}
+
+	return videoData, "mp4", 60.0, metadata, nil
+}
+
+// callDoubaoImageToVideo 调用豆包Doubao-Seedance-1.0-lite-i2v API (图像到视频)
+func (c *Client) callDoubaoImageToVideo(ctx context.Context, imageData, prompt, style string, duration float64, scenes []string, voice, language string) ([]byte, string, float64, *VideoMetadata, error) {
+	// 构建API请求体 - 图像到视频
+	reqBody := map[string]interface{}{
+		"model":          ModelVideoGeneration,
+		"image":          imageData,  // base64编码的图片数据
+		"prompt":         prompt,     // 文字描述
+		"quality":        "standard",
+		"response_format": "url",
+		"prompt_extend":   true,
+		"duration":        duration,   // 视频时长
+		"style":           style,      // 视频风格
+	}
+
+	// 序列化请求体
+	reqData, err := json.Marshal(reqBody)
+	if err != nil {
+		return nil, "", 0, nil, fmt.Errorf("序列化请求失败: %v", err)
+	}
+
+	// 构建HTTP请求
+	apiURL := fmt.Sprintf("%s/images/generations", c.config.BaseURL)
+	req, err := http.NewRequestWithContext(ctx, "POST", apiURL, strings.NewReader(string(reqData)))
+	if err != nil {
+		return nil, "", 0, nil, fmt.Errorf("创建请求失败: %v", err)
+	}
+
+	// 设置请求头
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s:%s", c.config.TAL_MLOPS_APP_ID, c.config.TAL_MLOPS_APP_KEY))
+
+	// 发送请求
+	client := &http.Client{Timeout: 300 * time.Second} // 视频生成需要更长时间
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, "", 0, nil, fmt.Errorf("API请求失败: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// 读取响应
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, "", 0, nil, fmt.Errorf("读取响应失败: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, "", 0, nil, fmt.Errorf("API返回错误状态码: %d, 响应: %s", resp.StatusCode, string(respBody))
+	}
+
+	// 解析响应
+	var apiResp struct {
+		Data []struct {
+			URL           string `json:"url"`
+			RevisedPrompt string `json:"revised_prompt"`
+		} `json:"data"`
+	}
+
+	if err := json.Unmarshal(respBody, &apiResp); err != nil {
+		return nil, "", 0, nil, fmt.Errorf("解析响应失败: %v", err)
+	}
+
+	if len(apiResp.Data) == 0 {
+		return nil, "", 0, nil, fmt.Errorf("API未返回视频数据")
+	}
+
+	// 获取视频URL并下载视频文件
+	videoURL := apiResp.Data[0].URL
+	fmt.Printf("[AI_DEBUG] 豆包图像到视频API返回视频URL: %s\n", videoURL)
+
+	// 下载视频文件
+	videoData, err := c.downloadVideoFromURL(ctx, videoURL)
+	if err != nil {
+		return nil, "", 0, nil, fmt.Errorf("下载视频失败: %v", err)
+	}
+
+	// 构建元数据
+	scenesStr := strings.Join(scenes, ", ")
+	metadata := &VideoMetadata{
+		Title:         "基于用户图片生成的AI视频",
+		Description:   fmt.Sprintf("基于用户原始图片和润色描述生成的视频: %s", prompt[:min(100, len(prompt))]),
+		Scenes:        scenes,
+		AudioLanguage: language,
+		Resolution:    "1920x1080",
+	}
+
+	return videoData, "mp4", duration, metadata, nil
+}
+
+// downloadVideoFromURL 从URL下载视频文件
+func (c *Client) downloadVideoFromURL(ctx context.Context, videoURL string) ([]byte, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", videoURL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("创建下载请求失败: %v", err)
+	}
+
+	client := &http.Client{Timeout: 300 * time.Second} // 5分钟超时
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("下载请求失败: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("下载返回错误状态码: %d", resp.StatusCode)
+	}
+
+	videoData, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("读取视频数据失败: %v", err)
+	}
+
+	return videoData, nil
+}
+
+// generateMockVideo 生成模拟视频（当豆包API调用失败时使用）
+func (c *Client) generateMockVideo(script, style string, duration float64, scenes []string, voice, language string) ([]byte, string, float64, *VideoMetadata, error) {
+	fmt.Printf("[AI_DEBUG] GenerateMockVideo生成模拟视频\n")
+
+	// 生成模拟的MP4视频数据
+	mockVideoData := c.generateMP4VideoData(script, duration)
+
+	metadata := &VideoMetadata{
+		Title:         "AI生成的演示视频（模拟）",
+		Description:   fmt.Sprintf("基于脚本生成的模拟视频: %s", script[:min(100, len(script))]),
+		Scenes:        scenes,
+		AudioLanguage: language,
+		Resolution:    "1920x1080",
+	}
+
+	fmt.Printf("[AI_DEBUG] GenerateMockVideo生成模拟视频成功，大小: %d bytes\n", len(mockVideoData))
+	return mockVideoData, "mp4", duration, metadata, nil
 }
 
 // getDefaultVideoAnalysis 返回默认的视频分析结果

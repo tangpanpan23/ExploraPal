@@ -194,7 +194,9 @@ type GenerateReportResp struct {
 type GenerateVideoReq struct {
 	ProjectId int64    `json:"project_id" desc:"项目ID"`
 	UserId    int64    `json:"user_id" desc:"用户ID"`
-	Script    string   `json:"script" desc:"视频脚本"`
+	Script    string   `json:"script,optional" desc:"视频脚本（文本生成模式）"`
+	ImageData string   `json:"image_data,optional" desc:"base64编码的图片数据（图像到视频模式）"`
+	Prompt    string   `json:"prompt,optional" desc:"文字描述（图像到视频模式）"`
 	Style     string   `json:"style,optional,default=educational" desc:"风格：educational,story,animation"`
 	Duration  float64  `json:"duration,optional,default=60" desc:"期望时长(秒)"`
 	Scenes    []string `json:"scenes,optional" desc:"场景描述"`

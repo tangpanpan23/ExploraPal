@@ -291,13 +291,15 @@ curl -X POST "http://localhost:9003/api/audio/text-to-speech" \
 #### 步骤7：多媒体创作 - AI视频生成
 
 ```bash
-# 基于项目内容生成教学视频
+# 使用豆包Doubao-Seedance-1.0-lite-i2v模型生成教学视频
+# 输入：用户原始图片 + AI润色后的描述
 curl -X POST "http://localhost:9003/api/achievement/video/generate" \
   -H "Content-Type: application/json" \
   -d '{
     "project_id": 1,
     "user_id": 1,
-    "script": "欢迎来到恐龙世界！今天我们来学习三角龙。三角龙是一种古老的爬行动物，有三只角和坚硬的骨板...",
+    "image_data": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+IRjWjBqO6O2mhP//Z",
+    "prompt": "小葫芦观察到了一只三角龙化石，上面有三只角和坚硬的骨板，看起来非常威武。这是白垩纪时期的古老生物，生活在大约7000万年前。",
     "style": "educational",
     "duration": 60.0,
     "scenes": [

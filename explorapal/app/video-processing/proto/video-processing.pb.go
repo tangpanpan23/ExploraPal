@@ -738,12 +738,14 @@ func (x *VideoSummary) GetDuration() float64 {
 // 视频生成请求
 type GenerateVideoReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Script        string                 `protobuf:"bytes,1,opt,name=script,proto3" json:"script,omitempty"`       // 视频脚本
-	Style         string                 `protobuf:"bytes,2,opt,name=style,proto3" json:"style,omitempty"`         // 风格: "educational", "story", "animation"
-	Duration      float64                `protobuf:"fixed64,3,opt,name=duration,proto3" json:"duration,omitempty"` // 期望时长(秒)
-	Scenes        []string               `protobuf:"bytes,4,rep,name=scenes,proto3" json:"scenes,omitempty"`       // 场景描述
-	Voice         string                 `protobuf:"bytes,5,opt,name=voice,proto3" json:"voice,omitempty"`         // 语音类型
-	Language      string                 `protobuf:"bytes,6,opt,name=language,proto3" json:"language,omitempty"`   // 语言
+	Script        string                 `protobuf:"bytes,1,opt,name=script,proto3" json:"script,omitempty"`                        // 视频脚本 (文本到视频模式)
+	ImageData     string                 `protobuf:"bytes,2,opt,name=image_data,json=imageData,proto3" json:"image_data,omitempty"` // base64编码的图片数据 (图像到视频模式)
+	Prompt        string                 `protobuf:"bytes,3,opt,name=prompt,proto3" json:"prompt,omitempty"`                        // 文字描述 (图像到视频模式)
+	Style         string                 `protobuf:"bytes,4,opt,name=style,proto3" json:"style,omitempty"`                          // 风格: "educational", "story", "animation"
+	Duration      float64                `protobuf:"fixed64,5,opt,name=duration,proto3" json:"duration,omitempty"`                  // 期望时长(秒)
+	Scenes        []string               `protobuf:"bytes,6,rep,name=scenes,proto3" json:"scenes,omitempty"`                        // 场景描述
+	Voice         string                 `protobuf:"bytes,7,opt,name=voice,proto3" json:"voice,omitempty"`                          // 语音类型
+	Language      string                 `protobuf:"bytes,8,opt,name=language,proto3" json:"language,omitempty"`                    // 语言
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -781,6 +783,20 @@ func (*GenerateVideoReq) Descriptor() ([]byte, []int) {
 func (x *GenerateVideoReq) GetScript() string {
 	if x != nil {
 		return x.Script
+	}
+	return ""
+}
+
+func (x *GenerateVideoReq) GetImageData() string {
+	if x != nil {
+		return x.ImageData
+	}
+	return ""
+}
+
+func (x *GenerateVideoReq) GetPrompt() string {
+	if x != nil {
+		return x.Prompt
 	}
 	return ""
 }
@@ -1052,14 +1068,17 @@ const file_video_processing_proto_rawDesc = "" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x1a\n" +
 	"\bkeywords\x18\x03 \x03(\tR\bkeywords\x12\x1a\n" +
 	"\bcategory\x18\x04 \x01(\tR\bcategory\x12\x1a\n" +
-	"\bduration\x18\x05 \x01(\x01R\bduration\"\xa6\x01\n" +
+	"\bduration\x18\x05 \x01(\x01R\bduration\"\xdd\x01\n" +
 	"\x10GenerateVideoReq\x12\x16\n" +
-	"\x06script\x18\x01 \x01(\tR\x06script\x12\x14\n" +
-	"\x05style\x18\x02 \x01(\tR\x05style\x12\x1a\n" +
-	"\bduration\x18\x03 \x01(\x01R\bduration\x12\x16\n" +
-	"\x06scenes\x18\x04 \x03(\tR\x06scenes\x12\x14\n" +
-	"\x05voice\x18\x05 \x01(\tR\x05voice\x12\x1a\n" +
-	"\blanguage\x18\x06 \x01(\tR\blanguage\"\xcc\x01\n" +
+	"\x06script\x18\x01 \x01(\tR\x06script\x12\x1d\n" +
+	"\n" +
+	"image_data\x18\x02 \x01(\tR\timageData\x12\x16\n" +
+	"\x06prompt\x18\x03 \x01(\tR\x06prompt\x12\x14\n" +
+	"\x05style\x18\x04 \x01(\tR\x05style\x12\x1a\n" +
+	"\bduration\x18\x05 \x01(\x01R\bduration\x12\x16\n" +
+	"\x06scenes\x18\x06 \x03(\tR\x06scenes\x12\x14\n" +
+	"\x05voice\x18\a \x01(\tR\x05voice\x12\x1a\n" +
+	"\blanguage\x18\b \x01(\tR\blanguage\"\xcc\x01\n" +
 	"\x11GenerateVideoResp\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\x05R\x06status\x12\x10\n" +
 	"\x03msg\x18\x02 \x01(\tR\x03msg\x12\x1d\n" +
