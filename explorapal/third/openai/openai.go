@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -1026,7 +1027,6 @@ func (c *Client) callDoubaoImageToVideo(ctx context.Context, imageData, prompt, 
 	}
 
 	// 构建元数据
-	scenesStr := strings.Join(scenes, ", ")
 	metadata := &VideoMetadata{
 		Title:         "基于用户图片生成的AI视频",
 		Description:   fmt.Sprintf("基于用户原始图片和润色描述生成的视频: %s", prompt[:min(100, len(prompt))]),
@@ -1062,6 +1062,33 @@ func (c *Client) downloadVideoFromURL(ctx context.Context, videoURL string) ([]b
 	}
 
 	return videoData, nil
+}
+
+// generateMP4VideoData 生成模拟的MP4视频数据
+func (c *Client) generateMP4VideoData(script string, duration float64) []byte {
+	// 生成一个最小的有效MP4文件的十六进制数据
+	// 这是一个简化的MP4头部，实际应用中应该生成真实的视频数据
+	mp4Header := []byte{
+		0x00, 0x00, 0x00, 0x20, 0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6F, 0x6D, 0x00, 0x00, 0x00, 0x01,
+		0x69, 0x73, 0x6F, 0x6D, 0x61, 0x76, 0x63, 0x31, 0x69, 0x73, 0x6F, 0x32, 0x00, 0x00, 0x00, 0x08,
+		0x66, 0x72, 0x65, 0x65, 0x00, 0x00, 0x00, 0x00, 0x6D, 0x64, 0x61, 0x74,
+	}
+
+	// 添加一些填充数据来模拟视频内容
+	videoSize := int(duration * 1000) // 假设每秒1KB数据
+	if videoSize < 1024 {
+		videoSize = 1024 // 最少1KB
+	}
+
+	mockVideoData := make([]byte, len(mp4Header)+videoSize)
+	copy(mockVideoData, mp4Header)
+
+	// 填充模拟视频数据
+	for i := len(mp4Header); i < len(mockVideoData); i++ {
+		mockVideoData[i] = byte(i % 256)
+	}
+
+	return mockVideoData
 }
 
 // generateMockVideo 生成模拟视频（当豆包API调用失败时使用）
