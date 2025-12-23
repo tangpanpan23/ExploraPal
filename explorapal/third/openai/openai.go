@@ -991,12 +991,29 @@ func (c *Client) callDoubaoImageToVideo(ctx context.Context, imageData, prompt, 
 
 // submitVideoGenerationTask 提交视频生成异步任务
 func (c *Client) submitVideoGenerationTask(ctx context.Context, imageData, prompt, style string, duration float64) (string, error) {
-	// 构建异步API请求体
+	// 构建异步API请求体 - 使用messages格式
 	reqBody := map[string]interface{}{
-		"model":    ModelVideoGeneration,
-		"img_url":  fmt.Sprintf("data:image/jpeg;base64,%s", imageData), // 转换为data URL格式
-		"prompt":   prompt,
-		"duration": fmt.Sprintf("%.0f", duration), // 转换为字符串
+		"model": ModelVideoGeneration,
+		"messages": []map[string]interface{}{
+			{
+				"role": "user",
+				"content": []map[string]interface{}{
+					{
+						"type": "image_url",
+						"image_url": map[string]string{
+							"url": fmt.Sprintf("data:image/jpeg;base64,%s", imageData),
+						},
+					},
+					{
+						"type": "text",
+						"text": prompt,
+					},
+				},
+			},
+		},
+		"parameters": map[string]interface{}{
+			"duration": duration,
+		},
 	}
 
 	// 序列化请求体

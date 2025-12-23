@@ -183,9 +183,26 @@ echo "🔧 创建临时文件: $TEMP_JSON_FILE"
 cat > "$TEMP_JSON_FILE" << EOF
 {
   "model": "doubao-seedance-1.0-lite-i2v",
-  "img_url": "data:image/jpeg;base64,$IMAGE_BASE64",
-  "prompt": "$DESCRIPTION",
-  "duration": "$DEFAULT_DURATION"
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "data:image/jpeg;base64,$IMAGE_BASE64"
+          }
+        },
+        {
+          "type": "text",
+          "text": "$DESCRIPTION"
+        }
+      ]
+    }
+  ],
+  "parameters": {
+    "duration": "$(./read_config.sh duration)"
+  }
 }
 EOF
 
@@ -243,8 +260,20 @@ if [ "$FILE_SIZE" -gt 2097152 ]; then  # 2MB限制
     cat > "$TEMP_JSON_FILE" << EOF
 {
   "model": "doubao-seedance-1.0-lite-i2v",
-  "prompt": "$DESCRIPTION (演示模式：图片因大小限制而省略)",
-  "duration": "$DEFAULT_DURATION"
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "$DESCRIPTION (演示模式：图片因大小限制而省略)"
+        }
+      ]
+    }
+  ],
+  "parameters": {
+    "duration": "$(./read_config.sh duration)"
+  }
 }
 EOF
 
