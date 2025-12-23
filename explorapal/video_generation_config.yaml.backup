@@ -19,14 +19,14 @@ AstraAI:
 
 # 视频生成参数配置
 VideoGeneration:
-  # 默认视频时长(秒) - 豆包模型最大支持10秒
-  DefaultDuration: 10
+  # 默认视频时长(秒)
+  DefaultDuration: 60
 
   # 默认视频风格
   DefaultStyle: "educational"
 
-  # 模型配置 (星图AI平台异步视频生成模型)
-  Model: "doubao-seedance-1.0-lite-i2v"
+  # 模型配置
+  Model: "doubao-seedance-1.0-lite-t2v"
 
   # 图片质量设置
   ImageQuality: 80

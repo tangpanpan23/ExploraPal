@@ -87,7 +87,7 @@ else
     # 真实的API调用
     RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -X GET "$ASYNC_API_URL" \
       -H "api-key: $API_KEY" \
-      -H "X-APX-Model: doubao-seedance-1.0-lite-t2v")
+      -H "X-APX-Model: doubao-seedance-1.0-lite-i2v")
 
     # 提取HTTP状态码和响应体
     HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)

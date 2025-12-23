@@ -237,7 +237,7 @@ curl -X POST "http://localhost:9003/api/expression/note/polish" \
 #### 步骤4.1: AI视频生成
 
 ```bash
-# 使用豆包Doubao-Seedance-1.0-lite-i2v模型进行图像到视频生成
+# 使用豆包doubao-seedance-1.0-lite-i2v模型进行图像到视频生成
 curl -X POST "http://localhost:9003/api/achievement/video/generate" \
   -H "Content-Type: application/json" \
   -d '{

@@ -53,7 +53,7 @@ const (
 
 	// 视频处理模型
 	ModelVideoAnalysis   = "qwen3-omni-flash"                // 视频内容分析
-	ModelVideoGeneration = "Doubao-Seedance-1.0-lite-i2v"    // 图像到视频生成
+	ModelVideoGeneration = "doubao-seedance-1.0-lite-i2v"    // 图像到视频生成
 
 	// 备用模型
 	ModelImageAnalysisBackup     = "qwen3-vl-235b-a22b-instruct" // 备用的视觉模型
@@ -789,9 +789,9 @@ func (c *Client) generateMockVideoAnalysis() *VideoAnalysis {
 	}
 }
 
-// GenerateVideo AI视频生成 (使用豆包Doubao-Seedance-1.0-lite-i2v模型)
+// GenerateVideo AI视频生成 (使用豆包doubao-seedance-1.0-lite-i2v模型)
 func (c *Client) GenerateVideo(ctx context.Context, script, style string, duration float64, scenes []string, voice, language string) ([]byte, string, float64, *VideoMetadata, error) {
-	fmt.Printf("[AI_DEBUG] GenerateVideo使用豆包Doubao-Seedance-1.0-lite-i2v模型\n")
+	fmt.Printf("[AI_DEBUG] GenerateVideo使用豆包doubao-seedance-1.0-lite-i2v模型\n")
 	fmt.Printf("[AI_DEBUG] GenerateVideo请求参数:\n")
 	fmt.Printf("  Script长度: %d\n", len(script))
 	fmt.Printf("  Style: %s\n", style)
@@ -801,7 +801,7 @@ func (c *Client) GenerateVideo(ctx context.Context, script, style string, durati
 	fmt.Printf("  Language: %s\n", language)
 
 	// 构建豆包视频生成API请求
-	// Doubao-Seedance-1.0-lite-i2v是图像到视频模型，需要将脚本转换为图像生成提示
+	// doubao-seedance-1.0-lite-i2v是图像到视频模型，需要将脚本转换为图像生成提示
 	imagePrompt := c.buildVideoPrompt(script, style, duration, scenes, voice, language)
 
 	fmt.Printf("[AI_DEBUG] GenerateVideo构建的图像提示: %s\n", imagePrompt[:min(200, len(imagePrompt))])
@@ -818,9 +818,9 @@ func (c *Client) GenerateVideo(ctx context.Context, script, style string, durati
 	return videoData, format, actualDuration, metadata, nil
 }
 
-// GenerateVideoWithImage AI视频生成 (使用豆包Doubao-Seedance-1.0-lite-i2v模型 + 图片输入)
+// GenerateVideoWithImage AI视频生成 (使用豆包doubao-seedance-1.0-lite-i2v模型 + 图片输入)
 func (c *Client) GenerateVideoWithImage(ctx context.Context, imageData, prompt, style string, duration float64, scenes []string, voice, language string) ([]byte, string, float64, *VideoMetadata, error) {
-	fmt.Printf("[AI_DEBUG] GenerateVideoWithImage使用豆包Doubao-Seedance-1.0-lite-i2v模型\n")
+	fmt.Printf("[AI_DEBUG] GenerateVideoWithImage使用豆包doubao-seedance-1.0-lite-i2v模型\n")
 	fmt.Printf("[AI_DEBUG] GenerateVideoWithImage请求参数:\n")
 	fmt.Printf("  ImageData长度: %d\n", len(imageData))
 	fmt.Printf("  Prompt长度: %d\n", len(prompt))
@@ -867,7 +867,7 @@ func (c *Client) buildVideoPrompt(script, style string, duration float64, scenes
 	return prompt
 }
 
-// callDoubaoVideoGeneration 调用豆包Doubao-Seedance-1.0-lite-i2v API (文本到视频)
+// callDoubaoVideoGeneration 调用豆包doubao-seedance-1.0-lite-i2v API (文本到视频)
 func (c *Client) callDoubaoVideoGeneration(ctx context.Context, prompt string) ([]byte, string, float64, *VideoMetadata, error) {
 	// 构建API请求体
 	reqBody := map[string]interface{}{
@@ -951,7 +951,7 @@ func (c *Client) callDoubaoVideoGeneration(ctx context.Context, prompt string) (
 	return videoData, "mp4", 60.0, metadata, nil
 }
 
-// callDoubaoImageToVideo 调用豆包Doubao-Seedance-1.0-lite-i2v API (图像到视频 - 异步)
+// callDoubaoImageToVideo 调用豆包doubao-seedance-1.0-lite-i2v API (图像到视频 - 异步)
 func (c *Client) callDoubaoImageToVideo(ctx context.Context, imageData, prompt, style string, duration float64, scenes []string, voice, language string) ([]byte, string, float64, *VideoMetadata, error) {
 	fmt.Printf("[AI_DEBUG] 开始异步豆包图像到视频生成流程\n")
 

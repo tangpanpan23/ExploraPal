@@ -24,7 +24,7 @@ get_config_value() {
             echo "${app_id}:${app_key}"
             ;;
         "base_url")
-            grep "^  BaseURL:" "$CONFIG_FILE" | sed 's/.*: *//' | tr -d '"'
+            grep "^  BaseURL:" "$CONFIG_FILE" | head -1 | sed 's/^.*BaseURL: *//' | tr -d '"'
             ;;
         "model")
             grep "^  Model:" "$CONFIG_FILE" | sed 's/.*: *//' | tr -d '"'

@@ -291,7 +291,7 @@ curl -X POST "http://localhost:9003/api/audio/text-to-speech" \
 #### 步骤7：多媒体创作 - AI视频生成
 
 ```bash
-# 使用豆包Doubao-Seedance-1.0-lite-i2v模型生成教学视频
+# 使用豆包doubao-seedance-1.0-lite-i2v模型生成教学视频
 # 输入：用户原始图片 + AI润色后的描述
 curl -X POST "http://localhost:9003/api/achievement/video/generate" \
   -H "Content-Type: application/json" \

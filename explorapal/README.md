@@ -49,8 +49,8 @@ http://localhost:9003/api/common/demo
 
 4. **创作阶段** 🎬
    - ✅ 生成研究报告（qwen3-max）
-   - ✅ 视频内容分析（qwen-vl-plus）
-   - ✅ AI视频创作（qwen-vl-plus）
+   - ✅ 视频内容分析（qwen3-omni-flash）
+   - ✅ AI视频创作（doubao-seedance-1.0-lite-i2v）
 
 ## 技术架构
 
@@ -58,7 +58,7 @@ http://localhost:9003/api/common/demo
 - **框架**: Go + go-zero 微服务框架
 - **数据库**: MySQL
 - **缓存**: Redis
-- **AI服务**: 阿里云Qwen系列大模型 (qwen3-vl-plus, qwen-flash, qwen3-max, qwen3-omni-flash, qwen-vl-plus)
+- **AI服务**: 阿里云Qwen系列 + 豆包Doubao大模型 (qwen3-vl-plus, qwen-flash, qwen3-max, qwen3-omni-flash, doubao-seedance-1.0-lite-i2v)
 - **多媒体**: 系统TTS/STT + AI视频处理
 - **架构**: 5个微服务 (API + 4个RPC服务)
 
@@ -162,7 +162,8 @@ explorapal/
 - Go 1.22+
 - MySQL 8.0+
 - Redis 6.0+
-- 阿里云DashScope API Key
+- TAL MLOps平台API访问权限 (阿里云Qwen系列模型)
+- 星图AI平台API访问权限 (豆包Doubao模型)
 
 ### AI服务配置
 
@@ -236,6 +237,17 @@ chmod +x start_demo.sh stop_demo.sh
 
 4. **脚本会自动从配置文件读取API配置，无需在代码中硬编码**
 
+**⚠️ 重要配置要求：**
+- **异步应用配置**：需要在星图AI平台申请应用后，联系平台管理员将应用配置为异步应用
+- **API密钥格式**：`appId:appKey`（已在配置文件中配置）
+- **模型名称**：`doubao-seedance-1.0-lite-i2v`（用于异步视频生成）
+
+**常见错误及解决方案：**
+- **错误码 110000 "Header 模型不存在"**：
+  - 确认应用已配置为异步应用（需要平台管理员操作）
+  - 检查API密钥是否正确
+  - 联系星图AI平台技术支持
+
 ```bash
 # 生成演示视频（异步）
 ./生成演示视频.sh <图片文件路径> <描述文本>
@@ -264,7 +276,7 @@ chmod +x start_demo.sh stop_demo.sh
 - **模型**：豆包Doubao-Seedance-1.0-lite-t2v
 - **输入**：用户原始图片(data URL) + AI润色描述
 - **输出**：高质量MP4教育视频
-- **时长**：约60秒
+- **时长**：约10秒（豆包模型最大支持时长）
 - **风格**：教育演示风格
 - **测试模式**：使用占位符密钥时自动启用模拟响应
 
