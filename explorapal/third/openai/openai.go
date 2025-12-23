@@ -13,6 +13,35 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
+// MCPIntegration MCP集成配置
+type MCPIntegration struct {
+	Enabled  bool   `json:"enabled"`   // 是否启用MCP集成
+	BaseURL  string `json:"baseURL"`  // TALect MCP服务地址
+	APIToken string `json:"apiToken"` // MCP API访问令牌
+}
+
+// MCPClient 嵌入MCP客户端
+var mcpClient *MCPClient
+
+// SetMCPIntegration 设置MCP集成
+func SetMCPIntegration(config *MCPIntegration) error {
+	if !config.Enabled {
+		return nil
+	}
+
+	mcpClient = NewMCPClient(config.BaseURL)
+	if config.APIToken != "" {
+		// 设置认证头
+		mcpClient.HTTPClient.Transport = &mcpTransport{
+			base:      mcpClient.HTTPClient.Transport,
+			apiToken:  config.APIToken,
+		}
+	}
+
+	// 初始化MCP连接
+	return mcpClient.Initialize()
+}
+
 // min 返回两个整数中的较小值
 func min(a, b int) int {
 	if a < b {
@@ -1790,4 +1819,407 @@ type BoundingBox struct {
 	Y      float64 `json:"y"`
 	Width  float64 `json:"width"`
 	Height float64 `json:"height"`
+}
+
+// MCP相关类型和实现
+// MCPClient TALect MCP客户端
+type MCPClient struct {
+	BaseURL    string
+	HTTPClient *http.Client
+}
+
+// NewMCPClient 创建MCP客户端
+func NewMCPClient(baseURL string) *MCPClient {
+	return &MCPClient{
+		BaseURL: baseURL,
+		HTTPClient: &http.Client{
+			Timeout: 30 * time.Second,
+		},
+	}
+}
+
+// MCPRequest MCP请求结构
+type MCPRequest struct {
+	JSONRPC string      `json:"jsonrpc"`
+	ID      interface{} `json:"id"`
+	Method  string      `json:"method"`
+	Params  interface{} `json:"params,omitempty"`
+}
+
+// MCPResponse MCP响应结构
+type MCPResponse struct {
+	JSONRPC string      `json:"jsonrpc"`
+	ID      interface{} `json:"id"`
+	Result  interface{} `json:"result,omitempty"`
+	Error   *MCPError   `json:"error,omitempty"`
+}
+
+// MCPError MCP错误结构
+type MCPError struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
+// ToolsCallResponse 工具调用响应
+type ToolsCallResponse struct {
+	Content []MCPContent `json:"content"`
+	IsError bool         `json:"isError,omitempty"`
+}
+
+// MCPContent MCP内容结构
+type MCPContent struct {
+	Type string `json:"type"`
+	Text string `json:"text,omitempty"`
+}
+
+// mcpTransport MCP认证传输层
+type mcpTransport struct {
+	base     http.RoundTripper
+	apiToken string
+}
+
+func (t *mcpTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if t.apiToken != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", t.apiToken))
+	}
+	req.Header.Set("Content-Type", "application/json")
+	return t.base.RoundTrip(req)
+}
+
+// Initialize 初始化MCP连接
+func (c *MCPClient) Initialize() error {
+	req := MCPRequest{
+		JSONRPC: "2.0",
+		ID:      1,
+		Method:  "initialize",
+		Params: map[string]interface{}{
+			"protocolVersion": "2024-11-05",
+			"capabilities": map[string]interface{}{
+				"tools": map[string]interface{}{},
+			},
+			"clientInfo": map[string]interface{}{
+				"name":    "ExploraPal AI Learning Platform",
+				"version": "1.0.0",
+			},
+		},
+	}
+
+	var resp MCPResponse
+	if err := c.doRequest(req, &resp); err != nil {
+		return fmt.Errorf("failed to initialize MCP client: %w", err)
+	}
+
+	if resp.Error != nil {
+		return fmt.Errorf("MCP initialization error: %s", resp.Error.Message)
+	}
+
+	fmt.Println("✅ MCP客户端初始化成功")
+	return nil
+}
+
+// SearchTeachingMaterials 搜索教学素材
+func (c *MCPClient) SearchTeachingMaterials(query string, grade []string, subject string, limit int) (*ToolsCallResponse, error) {
+	req := MCPRequest{
+		JSONRPC: "2.0",
+		ID:      fmt.Sprintf("search_%d", time.Now().Unix()),
+		Method:  "tools/call",
+		Params: map[string]interface{}{
+			"name": "search_teaching_materials",
+			"arguments": map[string]interface{}{
+				"query":   query,
+				"grade":   grade,
+				"subject": subject,
+				"limit":   limit,
+			},
+		},
+	}
+
+	var resp MCPResponse
+	if err := c.doRequest(req, &resp); err != nil {
+		return nil, fmt.Errorf("failed to search materials: %w", err)
+	}
+
+	if resp.Error != nil {
+		return nil, fmt.Errorf("MCP search error: %s", resp.Error.Message)
+	}
+
+	// 解析响应
+	var toolResp ToolsCallResponse
+	if result, ok := resp.Result.(map[string]interface{}); ok {
+		if content, ok := result["content"].([]interface{}); ok && len(content) > 0 {
+			if contentMap, ok := content[0].(map[string]interface{}); ok {
+				if text, ok := contentMap["text"].(string); ok {
+					toolResp.Content = []MCPContent{{Type: "text", Text: text}}
+				}
+			}
+		}
+	}
+
+	return &toolResp, nil
+}
+
+// GetMaterialDetail 获取素材详情
+func (c *MCPClient) GetMaterialDetail(materialID string) (*ToolsCallResponse, error) {
+	req := MCPRequest{
+		JSONRPC: "2.0",
+		ID:      fmt.Sprintf("detail_%d", time.Now().Unix()),
+		Method:  "tools/call",
+		Params: map[string]interface{}{
+			"name": "get_material_detail",
+			"arguments": map[string]interface{}{
+				"material_id": materialID,
+			},
+		},
+	}
+
+	var resp MCPResponse
+	if err := c.doRequest(req, &resp); err != nil {
+		return nil, fmt.Errorf("failed to get material detail: %w", err)
+	}
+
+	if resp.Error != nil {
+		return nil, fmt.Errorf("MCP get detail error: %s", resp.Error.Message)
+	}
+
+	// 解析响应
+	var toolResp ToolsCallResponse
+	if result, ok := resp.Result.(map[string]interface{}); ok {
+		if content, ok := result["content"].([]interface{}); ok && len(content) > 0 {
+			if contentMap, ok := content[0].(map[string]interface{}); ok {
+				if text, ok := contentMap["text"].(string); ok {
+					toolResp.Content = []MCPContent{{Type: "text", Text: text}}
+				}
+			}
+		}
+	}
+
+	return &toolResp, nil
+}
+
+// GenerateLessonPlan 生成教案
+func (c *MCPClient) GenerateLessonPlan(materialIDs []string, objectives []string, grade string, studentLevel string, duration int) (*ToolsCallResponse, error) {
+	req := MCPRequest{
+		JSONRPC: "2.0",
+		ID:      fmt.Sprintf("lesson_%d", time.Now().Unix()),
+		Method:  "tools/call",
+		Params: map[string]interface{}{
+			"name": "generate_lesson_plan",
+			"arguments": map[string]interface{}{
+				"material_ids":  materialIDs,
+				"objectives":    objectives,
+				"grade":         grade,
+				"student_level": studentLevel,
+				"duration":      duration,
+			},
+		},
+	}
+
+	var resp MCPResponse
+	if err := c.doRequest(req, &resp); err != nil {
+		return nil, fmt.Errorf("failed to generate lesson plan: %w", err)
+	}
+
+	if resp.Error != nil {
+		return nil, fmt.Errorf("MCP generate lesson plan error: %s", resp.Error.Message)
+	}
+
+	// 解析响应
+	var toolResp ToolsCallResponse
+	if result, ok := resp.Result.(map[string]interface{}); ok {
+		if content, ok := result["content"].([]interface{}); ok && len(content) > 0 {
+			if contentMap, ok := content[0].(map[string]interface{}); ok {
+				if text, ok := contentMap["text"].(string); ok {
+					toolResp.Content = []MCPContent{{Type: "text", Text: text}}
+				}
+			}
+		}
+	}
+
+	return &toolResp, nil
+}
+
+// doRequest 执行HTTP请求
+func (c *MCPClient) doRequest(req MCPRequest, resp *MCPResponse) error {
+	reqBody, err := json.Marshal(req)
+	if err != nil {
+		return fmt.Errorf("failed to marshal request: %w", err)
+	}
+
+	httpReq, err := http.NewRequest("POST", c.BaseURL, strings.NewReader(string(reqBody)))
+	if err != nil {
+		return fmt.Errorf("failed to create HTTP request: %w", err)
+	}
+
+	httpReq.Header.Set("Content-Type", "application/json")
+
+	httpResp, err := c.HTTPClient.Do(httpReq)
+	if err != nil {
+		return fmt.Errorf("failed to send HTTP request: %w", err)
+	}
+	defer httpResp.Body.Close()
+
+	respBody, err := io.ReadAll(httpResp.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read response: %w", err)
+	}
+
+	if httpResp.StatusCode != http.StatusOK {
+		return fmt.Errorf("HTTP error %d: %s", httpResp.StatusCode, string(respBody))
+	}
+
+	if err := json.Unmarshal(respBody, resp); err != nil {
+		return fmt.Errorf("failed to unmarshal response: %w", err)
+	}
+
+	return nil
+}
+
+// EnhancedLearningFlow 增强版学习流程 - 结合ExploraPal AI + TALect教学资源
+func (c *Client) EnhancedLearningFlow(ctx context.Context, imageData []byte, userID string, gradeLevel string) (*EnhancedLearningResult, error) {
+	result := &EnhancedLearningResult{}
+
+	// 1. AI图像分析 (ExploraPal能力)
+	fmt.Println("🔍 步骤1: AI图像分析...")
+	imageAnalysis, err := c.AnalyzeImageWithDetail(ctx, imageData)
+	if err != nil {
+		return nil, fmt.Errorf("图像分析失败: %w", err)
+	}
+	result.ImageAnalysis = imageAnalysis
+
+	// 2. 智能教学资源搜索 (TALect MCP能力)
+	if mcpClient != nil {
+		fmt.Println("📚 步骤2: 智能教学资源搜索...")
+		searchQuery := fmt.Sprintf("%s %s", imageAnalysis.ObjectName, imageAnalysis.Category)
+		grade := []string{gradeLevel}
+
+		materials, err := mcpClient.SearchTeachingMaterials(searchQuery, grade, "science", 5)
+		if err != nil {
+			fmt.Printf("⚠️ MCP搜索失败，使用AI生成内容: %v\n", err)
+		} else {
+			result.RelatedMaterials = materials.Content
+		}
+	}
+
+	// 3. 生成个性化问题 (ExploraPal能力)
+	fmt.Println("❓ 步骤3: 生成个性化问题...")
+	questions, err := c.GeneratePersonalizedQuestions(ctx, imageAnalysis, gradeLevel)
+	if err != nil {
+		return nil, fmt.Errorf("问题生成失败: %w", err)
+	}
+	result.PersonalizedQuestions = questions
+
+	// 4. 生成教学教案 (TALect MCP能力)
+	if mcpClient != nil && len(result.RelatedMaterials) > 0 {
+		fmt.Println("📝 步骤4: 生成教学教案...")
+
+		// 提取素材ID (简化处理，从搜索结果中提取)
+		var materialIDs []string
+		for _, material := range result.RelatedMaterials {
+			if strings.Contains(material.Text, "ID: ") {
+				// 从文本中提取ID (简化实现)
+				parts := strings.Split(material.Text, "ID: ")
+				if len(parts) > 1 {
+					id := strings.Fields(parts[1])[0]
+					materialIDs = append(materialIDs, id)
+				}
+			}
+		}
+
+		if len(materialIDs) > 0 {
+			objectives := []string{
+				fmt.Sprintf("理解%s的基本特征和科学原理", imageAnalysis.ObjectName),
+				"培养观察能力和科学思维",
+				"激发学习兴趣和探索欲望",
+			}
+
+			lessonPlan, err := mcpClient.GenerateLessonPlan(materialIDs, objectives, gradeLevel, "intermediate", 45)
+			if err != nil {
+				fmt.Printf("⚠️ 教案生成失败: %v\n", err)
+			} else {
+				result.LessonPlan = lessonPlan.Content
+			}
+		}
+	}
+
+	// 5. 生成学习报告 (ExploraPal能力)
+	fmt.Println("📊 步骤5: 生成学习报告...")
+	report, err := c.GenerateResearchReport(ctx, imageAnalysis, questions, gradeLevel)
+	if err != nil {
+		return nil, fmt.Errorf("报告生成失败: %w", err)
+	}
+	result.ResearchReport = report
+
+	// 6. 生成个性化学习建议 (结合双方能力)
+	fmt.Println("🎯 步骤6: 生成个性化学习建议...")
+	recommendations := c.generatePersonalizedRecommendations(imageAnalysis, result.RelatedMaterials, gradeLevel)
+	result.Recommendations = recommendations
+
+	fmt.Println("✅ 增强版学习流程完成!")
+	return result, nil
+}
+
+// generatePersonalizedRecommendations 生成个性化学习建议
+func (c *Client) generatePersonalizedRecommendations(analysis *ImageAnalysisResult, materials []MCPContent, gradeLevel string) []LearningRecommendation {
+	var recommendations []LearningRecommendation
+
+	// 基于图像分析结果的推荐
+	recommendations = append(recommendations, LearningRecommendation{
+		Type:        "exploration",
+		Title:       "深入探索活动",
+		Description: fmt.Sprintf("组织实地考察或实验活动，近距离观察%s", analysis.ObjectName),
+		Difficulty:  "medium",
+		Duration:    60,
+	})
+
+	// 基于相关素材的推荐
+	if len(materials) > 0 {
+		recommendations = append(recommendations, LearningRecommendation{
+			Type:        "reading",
+			Title:       "扩展阅读",
+			Description: "阅读相关科普书籍和资料，扩展知识面",
+			Difficulty:  "easy",
+			Duration:    30,
+		})
+	}
+
+	// 年级相关的推荐
+	switch gradeLevel {
+	case "grade_1", "grade_2", "grade_3":
+		recommendations = append(recommendations, LearningRecommendation{
+			Type:        "creative",
+			Title:       "创意表达",
+			Description: "通过绘画、手工制作等方式表达对学习的理解",
+			Difficulty:  "easy",
+			Duration:    45,
+		})
+	case "grade_4", "grade_5", "grade_6":
+		recommendations = append(recommendations, LearningRecommendation{
+			Type:        "research",
+			Title:       "小研究项目",
+			Description: "设计简单的科学实验或调查研究",
+			Difficulty:  "medium",
+			Duration:    90,
+		})
+	}
+
+	return recommendations
+}
+
+// EnhancedLearningResult 增强版学习结果
+type EnhancedLearningResult struct {
+	ImageAnalysis         *ImageAnalysisResult      `json:"image_analysis"`
+	RelatedMaterials      []MCPContent              `json:"related_materials"`
+	PersonalizedQuestions []Question                `json:"personalized_questions"`
+	LessonPlan            []MCPContent              `json:"lesson_plan"`
+	ResearchReport        *ResearchReport           `json:"research_report"`
+	Recommendations       []LearningRecommendation  `json:"recommendations"`
+}
+
+// LearningRecommendation 学习推荐
+type LearningRecommendation struct {
+	Type        string `json:"type"`        // 推荐类型: exploration, reading, creative, research
+	Title       string `json:"title"`       // 推荐标题
+	Description string `json:"description"` // 详细描述
+	Difficulty  string `json:"difficulty"`  // 难度: easy, medium, hard
+	Duration    int    `json:"duration"`    // 建议时长(分钟)
 }

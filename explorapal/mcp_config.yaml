@@ -1,0 +1,109 @@
+# TALect MCP集成配置
+# 这是ExploraPal与TALect教学资源平台的集成配置文件
+
+mcp:
+  # 是否启用MCP集成
+  enabled: true
+
+  # TALect MCP服务器地址
+  base_url: "http://localhost:8080/mcp"
+
+  # API认证令牌 (如果需要)
+  api_token: ""
+
+  # 连接超时时间(秒)
+  timeout: 30
+
+  # 重试配置
+  retry:
+    max_attempts: 3
+    initial_delay: 1
+    max_delay: 10
+
+  # 缓存配置
+  cache:
+    enabled: true
+    ttl: 3600  # 缓存时间(秒)
+
+# TALect教学资源配置
+talect:
+  # 默认学科映射
+  subject_mapping:
+    science: "science"
+    math: "math"
+    chinese: "chinese"
+    english: "english"
+    physics: "physics"
+    chemistry: "chemistry"
+    biology: "biology"
+
+  # 年级映射 (学而思体系)
+  grade_mapping:
+    grade_1: "grade_1"
+    grade_2: "grade_2"
+    grade_3: "grade_3"
+    grade_4: "grade_4"
+    grade_5: "grade_5"
+    grade_6: "grade_6"
+    grade_7: "grade_7"
+    grade_8: "grade_8"
+    grade_9: "grade_9"
+
+  # 教学资源搜索配置
+  search:
+    default_limit: 10
+    max_limit: 50
+    include_related: true
+
+  # 教案生成配置
+  lesson_plan:
+    default_duration: 45  # 默认教学时长(分钟)
+    student_levels:
+      - beginner
+      - intermediate
+      - advanced
+    teaching_models:
+      - "5e_model"    # Engage-Explore-Explain-Elaborate-Evaluate
+      - "direct_model" # 直接教学法
+      - "inquiry_model" # 探究教学法
+
+# 增强版学习流程配置
+enhanced_learning:
+  # 启用智能教学资源推荐
+  enable_material_recommendation: true
+
+  # 启用个性化教案生成
+  enable_lesson_plan_generation: true
+
+  # 启用学习路径规划
+  enable_learning_path_planning: true
+
+  # AI决策权重 (ExploraPal vs TALect)
+  ai_weights:
+    explorapal_content_generation: 0.7
+    talect_resource_integration: 0.3
+
+  # 学习分析配置
+  analytics:
+    track_user_progress: true
+    generate_insights: true
+    adaptive_difficulty: true
+
+# 企业级功能配置
+enterprise:
+  # 用户权限管理
+  user_management:
+    enable_role_based_access: true
+    enable_school_hierarchy: true
+
+  # 数据合规配置
+  compliance:
+    enable_data_encryption: true
+    enable_audit_logging: true
+    gdpr_compliant: true
+
+  # 性能监控
+  monitoring:
+    enable_metrics: true
+    enable_health_checks: true
+    enable_tracing: true
