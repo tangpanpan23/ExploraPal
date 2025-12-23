@@ -164,12 +164,27 @@ explorapal/
 - Redis 6.0+
 - 阿里云DashScope API Key
 
-### 内部AI服务配置 (TAL MLOps平台)
+### AI服务配置
+
+#### 内部AI服务配置 (TAL MLOps平台 - 同步API)
 1. 获取TAL MLOps应用ID和应用密钥
 2. 确保内部AI服务网络可达 (http://ai-service.tal.com)
-3. 确认账户权限，支持调用qwen3-vl-plus、qwen-flash、qwen3-max、qwen3-omni-flash、qwen-vl-plus等模型
-4. 注意：所有服务超时时间设置为70-120秒，确保AI处理有充分时间
-5. 慢调用阈值：AI对话服务设置为10秒，音频/视频处理设置为30秒，项目管理设置为5秒
+3. 同步API鉴权：使用Bearer token (`Bearer appId:appKey`)
+4. 支持模型：qwen3-vl-plus、qwen-flash、qwen3-max、qwen3-omni-flash等
+5. 用途：视频内容分析、文本生成、语音处理等
+
+#### 星图AI平台配置 (异步API)
+1. 服务地址：
+   - 生产环境：http://apx-api.tal.com
+   - 测试环境：http://apx-api-gray.tal.com
+2. 异步API鉴权：使用api-key header (`api-key: appId:appKey`)
+3. 支持模型：doubao-seedance-1.0-lite-t2v (视频生成)
+4. 用途：基于图片生成视频
+
+#### 超时和性能配置
+- 同步API超时：70-120秒
+- 异步API超时：300秒 (视频生成)
+- 慢调用阈值：AI对话10秒，音频/视频处理30秒，项目管理5秒
 
 ### Git提交注意事项
 - ⚠️ **不要提交编译后的可执行文件**：`api`、`rpc`、`*-processing` 等可执行文件已被 `.gitignore` 排除
@@ -196,6 +211,42 @@ chmod +x start_demo.sh stop_demo.sh
 ```bash
 ./stop_demo.sh
 ```
+
+#### 🎬 视频演示生成
+
+项目提供了专门的脚本用于生成AI视频演示，支持基于用户图片和描述的异步视频生成：
+
+```bash
+# 生成演示视频（异步）
+./生成演示视频.sh <图片文件路径> <描述文本>
+
+# 示例
+./生成演示视频.sh test_image.png "小葫芦观察到了一只可爱的小恐龙，有着绿色的皮肤和长长的脖子"
+
+# 查询生成结果
+./查询视频生成结果.sh <任务ID>
+```
+
+**视频生成流程：**
+1. **提交任务**：脚本直接调用星图AI平台异步API提交视频生成任务
+2. **获取任务ID**：API返回唯一任务ID，保存到本地文件
+3. **等待处理**：AI需要5-10分钟处理视频生成
+4. **查询结果**：使用任务ID查询生成状态和下载链接
+5. **下载视频**：生成完成后自动下载MP4视频文件
+
+**修复内容：**
+- ✅ **API端点修正**：从调用本地后端改为直接调用星图AI平台
+- ✅ **请求格式修正**：使用正确的星图API参数格式
+- ✅ **错误处理改进**：添加图片压缩和模拟测试模式
+- ✅ **兼容性修复**：支持macOS和Linux的日期命令
+
+**异步API特性：**
+- **模型**：豆包Doubao-Seedance-1.0-lite-t2v
+- **输入**：用户原始图片(data URL) + AI润色描述
+- **输出**：高质量MP4教育视频
+- **时长**：约60秒
+- **风格**：教育演示风格
+- **测试模式**：使用占位符密钥时自动启用模拟响应
 
 #### 手动启动
 

@@ -11,23 +11,16 @@ echo "🤖 使用豆包图像到视频生成模型"
 echo "📸 输入：用户原始图片 + AI润色描述"
 echo "🎥 输出：高质量MP4演示视频"
 
-# 检查服务是否运行
-echo "🔍 检查API服务状态..."
-if ! curl -s http://localhost:9003/api/ping > /dev/null 2>&1; then
-    echo "❌ API服务未运行"
+# 检查网络连接和豆包API可达性
+echo "🔍 检查豆包API连接状态..."
+if ! curl -s --connect-timeout 5 http://apx-api-gray.tal.com/v1/async/results > /dev/null 2>&1; then
+    echo "⚠️ 豆包API服务可能不可达，但这不影响脚本运行"
+    echo "💡 如果使用真实的API密钥，视频生成将调用星图AI平台"
+    echo "🎭 如果使用占位符密钥，将使用模拟响应测试脚本流程"
     echo ""
-    echo "请先启动服务："
-    echo "  1. 确保所有服务脚本有执行权限："
-    echo "     chmod +x *.sh"
-    echo "  2. 启动服务："
-    echo "     ./start_demo.sh"
-    echo "  3. 等待30秒让服务完全启动"
-    echo "  4. 重新运行此脚本"
-    echo ""
-    exit 1
+else
+    echo "✅ 豆包API服务可达"
 fi
-
-echo "✅ API服务运行正常"
 echo "🤖 使用AI模型: 豆包Doubao-Seedance-1.0-lite-i2v (图像到视频生成)"
 
 # 检查参数
@@ -181,19 +174,14 @@ echo "🎬 开始生成演示视频..."
 echo "🎬 调用豆包Doubao-Seedance-1.0-lite-i2v模型生成视频..."
 echo "📤 发送数据: 原始图片 + 润色描述"
 
-# 创建临时JSON文件避免参数过长问题
+# 创建临时JSON文件 - 直接调用星图AI平台API
 TEMP_JSON_FILE=$(mktemp /tmp/video_request_XXXXXX.json)
 cat > "$TEMP_JSON_FILE" << EOF
 {
-  "project_id": 1,
-  "user_id": 1,
-  "image_data": "data:image/jpeg;base64,$IMAGE_BASE64",
+  "model": "doubao-seedance-1.0-lite-t2v",
+  "img_url": "data:image/jpeg;base64,$IMAGE_BASE64",
   "prompt": "$DESCRIPTION",
-  "style": "educational",
-  "duration": 60,
-  "scenes": [],
-  "voice": "female",
-  "language": "zh-CN"
+  "duration": "60"
 }
 EOF
 
@@ -206,21 +194,105 @@ echo ""
 echo "📊 请求文件大小: $(wc -c < "$TEMP_JSON_FILE") bytes"
 echo ""
 
-# 执行API调用
-echo "🚀 发送API请求..."
+# 显示完整的请求内容（用于调试）
+echo "📄 完整请求内容："
+echo "=================="
+cat "$TEMP_JSON_FILE"
+echo ""
+echo "=================="
+
+# 执行异步API调用
+echo "🚀 提交异步视频生成任务..."
+
+# 使用豆包异步API端点 (测试环境)
+ASYNC_API_URL="http://apx-api-gray.tal.com/v1/async/chat"
+API_KEY="2000080004:xxxxx"  # 请替换为真实的API密钥 (格式: appId:appKey)
 
 # 先执行curl获取响应头信息
-CURL_HEADERS=$(curl -I -s http://localhost:9003/api/achievement/video/generate 2>/dev/null | head -1)
+CURL_HEADERS=$(curl -I -s "$ASYNC_API_URL" 2>/dev/null | head -1)
 echo "🌐 HTTP响应头: $CURL_HEADERS"
 
-# 执行实际的API调用
-RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -X POST http://localhost:9003/api/achievement/video/generate \
-  -H "Content-Type: application/json" \
-  -d @"$TEMP_JSON_FILE")
+# 检查请求文件大小，如果太大则尝试压缩图片
+FILE_SIZE=$(wc -c < "$TEMP_JSON_FILE")
+echo "📊 请求体大小: $FILE_SIZE bytes"
 
-# 提取HTTP状态码和响应体
-HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
-ACTUAL_RESPONSE=$(echo "$RESPONSE" | grep -v "HTTP_STATUS:")
+if [ "$FILE_SIZE" -gt 2097152 ]; then  # 2MB限制
+    echo "⚠️ 请求体过大 ($FILE_SIZE bytes)，尝试压缩图片..."
+
+    # 尝试压缩图片 (如果有ImageMagick)
+    if command -v convert >/dev/null 2>&1; then
+        echo "🔧 使用ImageMagick压缩图片..."
+        COMPRESSED_IMAGE="${IMAGE_FILE%.*}_compressed.${IMAGE_FILE##*.}"
+
+        # 压缩图片到更小的尺寸和质量
+        convert "$IMAGE_FILE" -resize 1024x1024\> -quality 80 "$COMPRESSED_IMAGE"
+
+        if [ -f "$COMPRESSED_IMAGE" ]; then
+            echo "✅ 图片已压缩: $COMPRESSED_IMAGE"
+
+            # 重新编码压缩后的图片
+            if [ -x "$(command -v base64)" ]; then
+                IMAGE_BASE64=$(base64 -w 0 "$COMPRESSED_IMAGE" 2>/dev/null || base64 "$COMPRESSED_IMAGE")
+            elif [ -x "$(command -v openssl)" ]; then
+                IMAGE_BASE64=$(openssl base64 -in "$COMPRESSED_IMAGE" | tr -d '\n')
+            elif [ -x "$(command -v python3)" ]; then
+                IMAGE_BASE64=$(python3 -c "import base64; print(base64.b64encode(open('$COMPRESSED_IMAGE', 'rb').read()).decode())")
+            else
+                echo "❌ 无法压缩图片，base64编码工具不可用"
+                exit 1
+            fi
+
+            # 重新创建请求文件
+            cat > "$TEMP_JSON_FILE" << EOF
+{
+  "model": "doubao-seedance-1.0-lite-t2v",
+  "img_url": "data:image/jpeg;base64,$IMAGE_BASE64",
+  "prompt": "$DESCRIPTION",
+  "duration": "60"
+}
+EOF
+
+            NEW_SIZE=$(wc -c < "$TEMP_JSON_FILE")
+            echo "📊 压缩后请求体大小: $NEW_SIZE bytes"
+
+            # 清理临时压缩文件
+            rm -f "$COMPRESSED_IMAGE"
+        else
+            echo "❌ 图片压缩失败，继续使用原图"
+        fi
+    else
+        echo "⚠️ ImageMagick不可用，跳过压缩"
+    fi
+fi
+
+# 执行异步任务提交
+echo "📡 发送请求到: $ASYNC_API_URL"
+
+# 检查API密钥是否为占位符
+if [[ "$API_KEY" == *"xxxxx"* ]]; then
+    echo "⚠️ 检测到占位符API密钥，请替换为真实的API密钥"
+    echo "📝 请在脚本中设置真实的API密钥: API_KEY=\"your_real_app_id:your_real_app_key\""
+    echo ""
+    echo "🔧 为了测试脚本流程，使用模拟响应..."
+
+    # 生成模拟的任务ID
+    MOCK_TASK_ID="mock-$(date +%s)-$(openssl rand -hex 8 2>/dev/null || echo "random123")"
+    HTTP_STATUS="200"
+    ACTUAL_RESPONSE="{\"id\":\"$MOCK_TASK_ID\",\"created_at\":\"$(date '+%Y-%m-%d %H:%M:%S')\",\"status\":1}"
+
+    echo "🎭 使用模拟响应测试脚本流程"
+else
+    # 真实的API调用
+    TASK_RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" -X POST "$ASYNC_API_URL" \
+      -H "Content-Type: application/json" \
+      -H "api-key: $API_KEY" \
+      -H "X-APX-Model: doubao-seedance-1.0-lite-t2v" \
+      -d @"$TEMP_JSON_FILE")
+
+    # 提取HTTP状态码和响应体
+    HTTP_STATUS=$(echo "$TASK_RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
+    ACTUAL_RESPONSE=$(echo "$TASK_RESPONSE" | grep -v "HTTP_STATUS:")
+fi
 
 echo "📊 HTTP状态码: $HTTP_STATUS"
 
@@ -233,9 +305,9 @@ echo "📡 API响应详情："
 if [ -z "$ACTUAL_RESPONSE" ]; then
     echo "❌ API无响应（响应为空）"
     echo "🔍 故障排查："
-    echo "  1. 检查API服务是否启动: curl http://localhost:9003/api/common/ping"
+    echo "  1. 检查API服务是否启动: curl http://apx-api.tal.com/v1/async/results"
     echo "  2. 检查网络连接"
-    echo "  3. 检查防火墙设置"
+    echo "  3. 检查API密钥是否正确"
     echo "  4. 查看API服务日志"
     exit 1
 fi
@@ -248,66 +320,49 @@ echo ""
 echo "🔍 响应解析："
 if echo "$ACTUAL_RESPONSE" | jq . 2>/dev/null; then
     echo "✅ 响应是有效的JSON格式"
-else
-    echo "⚠️ 响应不是有效的JSON格式"
-fi
-echo ""
 
-# 检查各种可能的响应状态
-if echo "$ACTUAL_RESPONSE" | grep -q '"status":200\|"code":200\|success\|Success'; then
-    echo ""
-    echo "✅ 演示视频生成成功！"
+    # 提取任务ID
+    TASK_ID=$(echo "$ACTUAL_RESPONSE" | jq -r '.id // empty' 2>/dev/null)
 
-    # 提取视频数据 - 使用jq进行JSON解析
-    VIDEO_DATA=$(echo "$ACTUAL_RESPONSE" | jq -r '.video_data // empty' 2>/dev/null)
+    if [ -n "$TASK_ID" ] && [ "$TASK_ID" != "null" ] && [ "$TASK_ID" != "empty" ]; then
+        echo "✅ 异步视频生成任务提交成功！"
+        echo "📋 任务ID: $TASK_ID"
 
-    if [ -n "$VIDEO_DATA" ] && [ "$VIDEO_DATA" != "null" ] && [ "$VIDEO_DATA" != "empty" ]; then
-        # 生成文件名
-        FILENAME="ExploraPal_完整演示视频_$(date +%Y%m%d_%H%M%S).mp4"
+        # 保存任务ID到本地文件
+        TASK_FILE="video_generation_task_$(date +%Y%m%d_%H%M%S).txt"
+        echo "$TASK_ID" > "$TASK_FILE"
+        echo "💾 任务ID已保存到文件: $TASK_FILE"
 
-        echo "💾 保存视频文件：$FILENAME"
-
-        # 将base64数据转换为MP4文件
-        echo "🔄 开始base64解码..."
-        if echo "$VIDEO_DATA" | base64 -d > "$FILENAME" 2>/dev/null; then
-            echo "✅ base64解码成功"
-        else
-            echo "❌ base64解码失败"
-            echo "请检查VIDEO_DATA格式是否正确"
-            exit 1
-        fi
-
-        if [ -f "$FILENAME" ] && [ -s "$FILENAME" ]; then
-            FILE_SIZE=$(stat -f%z "$FILENAME" 2>/dev/null || stat -c%s "$FILENAME" 2>/dev/null)
-            echo "✅ 视频文件已保存！"
-            echo "📊 文件大小：$FILE_SIZE bytes"
-            echo "🎬 文件位置：$(pwd)/$FILENAME"
-            echo ""
-            echo "🎥 视频规格："
-            echo "  • 时长：3分钟"
-            echo "  • 风格：教育风格"
-            echo "  • 语音：女声中文"
-            echo "  • 分辨率：1920x1080"
-            echo ""
-            echo "📖 演示内容涵盖："
-            echo "  1. 智能拍照分析"
-            echo "  2. 项目自动创建"
-            echo "  3. AI智能提问"
-            echo "  4. 内容润色优化"
-            echo "  5. 语音交互体验"
-            echo "  6. 自动生成报告"
-            echo "  7. 视频内容分析"
-            echo "  8. AI视频创作"
-        else
-            echo "❌ 视频文件保存失败"
-        fi
+        echo ""
+        echo "🎬 视频生成任务已提交，正在后台处理..."
+        echo "⏱️ 预计需要5-10分钟完成生成"
+        echo ""
+        echo "📋 如何查询生成结果："
+        echo "  1. 等待几分钟后运行查询脚本："
+        echo "     ./查询视频生成结果.sh $TASK_ID"
+        echo "  2. 或使用以下命令手动查询："
+        echo "     curl -X GET \"http://apx-api.tal.com/v1/async/results/$TASK_ID\" \\"
+        echo "       -H \"api-key: $API_KEY\" \\"
+        echo "       -H \"X-APX-Model: doubao-seedance-1.0-lite-t2v\""
+        echo ""
+        echo "🔍 任务状态说明："
+        echo "  • 状态1: 等待中"
+        echo "  • 状态2: 处理中"
+        echo "  • 状态3: 已完成"
+        echo "  • 状态4: 处理失败"
+        echo ""
+        echo "💡 提示："
+        echo "  • 视频生成需要时间，请耐心等待"
+        echo "  • 可以使用任务ID随时查询进度"
+        echo "  • 生成完成后会提供视频下载链接"
     else
-        echo "❌ 未找到视频数据"
+        echo "❌ 未获取到任务ID"
+        echo "API响应可能有误，请检查响应内容"
+        exit 1
     fi
 else
-    echo "❌ 视频生成失败"
-    echo "请检查："
-    echo "  • video-processing服务是否正常运行"
-    echo "  • 网络连接是否正常"
-    echo "  • AI模型服务是否可用"
+    echo "⚠️ 响应不是有效的JSON格式"
+    echo "❌ 异步任务提交失败"
+    echo "请检查API服务和网络连接"
+    exit 1
 fi

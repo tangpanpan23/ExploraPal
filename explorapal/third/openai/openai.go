@@ -52,7 +52,7 @@ const (
 	ModelVoiceInteraction = "qwen3-omni-flash" // 多模态语音处理
 
 	// 视频处理模型
-	ModelVideoAnalysis   = "qwen3-vl-plus"                   // 视频内容分析
+	ModelVideoAnalysis   = "qwen3-omni-flash"                // 视频内容分析
 	ModelVideoGeneration = "Doubao-Seedance-1.0-lite-i2v"    // 图像到视频生成
 
 	// 备用模型
@@ -951,76 +951,27 @@ func (c *Client) callDoubaoVideoGeneration(ctx context.Context, prompt string) (
 	return videoData, "mp4", 60.0, metadata, nil
 }
 
-// callDoubaoImageToVideo 调用豆包Doubao-Seedance-1.0-lite-i2v API (图像到视频)
+// callDoubaoImageToVideo 调用豆包Doubao-Seedance-1.0-lite-i2v API (图像到视频 - 异步)
 func (c *Client) callDoubaoImageToVideo(ctx context.Context, imageData, prompt, style string, duration float64, scenes []string, voice, language string) ([]byte, string, float64, *VideoMetadata, error) {
-	// 构建API请求体 - 图像到视频
-	reqBody := map[string]interface{}{
-		"model":          ModelVideoGeneration,
-		"image":          imageData,  // base64编码的图片数据
-		"prompt":         prompt,     // 文字描述
-		"quality":        "standard",
-		"response_format": "url",
-		"prompt_extend":   true,
-		"duration":        duration,   // 视频时长
-		"style":           style,      // 视频风格
-	}
+	fmt.Printf("[AI_DEBUG] 开始异步豆包图像到视频生成流程\n")
 
-	// 序列化请求体
-	reqData, err := json.Marshal(reqBody)
+	// 步骤1: 提交异步任务
+	taskID, err := c.submitVideoGenerationTask(ctx, imageData, prompt, style, duration)
 	if err != nil {
-		return nil, "", 0, nil, fmt.Errorf("序列化请求失败: %v", err)
+		return nil, "", 0, nil, fmt.Errorf("提交视频生成任务失败: %v", err)
 	}
 
-	// 构建HTTP请求
-	apiURL := fmt.Sprintf("%s/images/generations", c.config.BaseURL)
-	req, err := http.NewRequestWithContext(ctx, "POST", apiURL, strings.NewReader(string(reqData)))
+	fmt.Printf("[AI_DEBUG] 视频生成任务已提交，任务ID: %s\n", taskID)
+
+	// 步骤2: 轮询任务状态直到完成
+	videoURL, err := c.pollVideoGenerationResult(ctx, taskID)
 	if err != nil {
-		return nil, "", 0, nil, fmt.Errorf("创建请求失败: %v", err)
+		return nil, "", 0, nil, fmt.Errorf("获取视频生成结果失败: %v", err)
 	}
 
-	// 设置请求头
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s:%s", c.config.TAL_MLOPS_APP_ID, c.config.TAL_MLOPS_APP_KEY))
+	fmt.Printf("[AI_DEBUG] 视频生成完成，视频URL: %s\n", videoURL)
 
-	// 发送请求
-	client := &http.Client{Timeout: 300 * time.Second} // 视频生成需要更长时间
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, "", 0, nil, fmt.Errorf("API请求失败: %v", err)
-	}
-	defer resp.Body.Close()
-
-	// 读取响应
-	respBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, "", 0, nil, fmt.Errorf("读取响应失败: %v", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, "", 0, nil, fmt.Errorf("API返回错误状态码: %d, 响应: %s", resp.StatusCode, string(respBody))
-	}
-
-	// 解析响应
-	var apiResp struct {
-		Data []struct {
-			URL           string `json:"url"`
-			RevisedPrompt string `json:"revised_prompt"`
-		} `json:"data"`
-	}
-
-	if err := json.Unmarshal(respBody, &apiResp); err != nil {
-		return nil, "", 0, nil, fmt.Errorf("解析响应失败: %v", err)
-	}
-
-	if len(apiResp.Data) == 0 {
-		return nil, "", 0, nil, fmt.Errorf("API未返回视频数据")
-	}
-
-	// 获取视频URL并下载视频文件
-	videoURL := apiResp.Data[0].URL
-	fmt.Printf("[AI_DEBUG] 豆包图像到视频API返回视频URL: %s\n", videoURL)
-
-	// 下载视频文件
+	// 步骤3: 下载视频文件
 	videoData, err := c.downloadVideoFromURL(ctx, videoURL)
 	if err != nil {
 		return nil, "", 0, nil, fmt.Errorf("下载视频失败: %v", err)
@@ -1036,6 +987,153 @@ func (c *Client) callDoubaoImageToVideo(ctx context.Context, imageData, prompt, 
 	}
 
 	return videoData, "mp4", duration, metadata, nil
+}
+
+// submitVideoGenerationTask 提交视频生成异步任务
+func (c *Client) submitVideoGenerationTask(ctx context.Context, imageData, prompt, style string, duration float64) (string, error) {
+	// 构建异步API请求体
+	reqBody := map[string]interface{}{
+		"model":    ModelVideoGeneration,
+		"img_url":  fmt.Sprintf("data:image/jpeg;base64,%s", imageData), // 转换为data URL格式
+		"prompt":   prompt,
+		"duration": fmt.Sprintf("%.0f", duration), // 转换为字符串
+	}
+
+	// 序列化请求体
+	reqData, err := json.Marshal(reqBody)
+	if err != nil {
+		return "", fmt.Errorf("序列化请求失败: %v", err)
+	}
+
+	// 使用异步API端点
+	asyncBaseURL := "http://apx-api.tal.com/v1/async"
+	apiURL := fmt.Sprintf("%s/chat", asyncBaseURL)
+
+	req, err := http.NewRequestWithContext(ctx, "POST", apiURL, strings.NewReader(string(reqData)))
+	if err != nil {
+		return "", fmt.Errorf("创建异步任务请求失败: %v", err)
+	}
+
+	// 设置请求头
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("api-key", fmt.Sprintf("%s:%s", c.config.TAL_MLOPS_APP_ID, c.config.TAL_MLOPS_APP_KEY))
+	req.Header.Set("X-APX-Model", ModelVideoGeneration)
+
+	// 发送请求
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("提交异步任务失败: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// 读取响应
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("读取异步任务响应失败: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("异步任务提交失败，状态码: %d, 响应: %s", resp.StatusCode, string(respBody))
+	}
+
+	// 解析任务ID
+	var taskResp struct {
+		ID string `json:"id"`
+	}
+
+	if err := json.Unmarshal(respBody, &taskResp); err != nil {
+		return "", fmt.Errorf("解析任务响应失败: %v", err)
+	}
+
+	if taskResp.ID == "" {
+		return "", fmt.Errorf("未获取到任务ID")
+	}
+
+	return taskResp.ID, nil
+}
+
+// pollVideoGenerationResult 轮询视频生成任务结果
+func (c *Client) pollVideoGenerationResult(ctx context.Context, taskID string) (string, error) {
+	asyncBaseURL := "http://apx-api.tal.com/v1/async"
+	maxAttempts := 60  // 最多轮询60次
+	interval := 10 * time.Second // 每10秒检查一次
+
+	fmt.Printf("[AI_DEBUG] 开始轮询任务状态，任务ID: %s\n", taskID)
+
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		select {
+		case <-ctx.Done():
+			return "", ctx.Err()
+		default:
+		}
+
+		// 查询任务状态
+		apiURL := fmt.Sprintf("%s/results/%s", asyncBaseURL, taskID)
+		req, err := http.NewRequestWithContext(ctx, "GET", apiURL, nil)
+		if err != nil {
+			return "", fmt.Errorf("创建查询请求失败: %v", err)
+		}
+
+		req.Header.Set("api-key", fmt.Sprintf("%s:%s", c.config.TAL_MLOPS_APP_ID, c.config.TAL_MLOPS_APP_KEY))
+		req.Header.Set("X-APX-Model", ModelVideoGeneration)
+
+		client := &http.Client{Timeout: 30 * time.Second}
+		resp, err := client.Do(req)
+		if err != nil {
+			fmt.Printf("[AI_DEBUG] 查询任务状态失败 (尝试 %d/%d): %v\n", attempt, maxAttempts, err)
+			time.Sleep(interval)
+			continue
+		}
+
+		respBody, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+
+		if err != nil {
+			fmt.Printf("[AI_DEBUG] 读取任务状态响应失败 (尝试 %d/%d): %v\n", attempt, maxAttempts, err)
+			time.Sleep(interval)
+			continue
+		}
+
+		// 解析任务状态
+		var taskResult struct {
+			ID     string `json:"id"`
+			Status int    `json:"status"`
+			Response struct {
+				VideoURL string `json:"video_url"`
+				Code     string `json:"code"`
+				Message  string `json:"message"`
+			} `json:"response"`
+		}
+
+		if err := json.Unmarshal(respBody, &taskResult); err != nil {
+			fmt.Printf("[AI_DEBUG] 解析任务状态失败 (尝试 %d/%d): %v\n", attempt, maxAttempts, err)
+			time.Sleep(interval)
+			continue
+		}
+
+		fmt.Printf("[AI_DEBUG] 任务状态查询 (尝试 %d/%d): 状态=%d\n", attempt, maxAttempts, taskResult.Status)
+
+		switch taskResult.Status {
+		case 3: // 已完成
+			if taskResult.Response.VideoURL != "" {
+				fmt.Printf("[AI_DEBUG] 视频生成成功，视频URL: %s\n", taskResult.Response.VideoURL)
+				return taskResult.Response.VideoURL, nil
+			} else {
+				return "", fmt.Errorf("任务完成但未返回视频URL")
+			}
+		case 4: // 失败
+			return "", fmt.Errorf("视频生成任务失败: %s", taskResult.Response.Message)
+		case 1, 2: // 等待中或运行中，继续轮询
+			fmt.Printf("[AI_DEBUG] 任务仍在处理中，%d秒后重试...\n", int(interval.Seconds()))
+			time.Sleep(interval)
+			continue
+		default:
+			return "", fmt.Errorf("未知任务状态: %d", taskResult.Status)
+		}
+	}
+
+	return "", fmt.Errorf("轮询超时，任务未在%d分钟内完成", maxAttempts*int(interval.Minutes()))
 }
 
 // downloadVideoFromURL 从URL下载视频文件
