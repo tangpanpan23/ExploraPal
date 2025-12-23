@@ -4507,10 +4507,12 @@ ${conclusion}
                 let optionsHtml = '<div class="data-options-panel"><h4>📋 可用的数据选项</h4><p>选择以下选项之一作为下一步的输入数据：</p><div class="options-list">';
 
                 options.forEach((option, index) => {
+                    // 对数据进行安全的Unicode编码，避免btoa处理中文字符时的错误
+                    const safeEncodedData = btoa(encodeURIComponent(JSON.stringify(option.data)));
                     optionsHtml += `
                         <div class="option-item">
                             <button class="btn btn-outline-primary option-btn"
-                                    onclick="useResponseData('${option.targetInput}', '${btoa(JSON.stringify(option.data))}', ${stepNumber})">
+                                    onclick="useResponseData('${option.targetInput}', '${safeEncodedData}', ${stepNumber})">
                                 ${option.label}
                             </button>
                             <div class="option-description">${option.description}</div>
@@ -4536,7 +4538,8 @@ ${conclusion}
         // 使用响应数据填充输入框
         function useResponseData(targetInputId, encodedData, stepNumber) {
             try {
-                const data = JSON.parse(atob(encodedData));
+                // 解码Unicode安全的base64编码
+                const data = JSON.parse(decodeURIComponent(atob(encodedData)));
 
                 if (targetInputId) {
                     const targetInput = document.getElementById(targetInputId);
